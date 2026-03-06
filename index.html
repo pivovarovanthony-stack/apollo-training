@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apollo.io - День 1: Ориентация</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fb;
+            color: #1a1a2e;
+            line-height: 1.7;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            padding: 48px 0;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.4rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        .header .badge {
+            display: inline-block;
+            background: #e94560;
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .progress-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 24px 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .progress-bar .label {
+            font-weight: 600;
+            white-space: nowrap;
+            color: #555;
+        }
+
+        .progress-track {
+            flex: 1;
+            height: 10px;
+            background: #e8ecf1;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 20%;
+            height: 100%;
+            background: linear-gradient(90deg, #e94560, #0f3460);
+            border-radius: 5px;
+            transition: width 0.5s;
+        }
+
+        .progress-bar .day-label {
+            font-weight: 700;
+            color: #0f3460;
+            white-space: nowrap;
+        }
+
+        .toc {
+            background: white;
+            border-radius: 12px;
+            padding: 28px 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .toc h3 {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: #0f3460;
+        }
+
+        .toc ol {
+            padding-left: 20px;
+        }
+
+        .toc li {
+            margin-bottom: 8px;
+        }
+
+        .toc a {
+            color: #0f3460;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .toc .time {
+            color: #999;
+            font-size: 0.85rem;
+            margin-left: 8px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 36px 36px;
+            margin-bottom: 28px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #1a1a2e;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e8ecf1;
+        }
+
+        .section h2 .num {
+            display: inline-block;
+            background: #0f3460;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 36px;
+            font-size: 1rem;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+
+        .section h3 {
+            font-size: 1.15rem;
+            margin: 24px 0 12px;
+            color: #0f3460;
+        }
+
+        .section p {
+            margin-bottom: 16px;
+            color: #444;
+        }
+
+        .screenshot {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            margin: 16px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+
+        .screenshot-caption {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #888;
+            margin-top: -8px;
+            margin-bottom: 20px;
+            font-style: italic;
+        }
+
+        .steps {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+        }
+
+        .steps li {
+            counter-increment: step;
+            padding: 12px 16px 12px 52px;
+            position: relative;
+            margin-bottom: 8px;
+            background: #f8f9fb;
+            border-radius: 8px;
+            border-left: 3px solid #0f3460;
+        }
+
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            left: 14px;
+            top: 12px;
+            background: #0f3460;
+            color: white;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 26px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .warning .title {
+            font-weight: 700;
+            color: #856404;
+            margin-bottom: 4px;
+        }
+
+        .warning p {
+            color: #856404;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .tip {
+            background: #d4edda;
+            border: 1px solid #28a745;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .tip .title {
+            font-weight: 700;
+            color: #155724;
+            margin-bottom: 4px;
+        }
+
+        .tip p {
+            color: #155724;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #17a2b8;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .info .title {
+            font-weight: 700;
+            color: #0c5460;
+            margin-bottom: 4px;
+        }
+
+        .info p {
+            color: #0c5460;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        table th {
+            background: #0f3460;
+            color: white;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #e8ecf1;
+            font-size: 0.95rem;
+        }
+
+        table tr:nth-child(even) {
+            background: #f8f9fb;
+        }
+
+        .nav-diagram {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 0;
+            border: 2px solid #0f3460;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .nav-sidebar {
+            background: #1a1a2e;
+            color: white;
+            padding: 20px 0;
+        }
+
+        .nav-sidebar .nav-item {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            cursor: default;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-sidebar .nav-item.active {
+            background: #0f3460;
+        }
+
+        .nav-sidebar .nav-item .icon {
+            opacity: 0.7;
+            font-size: 0.85rem;
+        }
+
+        .nav-sidebar .nav-section {
+            padding: 8px 20px 4px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            opacity: 0.5;
+            letter-spacing: 1px;
+            margin-top: 8px;
+        }
+
+        .nav-main {
+            background: #f8f9fb;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-style: italic;
+        }
+
+        .credit-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .credit-card {
+            background: #f8f9fb;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+
+        .credit-card.free {
+            border-color: #28a745;
+        }
+
+        .credit-card.paid {
+            border-color: #e94560;
+        }
+
+        .credit-card .credit-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .credit-card .credit-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .credit-card .credit-desc {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .credit-card .credit-cost {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .credit-card.free .credit-cost {
+            color: #28a745;
+        }
+
+        .credit-card.paid .credit-cost {
+            color: #e94560;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 10px 16px;
+            margin-bottom: 6px;
+            background: #f8f9fb;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .checklist li .check {
+            width: 22px;
+            height: 22px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .quiz {
+            background: #f0e6ff;
+            border: 1px solid #7c3aed;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .quiz .title {
+            font-weight: 700;
+            color: #5b21b6;
+            margin-bottom: 12px;
+            font-size: 1.05rem;
+        }
+
+        .quiz ol {
+            padding-left: 20px;
+        }
+
+        .quiz li {
+            margin-bottom: 8px;
+            color: #5b21b6;
+        }
+
+        .link-btn {
+            display: inline-block;
+            background: #0f3460;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 8px 4px 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .link-btn:hover {
+            background: #1a4a8a;
+        }
+
+        .link-btn.secondary {
+            background: white;
+            color: #0f3460;
+            border: 2px solid #0f3460;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 40px 24px;
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 600px) {
+            .credit-grid { grid-template-columns: 1fr; }
+            .nav-diagram { grid-template-columns: 1fr; }
+            .section { padding: 24px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Apollo.io - Обучение</h1>
+    <div class="subtitle">Неделя 1 / День 1: Ориентация</div>
+    <div class="badge">~ 60 минут</div>
+</div>
+
+<div class="container">
+
+    <!-- Progress -->
+    <div class="progress-bar">
+        <span class="label">Прогресс обучения:</span>
+        <div class="progress-track">
+            <div class="progress-fill"></div>
+        </div>
+        <span class="day-label">День 1 из 10</span>
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+        <h3>Содержание дня</h3>
+        <ol>
+            <li><a href="#section1">Что такое Apollo.io и зачем он нам нужен</a> <span class="time">10 мин</span></li>
+            <li><a href="#section2">Создание аккаунта и первый вход</a> <span class="time">5 мин</span></li>
+            <li><a href="#section3">Установка Chrome-расширения</a> <span class="time">5 мин</span></li>
+            <li><a href="#section4">Обзор интерфейса: навигация по платформе</a> <span class="time">15 мин</span></li>
+            <li><a href="#section5">Система кредитов: что платно, что бесплатно</a> <span class="time">15 мин</span></li>
+            <li><a href="#section6">Чек-лист и самопроверка</a> <span class="time">10 мин</span></li>
+        </ol>
+    </div>
+
+    <!-- Section 1 -->
+    <div class="section" id="section1">
+        <h2><span class="num">1</span> Что такое Apollo.io и зачем он нам нужен</h2>
+
+        <p>Apollo.io - это платформа для поиска клиентов и автоматизации продаж. Представь это как огромную базу данных компаний и людей (210+ миллионов контактов, 35+ миллионов компаний) с инструментами для работы с ними.</p>
+
+        <h3>Что Apollo делает для нас:</h3>
+        <table>
+            <tr>
+                <th>Задача</th>
+                <th>Как Apollo помогает</th>
+            </tr>
+            <tr>
+                <td><strong>Поиск клиентов</strong></td>
+                <td>Находим компании и людей по фильтрам: должность, отрасль, размер компании, локация</td>
+            </tr>
+            <tr>
+                <td><strong>Контактные данные</strong></td>
+                <td>Получаем email-адреса и телефоны ЛПР (лиц, принимающих решения)</td>
+            </tr>
+            <tr>
+                <td><strong>Отслеживание интереса</strong></td>
+                <td>Видим, какие компании сейчас ищут наши услуги (Intent Signals)</td>
+            </tr>
+            <tr>
+                <td><strong>CRM-pipeline</strong></td>
+                <td>Ведем сделки от первого контакта до закрытия</td>
+            </tr>
+            <tr>
+                <td><strong>Обогащение данных</strong></td>
+                <td>Автоматически обновляем информацию о контактах (смена работы, новые email)</td>
+            </tr>
+        </table>
+
+        <div class="info">
+            <div class="title">Наш подход</div>
+            <p>Мы используем Apollo для <strong>поиска и квалификации лидов</strong>, а для отправки холодных писем используем отдельный инструмент (Smartlead). Apollo = данные и CRM, Smartlead = отправка.</p>
+        </div>
+    </div>
+
+    <!-- Section 2 -->
+    <div class="section" id="section2">
+        <h2><span class="num">2</span> Создание аккаунта и первый вход</h2>
+
+        <h3>Шаги для регистрации:</h3>
+        <ol class="steps">
+            <li>Перейди на <a href="https://www.apollo.io" target="_blank">apollo.io</a> и нажми <strong>"Sign Up Free"</strong></li>
+            <li>Зарегистрируйся через рабочий email (Google аккаунт - быстрее всего)</li>
+            <li>Заполни профиль: имя, компания, должность</li>
+            <li>Apollo покажет <strong>Onboarding Hub</strong> - список рекомендованных шагов. Пока пропусти его - мы пройдем все по нашему плану</li>
+            <li>Проверь, что ты видишь главную панель (Home) с навигацией слева</li>
+        </ol>
+
+        <div class="tip">
+            <div class="title">Подсказка</div>
+            <p>Если тебя пригласили в команду, используй ссылку-приглашение вместо обычной регистрации. Так ты сразу окажешься в нашем рабочем пространстве с общими настройками.</p>
+        </div>
+    </div>
+
+    <!-- Section 3 -->
+    <div class="section" id="section3">
+        <h2><span class="num">3</span> Установка Chrome-расширения</h2>
+
+        <p>Chrome-расширение Apollo позволяет находить контактные данные людей прямо на LinkedIn, на сайтах компаний и в Gmail.</p>
+
+        <h3>Установка:</h3>
+        <ol class="steps">
+            <li>Открой Chrome Web Store и найди <strong>"Apollo.io"</strong> (или попроси ссылку)</li>
+            <li>Нажми <strong>"Add to Chrome"</strong> (Добавить в Chrome)</li>
+            <li>Подтверди разрешения - расширение запросит доступ к LinkedIn и другим сайтам</li>
+            <li>Войди в расширение через свой Apollo-аккаунт</li>
+            <li>Проверь: открой LinkedIn профиль любого человека - справа должна появиться панель Apollo с данными</li>
+        </ol>
+
+        <h3>Что умеет расширение:</h3>
+        <table>
+            <tr>
+                <th>Где работает</th>
+                <th>Что делает</th>
+            </tr>
+            <tr>
+                <td><strong>LinkedIn</strong></td>
+                <td>Показывает email и телефон прямо на странице профиля. Можно сохранить контакт в Apollo одним кликом</td>
+            </tr>
+            <tr>
+                <td><strong>Сайты компаний</strong></td>
+                <td>Показывает контакты сотрудников компании, чей сайт ты просматриваешь</td>
+            </tr>
+            <tr>
+                <td><strong>Gmail</strong></td>
+                <td>Отслеживает открытие писем, добавляет шаблоны и ссылки на встречи</td>
+            </tr>
+            <tr>
+                <td><strong>Google Calendar</strong></td>
+                <td>Показывает информацию о контактах перед встречами</td>
+            </tr>
+        </table>
+
+        <div class="warning">
+            <div class="title">Важно!</div>
+            <p>Каждый раз, когда ты открываешь контактные данные нового человека через расширение, это <strong>тратит кредиты</strong>. Не кликай бездумно "Reveal" на каждом профиле. Подробнее о кредитах - в разделе 5.</p>
+        </div>
+
+        <a href="https://knowledge.apollo.io/hc/en-us/articles/4409154350477-Install-the-Apollo-Chrome-Extension" target="_blank" class="link-btn">Apollo: гайд по установке (англ.)</a>
+    </div>
+
+    <!-- Section 4 -->
+    <div class="section" id="section4">
+        <h2><span class="num">4</span> Обзор интерфейса: навигация по платформе</h2>
+
+        <p>Apollo состоит из нескольких основных разделов. Вот карта навигации с объяснением каждого раздела:</p>
+
+        <div class="nav-diagram">
+            <div class="nav-sidebar">
+                <div class="nav-item"><span class="icon">&#9750;</span> Home</div>
+                <div class="nav-item"><span class="icon">&#9733;</span> Assistant</div>
+                <div class="nav-section">Поиск</div>
+                <div class="nav-item active"><span class="icon">&#128269;</span> People</div>
+                <div class="nav-item"><span class="icon">&#127970;</span> Companies</div>
+                <div class="nav-item"><span class="icon">&#128203;</span> Lists</div>
+                <div class="nav-item"><span class="icon">&#128200;</span> Data enrichment</div>
+                <div class="nav-section">Коммуникация</div>
+                <div class="nav-item"><span class="icon">&#9993;</span> Sequences</div>
+                <div class="nav-item"><span class="icon">&#128231;</span> Emails</div>
+                <div class="nav-item"><span class="icon">&#128222;</span> Calls</div>
+                <div class="nav-item"><span class="icon">&#9745;</span> Tasks</div>
+                <div class="nav-section">Сделки</div>
+                <div class="nav-item"><span class="icon">&#128197;</span> Meetings</div>
+                <div class="nav-item"><span class="icon">&#128172;</span> Conversations</div>
+                <div class="nav-item"><span class="icon">&#128176;</span> Deals</div>
+                <div class="nav-section">Автоматизация</div>
+                <div class="nav-item"><span class="icon">&#9881;</span> Workflows</div>
+                <div class="nav-item"><span class="icon">&#128202;</span> Analytics</div>
+            </div>
+            <div class="nav-main">
+                Основная рабочая область - здесь отображается контент выбранного раздела
+            </div>
+        </div>
+
+        <h3>Разделы по группам:</h3>
+
+        <h3>Prospect and Enrich (Поиск и обогащение)</h3>
+        <table>
+            <tr>
+                <th>Раздел</th>
+                <th>Для чего</th>
+                <th>Как часто используем</th>
+            </tr>
+            <tr>
+                <td><strong>People</strong></td>
+                <td>Поиск конкретных людей по фильтрам (должность, компания, локация)</td>
+                <td>Каждый день</td>
+            </tr>
+            <tr>
+                <td><strong>Companies</strong></td>
+                <td>Поиск компаний по отрасли, размеру, локации, технологиям</td>
+                <td>Несколько раз в неделю</td>
+            </tr>
+            <tr>
+                <td><strong>Lists</strong></td>
+                <td>Сохраненные списки контактов и компаний для работы</td>
+                <td>Каждый день</td>
+            </tr>
+            <tr>
+                <td><strong>Data enrichment</strong></td>
+                <td>Обновление и обогащение данных контактов, Data Health Center</td>
+                <td>Раз в неделю</td>
+            </tr>
+        </table>
+
+        <h3>Engage (Коммуникация)</h3>
+        <table>
+            <tr>
+                <th>Раздел</th>
+                <th>Для чего</th>
+                <th>Наш подход</th>
+            </tr>
+            <tr>
+                <td><strong>Sequences</strong></td>
+                <td>Автоматические цепочки писем и задач</td>
+                <td>Используем для планирования, отправляем через Smartlead</td>
+            </tr>
+            <tr>
+                <td><strong>Emails</strong></td>
+                <td>Просмотр отправленных писем и статистики</td>
+                <td>Мониторинг</td>
+            </tr>
+            <tr>
+                <td><strong>Calls</strong></td>
+                <td>Встроенный номеронабиратель для звонков</td>
+                <td>На будущее</td>
+            </tr>
+            <tr>
+                <td><strong>Tasks</strong></td>
+                <td>Задачи по работе с контактами (позвонить, написать в LinkedIn)</td>
+                <td>Регулярно</td>
+            </tr>
+        </table>
+
+        <h3>Win Deals (Закрытие сделок)</h3>
+        <table>
+            <tr>
+                <th>Раздел</th>
+                <th>Для чего</th>
+            </tr>
+            <tr>
+                <td><strong>Meetings</strong></td>
+                <td>Планирование встреч, ссылки на бронирование</td>
+            </tr>
+            <tr>
+                <td><strong>Conversations</strong></td>
+                <td>Запись и анализ звонков</td>
+            </tr>
+            <tr>
+                <td><strong>Deals</strong></td>
+                <td>Pipeline сделок - от первого контакта до закрытия</td>
+            </tr>
+        </table>
+
+        <img src="https://www.apollo.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fcontact-account-search.ca09a7e6.png&w=3840&q=75" alt="Apollo.io фильтры поиска" class="screenshot">
+        <div class="screenshot-caption">Панель фильтров поиска: Lists, Job Titles, Persona, Company, Location, Industry и другие</div>
+
+        <div class="tip">
+            <div class="title">Задание</div>
+            <p>Пройди по каждому разделу в левой навигации и посмотри, что там находится. Не нажимай "Reveal" и не раскрывай контакты - просто ознакомься с интерфейсом. Потрать на это 10 минут.</p>
+        </div>
+    </div>
+
+    <!-- Section 5 -->
+    <div class="section" id="section5">
+        <h2><span class="num">5</span> Система кредитов: что платно, что бесплатно</h2>
+
+        <p>Apollo работает на системе кредитов. <strong>Кредиты - это валюта платформы.</strong> Каждое действие по раскрытию данных тратит кредиты. Это самое важное, что нужно понять в первый день.</p>
+
+        <h3>Что тратит кредиты:</h3>
+
+        <div class="credit-grid">
+            <div class="credit-card paid">
+                <div class="credit-icon">&#128231;</div>
+                <div class="credit-title">Email контакта</div>
+                <div class="credit-desc">Раскрытие рабочего email</div>
+                <div class="credit-cost">1 кредит</div>
+            </div>
+            <div class="credit-card paid">
+                <div class="credit-icon">&#128241;</div>
+                <div class="credit-title">Мобильный телефон</div>
+                <div class="credit-desc">Раскрытие прямого номера</div>
+                <div class="credit-cost">5 кредитов</div>
+            </div>
+            <div class="credit-card paid">
+                <div class="credit-icon">&#128228;</div>
+                <div class="credit-title">Экспорт контакта</div>
+                <div class="credit-desc">Выгрузка в CSV или CRM</div>
+                <div class="credit-cost">1 кредит</div>
+            </div>
+            <div class="credit-card paid">
+                <div class="credit-icon">&#127970;</div>
+                <div class="credit-title">Обогащение компании</div>
+                <div class="credit-desc">Получение подробных данных о компании</div>
+                <div class="credit-cost">1 кредит</div>
+            </div>
+        </div>
+
+        <h3>Что НЕ тратит кредиты (бесплатно):</h3>
+
+        <div class="credit-grid">
+            <div class="credit-card free">
+                <div class="credit-icon">&#128269;</div>
+                <div class="credit-title">Поиск</div>
+                <div class="credit-desc">Поиск людей и компаний по фильтрам</div>
+                <div class="credit-cost">Бесплатно</div>
+            </div>
+            <div class="credit-card free">
+                <div class="credit-icon">&#128203;</div>
+                <div class="credit-title">Списки</div>
+                <div class="credit-desc">Создание и управление списками</div>
+                <div class="credit-cost">Бесплатно</div>
+            </div>
+            <div class="credit-card free">
+                <div class="credit-icon">&#128276;</div>
+                <div class="credit-title">Оповещения</div>
+                <div class="credit-desc">Job Change Alerts, Intent Signals</div>
+                <div class="credit-cost">Бесплатно</div>
+            </div>
+            <div class="credit-card free">
+                <div class="credit-icon">&#128200;</div>
+                <div class="credit-title">Pipeline / CRM</div>
+                <div class="credit-desc">Управление сделками и стадиями</div>
+                <div class="credit-cost">Бесплатно</div>
+            </div>
+        </div>
+
+        <div class="warning">
+            <div class="title">ЗОЛОТОЕ ПРАВИЛО</div>
+            <p><strong>Никогда не раскрывай контакт, если ты не уверен, что он подходит под нашу целевую аудиторию (ICP).</strong> Сначала убедись, что компания и человек нам подходят, и только потом нажимай "Reveal". Каждый потраченный впустую кредит - это потерянные деньги.</p>
+        </div>
+
+        <h3>Наши лимиты по кредитам:</h3>
+        <table>
+            <tr>
+                <th>Тип кредитов</th>
+                <th>Сколько есть</th>
+                <th>Когда обновляются</th>
+            </tr>
+            <tr>
+                <td>Email кредиты</td>
+                <td>Безлимитно (fair use ~250/день)</td>
+                <td>Ежедневно</td>
+            </tr>
+            <tr>
+                <td>Mobile кредиты</td>
+                <td>Зависит от плана (5-100/мес)</td>
+                <td>Начало billing cycle</td>
+            </tr>
+            <tr>
+                <td>Export кредиты</td>
+                <td>Зависит от плана (10-250/мес)</td>
+                <td>Начало billing cycle</td>
+            </tr>
+        </table>
+
+        <div class="info">
+            <div class="title">Где проверить баланс</div>
+            <p>Перейди в <strong>Settings &rarr; Billing and Credits</strong>, чтобы увидеть текущий баланс кредитов и дату их обновления. Неиспользованные кредиты <strong>не переносятся</strong> на следующий месяц!</p>
+        </div>
+
+        <h3>5 правил работы с кредитами:</h3>
+        <ol class="steps">
+            <li><strong>Всегда используй Персоны</strong> - не ищи контакты "вручную", используй наши сохраненные фильтры</li>
+            <li><strong>Проверь компанию перед раскрытием контакта</strong> - подходит ли она под наш ICP?</li>
+            <li><strong>Не раскрывай телефоны</strong> без необходимости - они стоят в 5 раз дороже email</li>
+            <li><strong>Не экспортируй ради экспорта</strong> - экспортируй только когда готов работать с данными</li>
+            <li><strong>Проверяй баланс</strong> в начале каждого рабочего дня</li>
+        </ol>
+    </div>
+
+    <!-- Section 6 -->
+    <div class="section" id="section6">
+        <h2><span class="num">6</span> Чек-лист и самопроверка</h2>
+
+        <h3>Чек-лист Дня 1:</h3>
+        <ul class="checklist">
+            <li><span class="check"></span> Аккаунт Apollo создан и я могу войти</li>
+            <li><span class="check"></span> Chrome-расширение установлено и работает</li>
+            <li><span class="check"></span> Я прошел по всем разделам навигации и понимаю, что где находится</li>
+            <li><span class="check"></span> Я знаю, что тратит кредиты, а что бесплатно</li>
+            <li><span class="check"></span> Я знаю, где посмотреть баланс кредитов</li>
+            <li><span class="check"></span> Я понимаю разницу: Apollo = данные/CRM, Smartlead = отправка писем</li>
+        </ul>
+
+        <div class="quiz">
+            <div class="title">Самопроверка - ответь на вопросы:</div>
+            <ol>
+                <li>Сколько кредитов стоит раскрытие мобильного телефона контакта?</li>
+                <li>В каком разделе находится поиск людей по фильтрам?</li>
+                <li>Где посмотреть текущий баланс кредитов?</li>
+                <li>Переносятся ли неиспользованные кредиты на следующий месяц?</li>
+                <li>Через какой инструмент мы отправляем холодные письма - Apollo или Smartlead?</li>
+                <li>Что нужно проверить перед тем, как раскрыть контакт человека?</li>
+            </ol>
+        </div>
+
+        <h3>Правильные ответы:</h3>
+        <details>
+            <summary style="cursor:pointer; color:#0f3460; font-weight:600; padding: 8px 0;">Нажми, чтобы увидеть ответы</summary>
+            <ol style="padding: 16px 20px; background:#f8f9fb; border-radius:8px; margin-top:8px;">
+                <li><strong>5 кредитов</strong></li>
+                <li><strong>Prospect and Enrich &rarr; People</strong></li>
+                <li><strong>Settings &rarr; Billing and Credits</strong></li>
+                <li><strong>Нет</strong> - сгорают в конце billing cycle</li>
+                <li><strong>Smartlead</strong> - Apollo только для данных и CRM</li>
+                <li>Что <strong>компания подходит под наш ICP</strong> (целевой профиль клиента)</li>
+            </ol>
+        </details>
+
+        <div style="margin-top: 32px; padding-top: 20px; border-top: 2px solid #e8ecf1;">
+            <h3>Полезные ссылки для дополнительного изучения:</h3>
+            <p>
+                <a href="https://www.apollo.io/academy" target="_blank" class="link-btn">Apollo Academy (бесплатные курсы)</a>
+                <a href="https://knowledge.apollo.io/hc/en-us" target="_blank" class="link-btn secondary">Knowledge Base</a>
+            </p>
+            <p>
+                <a href="https://www.apollo.io/academy/master-classes" target="_blank" class="link-btn secondary">Мастер-классы</a>
+                <a href="https://www.apollo.io/files/quick-start-guide.pdf" target="_blank" class="link-btn secondary">Quick Start Guide (PDF)</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- Next day preview -->
+    <div class="section" style="border-left: 4px solid #0f3460;">
+        <h3>Завтра: День 2 - Поиск контактов (Prospecting)</h3>
+        <p>Научимся искать людей по фильтрам, использовать наши 3 сохраненные Персоны, и сохраним первые 20 контактов в тестовый список.</p>
+    </div>
+
+</div>
+
+<div class="footer">
+    <p>SF Agency - Внутреннее обучение Apollo.io</p>
+    <p>Создано: Март 2026</p>
+</div>
+
+</body>
+</html>
