@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apollo.io - День 4: CRM Pipeline и управление сделками</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fb; color: #1a1a2e; line-height: 1.7; }
+        .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; padding: 48px 0; text-align: center; }
+        .header h1 { font-size: 2.4rem; margin-bottom: 8px; font-weight: 700; }
+        .header .subtitle { font-size: 1.1rem; opacity: 0.8; }
+        .header .badge { display: inline-block; background: #e94560; color: white; padding: 4px 16px; border-radius: 20px; font-size: 0.85rem; margin-top: 12px; font-weight: 600; }
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+        .progress-bar { background: white; border-radius: 12px; padding: 24px 32px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 20px; }
+        .progress-bar .label { font-weight: 600; white-space: nowrap; color: #555; }
+        .progress-track { flex: 1; height: 10px; background: #e8ecf1; border-radius: 5px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #e94560, #0f3460); border-radius: 5px; }
+        .progress-bar .day-label { font-weight: 700; color: #0f3460; white-space: nowrap; }
+        .nav-links { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+        .nav-links a { padding: 8px 16px; background: white; border-radius: 8px; text-decoration: none; color: #0f3460; font-weight: 600; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .nav-links a:hover { background: #0f3460; color: white; }
+        .nav-links a.current { background: #0f3460; color: white; }
+        .toc { background: white; border-radius: 12px; padding: 28px 32px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .toc h3 { font-size: 1.1rem; margin-bottom: 16px; color: #0f3460; }
+        .toc ol { padding-left: 20px; }
+        .toc li { margin-bottom: 8px; }
+        .toc a { color: #0f3460; text-decoration: none; font-weight: 500; }
+        .toc a:hover { text-decoration: underline; }
+        .toc .time { color: #999; font-size: 0.85rem; margin-left: 8px; }
+        .section { background: white; border-radius: 12px; padding: 36px; margin-bottom: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .section h2 { font-size: 1.5rem; margin-bottom: 20px; color: #1a1a2e; padding-bottom: 12px; border-bottom: 2px solid #e8ecf1; }
+        .section h2 .num { display: inline-block; background: #0f3460; color: white; width: 36px; height: 36px; border-radius: 50%; text-align: center; line-height: 36px; font-size: 1rem; margin-right: 12px; vertical-align: middle; }
+        .section h3 { font-size: 1.15rem; margin: 24px 0 12px; color: #0f3460; }
+        .section p { margin-bottom: 16px; color: #444; }
+        .steps { counter-reset: step; list-style: none; padding: 0; }
+        .steps li { counter-increment: step; padding: 12px 16px 12px 52px; position: relative; margin-bottom: 8px; background: #f8f9fb; border-radius: 8px; border-left: 3px solid #0f3460; }
+        .steps li::before { content: counter(step); position: absolute; left: 14px; top: 12px; background: #0f3460; color: white; width: 26px; height: 26px; border-radius: 50%; text-align: center; line-height: 26px; font-size: 0.8rem; font-weight: 700; }
+        .warning { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+        .warning .title { font-weight: 700; color: #856404; margin-bottom: 4px; }
+        .warning p { color: #856404; margin: 0; font-size: 0.95rem; }
+        .tip { background: #d4edda; border: 1px solid #28a745; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+        .tip .title { font-weight: 700; color: #155724; margin-bottom: 4px; }
+        .tip p { color: #155724; margin: 0; font-size: 0.95rem; }
+        .info { background: #d1ecf1; border: 1px solid #17a2b8; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+        .info .title { font-weight: 700; color: #0c5460; margin-bottom: 4px; }
+        .info p { color: #0c5460; margin: 0; font-size: 0.95rem; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        table th { background: #0f3460; color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 0.9rem; }
+        table td { padding: 10px 16px; border-bottom: 1px solid #e8ecf1; font-size: 0.95rem; }
+        table tr:nth-child(even) { background: #f8f9fb; }
+
+        .dhc-card {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 16px;
+            margin: 20px 0;
+        }
+        .dhc-item {
+            background: #f8f9fb;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid #e8ecf1;
+        }
+        .dhc-item .dhc-icon { font-size: 2rem; margin-bottom: 8px; }
+        .dhc-item .dhc-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; color: #0f3460; }
+        .dhc-item .dhc-desc { font-size: 0.8rem; color: #666; }
+
+        .flow-diagram {
+            background: #f8f9fb;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 12px 0;
+        }
+        .flow-step:not(:last-child) { border-bottom: 1px dashed #ccc; }
+        .flow-num {
+            background: #0f3460;
+            color: white;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+        .flow-content { flex: 1; }
+        .flow-content strong { color: #0f3460; }
+        .flow-arrow {
+            color: #0f3460;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .practice-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            color: white;
+        }
+        .practice-box .practice-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 12px; }
+        .practice-box ol { padding-left: 20px; }
+        .practice-box li { margin-bottom: 8px; }
+
+        .checklist { list-style: none; padding: 0; }
+        .checklist li { padding: 10px 16px; margin-bottom: 6px; background: #f8f9fb; border-radius: 8px; font-size: 0.95rem; display: flex; align-items: center; gap: 12px; }
+        .checklist li .check { width: 22px; height: 22px; border: 2px solid #ccc; border-radius: 4px; flex-shrink: 0; }
+
+        .quiz { background: #f0e6ff; border: 1px solid #7c3aed; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .quiz .title { font-weight: 700; color: #5b21b6; margin-bottom: 12px; font-size: 1.05rem; }
+        .quiz ol { padding-left: 20px; }
+        .quiz li { margin-bottom: 8px; color: #5b21b6; }
+
+        .footer { text-align: center; padding: 40px 24px; color: #999; font-size: 0.85rem; }
+
+        @media (max-width: 600px) {
+            .dhc-card { grid-template-columns: 1fr; }
+            .section { padding: 24px 20px; }
+            .nav-links { gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Apollo.io - Обучение</h1>
+    <div class="subtitle">Неделя 1 / День 4: CRM Pipeline и управление сделками</div>
+    <div class="badge">~ 60 минут</div>
+</div>
+
+<div class="container">
+
+    <div class="nav-links">
+        <a href="index.html">День 1</a>
+        <a href="day-2.html">День 2</a>
+        <a href="day-3.html">День 3</a>
+        <a href="day-4.html" class="current">День 4</a>
+        <a href="day-5.html">День 5</a>
+        <a href="day-6.html">День 6</a>
+        <a href="day-7.html">День 7</a>
+        <a href="day-8.html">День 8</a>
+        <a href="day-9.html">День 9</a>
+        <a href="day-10.html">День 10</a>
+    </div>
+
+    <div class="progress-bar">
+        <span class="label">Прогресс:</span>
+        <div class="progress-track">
+            <div class="progress-fill" style="width: 40%"></div>
+        </div>
+        <span class="day-label">День 4 из 10</span>
+    </div>
+
+    <div class="toc">
+        <h3>Содержание дня</h3>
+        <ol>
+            <li><a href="#section1">Что такое CRM Pipeline</a> <span class="time">10 мин</span></li>
+            <li><a href="#section2">Работа со стадиями</a> <span class="time">15 мин</span></li>
+            <li><a href="#section3">Создание сделок (Deals)</a> <span class="time">10 мин</span></li>
+            <li><a href="#section4">Записи и активности</a> <span class="time">15 мин</span></li>
+            <li><a href="#section5">Практика</a> <span class="time">10 мин</span></li>
+        </ol>
+    </div>
+
+    <!-- Section 1: What is CRM Pipeline -->
+    <div class="section" id="section1">
+        <h2><span class="num">1</span> Что такое CRM Pipeline</h2>
+
+        <p>Pipeline (пайплайн) — это визуальная воронка, которая показывает, на каком этапе находится каждый контакт: от первого касания до закрытия сделки. Представь конвейер, где каждый человек двигается по стадиям слева направо.</p>
+
+        <p>Pipeline помогает видеть общую картину: сколько людей на каждом этапе, где затор, и кто требует внимания прямо сейчас.</p>
+
+        <h3>Наши 9 стадий pipeline:</h3>
+        <table>
+            <tr>
+                <th>#</th>
+                <th>Стадия</th>
+                <th>Что это значит</th>
+            </tr>
+            <tr>
+                <td><strong>1</strong></td>
+                <td><strong>New Lead</strong></td>
+                <td>Только что найден, ещё не контактировали</td>
+            </tr>
+            <tr>
+                <td><strong>2</strong></td>
+                <td><strong>Researching</strong></td>
+                <td>Изучаем компанию и человека перед контактом</td>
+            </tr>
+            <tr>
+                <td><strong>3</strong></td>
+                <td><strong>Contacted</strong></td>
+                <td>Отправили первое сообщение (email, LinkedIn invite)</td>
+            </tr>
+            <tr>
+                <td><strong>4</strong></td>
+                <td><strong>Connected</strong></td>
+                <td>Получили ответ или человек принял invite</td>
+            </tr>
+            <tr>
+                <td><strong>5</strong></td>
+                <td><strong>Engaged</strong></td>
+                <td>Ведём активный диалог</td>
+            </tr>
+            <tr>
+                <td><strong>6</strong></td>
+                <td><strong>Meeting Booked</strong></td>
+                <td>Назначена встреча / звонок</td>
+            </tr>
+            <tr>
+                <td><strong>7</strong></td>
+                <td><strong>Proposal Sent</strong></td>
+                <td>Отправлено коммерческое предложение</td>
+            </tr>
+            <tr>
+                <td><strong>8</strong></td>
+                <td><strong>Won</strong></td>
+                <td>Клиент подписался, сделка закрыта</td>
+            </tr>
+            <tr>
+                <td><strong>9</strong></td>
+                <td><strong>Lost</strong></td>
+                <td>Отказался или перестал отвечать</td>
+            </tr>
+        </table>
+
+        <h3>Как попасть в Pipeline:</h3>
+        <ol class="steps">
+            <li>В левой навигации нажми <strong>Deals</strong></li>
+            <li>Вверху выбери вкладку <strong>Pipeline</strong> (вид воронки)</li>
+            <li>Ты увидишь колонки — каждая колонка = стадия. Контакты/сделки отображаются карточками внутри колонок</li>
+        </ol>
+
+        <div class="tip">
+            <div class="title">Зачем нужен Pipeline</div>
+            <p>Pipeline нужен для того, чтобы ни один контакт не потерялся. Каждый человек должен быть в определённой стадии. Если контакт "завис" без стадии — ты не знаешь, что с ним делать, и он забывается.</p>
+        </div>
+    </div>
+
+    <!-- Section 2: Working with Stages -->
+    <div class="section" id="section2">
+        <h2><span class="num">2</span> Работа со стадиями</h2>
+
+        <p>Главная задача — вовремя двигать контакты между стадиями. Это можно делать двумя способами:</p>
+
+        <h3>Способ 1: Drag-and-drop в Pipeline view</h3>
+        <p>Просто перетащи карточку сделки из одной колонки в другую. Это самый быстрый способ.</p>
+
+        <h3>Способ 2: Через карточку контакта</h3>
+        <ol class="steps">
+            <li>Открой контакт (кликни на его имя)</li>
+            <li>Найди выпадающее меню <strong>Stage</strong> (стадия)</li>
+            <li>Выбери новую стадию из списка</li>
+            <li>Изменение сохранится автоматически</li>
+        </ol>
+
+        <h3>Когда перемещать контакт:</h3>
+        <table>
+            <tr>
+                <th>Действие</th>
+                <th>Из стадии</th>
+                <th>В стадию</th>
+            </tr>
+            <tr>
+                <td>Отправили LinkedIn invite</td>
+                <td>New Lead</td>
+                <td><strong>Contacted</strong></td>
+            </tr>
+            <tr>
+                <td>Человек принял invite</td>
+                <td>Contacted</td>
+                <td><strong>Connected</strong></td>
+            </tr>
+            <tr>
+                <td>Ответил на сообщение</td>
+                <td>Connected</td>
+                <td><strong>Engaged</strong></td>
+            </tr>
+            <tr>
+                <td>Согласился на звонок</td>
+                <td>Engaged</td>
+                <td><strong>Meeting Booked</strong></td>
+            </tr>
+            <tr>
+                <td>Отправили предложение</td>
+                <td>Meeting Booked</td>
+                <td><strong>Proposal Sent</strong></td>
+            </tr>
+            <tr>
+                <td>Подписал договор</td>
+                <td>Proposal Sent</td>
+                <td><strong>Won</strong></td>
+            </tr>
+            <tr>
+                <td>Отказался / пропал</td>
+                <td>Любая</td>
+                <td><strong>Lost</strong></td>
+            </tr>
+        </table>
+
+        <div class="warning">
+            <div class="title">Не оставляй контакты в "New Lead" больше 3 дней</div>
+            <p>Если ты не планируешь отправить им сообщение — удали из pipeline. Застрявшие контакты загрязняют воронку, и ты перестаёшь видеть реальную картину.</p>
+        </div>
+    </div>
+
+    <!-- Section 3: Creating Deals -->
+    <div class="section" id="section3">
+        <h2><span class="num">3</span> Создание сделок (Deals)</h2>
+
+        <p>Deal (сделка) — это потенциальный доход от конкретного контакта. Сделка привязывается к контакту и имеет сумму, стадию и ожидаемую дату закрытия.</p>
+
+        <h3>Как создать сделку:</h3>
+        <ol class="steps">
+            <li>Открой контакт, для которого хочешь создать сделку</li>
+            <li>Справа найди секцию <strong>Deals</strong></li>
+            <li>Нажми <strong>+ Create Deal</strong></li>
+            <li>Заполни поля: <strong>название</strong> (компания + услуга), <strong>сумма</strong>, <strong>стадию</strong>, <strong>дату закрытия</strong></li>
+            <li>Нажми <strong>Save</strong></li>
+        </ol>
+
+        <div class="info">
+            <div class="title">Когда создавать Deal</div>
+            <p>Создавай сделку когда контакт в стадии "Meeting Booked" или выше. Не раньше — это загрязнит pipeline ненужными сделками и исказит прогнозы по выручке.</p>
+        </div>
+
+        <h3>Формат именования сделок:</h3>
+        <table>
+            <tr>
+                <th>Формат</th>
+                <th>Пример</th>
+            </tr>
+            <tr>
+                <td><strong>[Компания] - Meta Ads [Месяц]</strong></td>
+                <td>Sohum Wellness - Meta Ads Апр 2026</td>
+            </tr>
+            <tr>
+                <td><strong>[Компания] - Meta Ads [Месяц]</strong></td>
+                <td>Al Rawi Group - Meta Ads Мар 2026</td>
+            </tr>
+            <tr>
+                <td><strong>[Компания] - Meta Ads [Месяц]</strong></td>
+                <td>FitZone Dubai - Meta Ads Май 2026</td>
+            </tr>
+        </table>
+
+        <div class="tip">
+            <div class="title">Единый формат = порядок</div>
+            <p>Всегда используй один и тот же формат имени. Так проще искать сделки, фильтровать по компании, и видеть, в каком месяце ожидается закрытие.</p>
+        </div>
+    </div>
+
+    <!-- Section 4: Notes and Activities -->
+    <div class="section" id="section4">
+        <h2><span class="num">4</span> Записи и активности</h2>
+
+        <p>Каждое взаимодействие с контактом нужно фиксировать. Apollo поддерживает 4 типа активностей:</p>
+
+        <table>
+            <tr>
+                <th>Тип</th>
+                <th>Для чего</th>
+            </tr>
+            <tr>
+                <td><strong>Notes</strong> (Заметки)</td>
+                <td>Свободный текст: что обсуждали, что узнали, что решили</td>
+            </tr>
+            <tr>
+                <td><strong>Tasks</strong> (Задачи)</td>
+                <td>Напоминания о следующем шаге с дедлайном</td>
+            </tr>
+            <tr>
+                <td><strong>Calls</strong> (Звонки)</td>
+                <td>Запись о звонке: длительность, результат</td>
+            </tr>
+            <tr>
+                <td><strong>Emails</strong> (Письма)</td>
+                <td>Автоматически логируются при отправке через Apollo</td>
+            </tr>
+        </table>
+
+        <h3>Как добавить заметку:</h3>
+        <ol class="steps">
+            <li>Открой контакт (кликни на имя)</li>
+            <li>Внизу карточки найди секцию <strong>Activity</strong></li>
+            <li>Нажми <strong>Note</strong></li>
+            <li>Напиши заметку</li>
+            <li>Нажми <strong>Save</strong></li>
+        </ol>
+
+        <h3>Когда и что записывать:</h3>
+        <table>
+            <tr>
+                <th>Когда</th>
+                <th>Что записать</th>
+            </tr>
+            <tr>
+                <td>После отправки сообщения</td>
+                <td>"Отправил invite + сообщение [дата]"</td>
+            </tr>
+            <tr>
+                <td>После ответа</td>
+                <td>"Ответил: [суть ответа]"</td>
+            </tr>
+            <tr>
+                <td>После звонка</td>
+                <td>"Звонок [дата]: обсудили X, следующий шаг Y"</td>
+            </tr>
+            <tr>
+                <td>После отказа</td>
+                <td>"Отказ: причина — [причина]"</td>
+            </tr>
+        </table>
+
+        <h3>Как создать задачу (Task):</h3>
+        <ol class="steps">
+            <li>Открой контакт</li>
+            <li>В секции Activity нажми <strong>Task</strong></li>
+            <li>Напиши, что нужно сделать (например, "Отправить follow-up")</li>
+            <li>Установи <strong>Due date</strong> (дедлайн)</li>
+            <li>Выбери <strong>Priority</strong> (приоритет): High, Medium, Low</li>
+            <li>Нажми <strong>Save</strong></li>
+        </ol>
+
+        <p>Задачи с дедлайном появятся в разделе <strong>Tasks</strong> в левом меню. Apollo напомнит о просроченных задачах.</p>
+
+        <div class="tip">
+            <div class="title">Записывай ВСЁ</div>
+            <p>Через месяц ты не вспомнишь, что обсуждали. Заметка в 2 строки экономит 20 минут вспоминания. Привычка записывать — один из главных навыков в продажах.</p>
+        </div>
+    </div>
+
+    <!-- Section 5: Practice -->
+    <div class="section" id="section5">
+        <h2><span class="num">5</span> Практика</h2>
+
+        <div class="practice-box">
+            <div class="practice-title">Задание 1: Создай тестовую сделку</div>
+            <ol>
+                <li>Открой любой контакт из тестового списка</li>
+                <li>Справа найди секцию <strong>Deals</strong></li>
+                <li>Нажми <strong>+ Create Deal</strong></li>
+                <li>Название: <strong>"Test Company - Meta Ads Мар 2026"</strong></li>
+                <li>Сумма: <strong>5000</strong></li>
+                <li>Стадия: <strong>Meeting Booked</strong></li>
+                <li>Дата закрытия: <strong>через 2 недели от сегодня</strong></li>
+                <li>Сохрани и проверь, что сделка появилась в Pipeline view</li>
+            </ol>
+        </div>
+
+        <div class="practice-box" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+            <div class="practice-title">Задание 2: Двигай контакты по стадиям</div>
+            <ol>
+                <li>Возьми <strong>5 контактов</strong> из тестового списка</li>
+                <li>Контакт 1: перемести из New Lead в <strong>Contacted</strong></li>
+                <li>Контакт 2: перемести из New Lead в <strong>Connected</strong></li>
+                <li>Контакт 3: перемести в <strong>Engaged</strong></li>
+                <li>Контакт 4: перемести в <strong>Meeting Booked</strong></li>
+                <li>Контакт 5: перемести в <strong>Lost</strong></li>
+                <li>Открой <strong>Pipeline view</strong> и убедись, что контакты в правильных колонках</li>
+            </ol>
+        </div>
+
+        <div class="practice-box" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+            <div class="practice-title">Задание 3: Добавь заметки</div>
+            <ol>
+                <li>Открой <strong>3 контакта</strong> из тестового списка</li>
+                <li>Контакт 1: добавь заметку <strong>"Отправил invite + сообщение 09.03.2026"</strong></li>
+                <li>Контакт 2: добавь заметку <strong>"Ответил: интересуется Meta Ads, спросил о цене"</strong></li>
+                <li>Контакт 3: добавь заметку <strong>"Звонок 09.03: обсудили бюджет, следующий шаг — КП"</strong></li>
+                <li>Для Контакта 3 создай <strong>задачу</strong>: "Отправить КП" с дедлайном <strong>завтра</strong></li>
+            </ol>
+        </div>
+
+        <div class="warning">
+            <div class="title">Только тестовые контакты!</div>
+            <p>Все практические задания делай на ТЕСТОВЫХ контактах. Не трогай рабочие списки.</p>
+        </div>
+    </div>
+
+    <!-- Checklist -->
+    <div class="section">
+        <h2>Чек-лист Дня 4</h2>
+
+        <ul class="checklist">
+            <li><span class="check"></span> Я знаю 9 стадий нашего pipeline</li>
+            <li><span class="check"></span> Я знаю, как переместить контакт между стадиями</li>
+            <li><span class="check"></span> Я знаю, когда создавать сделку</li>
+            <li><span class="check"></span> Я знаю формат именования сделок</li>
+            <li><span class="check"></span> Я умею добавлять заметки к контактам</li>
+            <li><span class="check"></span> Я умею создавать задачи с дедлайном</li>
+            <li><span class="check"></span> Я создал тестовую сделку и добавил заметки</li>
+        </ul>
+
+        <div class="quiz">
+            <div class="title">Самопроверка:</div>
+            <ol>
+                <li>В какую стадию перемещаем контакт после того, как он принял LinkedIn invite?</li>
+                <li>Когда нужно создавать Deal (сделку)?</li>
+                <li>Что нужно записать после каждого звонка?</li>
+                <li>Почему не стоит оставлять контакт в "New Lead" больше 3 дней?</li>
+                <li>Как правильно назвать сделку по нашему формату?</li>
+            </ol>
+        </div>
+
+        <details>
+            <summary style="cursor:pointer; color:#0f3460; font-weight:600; padding: 8px 0;">Нажми, чтобы увидеть ответы</summary>
+            <ol style="padding: 16px 20px; background:#f8f9fb; border-radius:8px; margin-top:8px;">
+                <li><strong>Connected</strong> — принятый invite означает, что контакт подключился</li>
+                <li>Когда контакт в стадии <strong>Meeting Booked</strong> или выше — раньше создавать сделку не нужно, это загрязнит pipeline</li>
+                <li><strong>Дату, что обсуждали, и следующий шаг</strong> — формат: "Звонок [дата]: обсудили X, следующий шаг Y"</li>
+                <li>Это <strong>загрязняет pipeline</strong> — если не планируем контактировать, лучше удалить. Застрявшие контакты мешают видеть реальную картину</li>
+                <li><strong>"[Компания] - Meta Ads [Месяц]"</strong> — например, "Sohum Wellness - Meta Ads Апр 2026"</li>
+            </ol>
+        </details>
+    </div>
+
+    <!-- Next day -->
+    <div class="section" style="border-left: 4px solid #0f3460;">
+        <h3>Завтра: День 5 - Обзор и практический тест</h3>
+        <p>Повторим всё, что изучили за первую неделю (Дни 1-4), и пройдём практический тест на знание Apollo.io: поиск, фильтры, списки, обогащение, pipeline и сделки.</p>
+    </div>
+
+</div>
+
+<div class="footer">
+    <p>SF Agency - Внутреннее обучение Apollo.io</p>
+    <p>Создано: Март 2026</p>
+</div>
+
+</body>
+</html>

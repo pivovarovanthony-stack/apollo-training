@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apollo.io - День 5: Обзор и практический тест</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fb; color: #1a1a2e; line-height: 1.7; }
+        .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; padding: 48px 0; text-align: center; }
+        .header h1 { font-size: 2.4rem; margin-bottom: 8px; font-weight: 700; }
+        .header .subtitle { font-size: 1.1rem; opacity: 0.8; }
+        .header .badge { display: inline-block; background: #e94560; color: white; padding: 4px 16px; border-radius: 20px; font-size: 0.85rem; margin-top: 12px; font-weight: 600; }
+        .container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+        .progress-bar { background: white; border-radius: 12px; padding: 24px 32px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 20px; }
+        .progress-bar .label { font-weight: 600; white-space: nowrap; color: #555; }
+        .progress-track { flex: 1; height: 10px; background: #e8ecf1; border-radius: 5px; overflow: hidden; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #e94560, #0f3460); border-radius: 5px; }
+        .progress-bar .day-label { font-weight: 700; color: #0f3460; white-space: nowrap; }
+        .nav-links { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+        .nav-links a { padding: 8px 16px; background: white; border-radius: 8px; text-decoration: none; color: #0f3460; font-weight: 600; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .nav-links a:hover { background: #0f3460; color: white; }
+        .nav-links a.current { background: #0f3460; color: white; }
+        .toc { background: white; border-radius: 12px; padding: 28px 32px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .toc h3 { font-size: 1.1rem; margin-bottom: 16px; color: #0f3460; }
+        .toc ol { padding-left: 20px; }
+        .toc li { margin-bottom: 8px; }
+        .toc a { color: #0f3460; text-decoration: none; font-weight: 500; }
+        .toc a:hover { text-decoration: underline; }
+        .toc .time { color: #999; font-size: 0.85rem; margin-left: 8px; }
+        .section { background: white; border-radius: 12px; padding: 36px; margin-bottom: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .section h2 { font-size: 1.5rem; margin-bottom: 20px; color: #1a1a2e; padding-bottom: 12px; border-bottom: 2px solid #e8ecf1; }
+        .section h2 .num { display: inline-block; background: #0f3460; color: white; width: 36px; height: 36px; border-radius: 50%; text-align: center; line-height: 36px; font-size: 1rem; margin-right: 12px; vertical-align: middle; }
+        .section h3 { font-size: 1.15rem; margin: 24px 0 12px; color: #0f3460; }
+        .section p { margin-bottom: 16px; color: #444; }
+        .steps { counter-reset: step; list-style: none; padding: 0; }
+        .steps li { counter-increment: step; padding: 12px 16px 12px 52px; position: relative; margin-bottom: 8px; background: #f8f9fb; border-radius: 8px; border-left: 3px solid #0f3460; }
+        .steps li::before { content: counter(step); position: absolute; left: 14px; top: 12px; background: #0f3460; color: white; width: 26px; height: 26px; border-radius: 50%; text-align: center; line-height: 26px; font-size: 0.8rem; font-weight: 700; }
+        .warning { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+        .warning .title { font-weight: 700; color: #856404; margin-bottom: 4px; }
+        .warning p { color: #856404; margin: 0; font-size: 0.95rem; }
+        .tip { background: #d4edda; border: 1px solid #28a745; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+        .tip .title { font-weight: 700; color: #155724; margin-bottom: 4px; }
+        .tip p { color: #155724; margin: 0; font-size: 0.95rem; }
+        .info { background: #d1ecf1; border: 1px solid #17a2b8; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+        .info .title { font-weight: 700; color: #0c5460; margin-bottom: 4px; }
+        .info p { color: #0c5460; margin: 0; font-size: 0.95rem; }
+        table { width: 100%; border-collapse: collapse; margin: 16px 0; }
+        table th { background: #0f3460; color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 0.9rem; }
+        table td { padding: 10px 16px; border-bottom: 1px solid #e8ecf1; font-size: 0.95rem; }
+        table tr:nth-child(even) { background: #f8f9fb; }
+
+        .practice-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            color: white;
+        }
+        .practice-box .practice-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 12px; }
+        .practice-box ol { padding-left: 20px; }
+        .practice-box li { margin-bottom: 8px; }
+
+        .checklist { list-style: none; padding: 0; }
+        .checklist li { padding: 10px 16px; margin-bottom: 6px; background: #f8f9fb; border-radius: 8px; font-size: 0.95rem; display: flex; align-items: center; gap: 12px; }
+        .checklist li .check { width: 22px; height: 22px; border: 2px solid #ccc; border-radius: 4px; flex-shrink: 0; }
+
+        .quiz { background: #f0e6ff; border: 1px solid #7c3aed; border-radius: 8px; padding: 20px; margin: 20px 0; }
+        .quiz .title { font-weight: 700; color: #5b21b6; margin-bottom: 12px; font-size: 1.05rem; }
+        .quiz ol { padding-left: 20px; }
+        .quiz li { margin-bottom: 8px; color: #5b21b6; }
+
+        .footer { text-align: center; padding: 40px 24px; color: #999; font-size: 0.85rem; }
+
+        .celebration { text-align: center; padding: 20px 0; }
+        .celebration .emoji { font-size: 3rem; margin-bottom: 12px; }
+        .celebration .congrats { font-size: 1.4rem; font-weight: 700; color: #0f3460; margin-bottom: 8px; }
+
+        .self-assess td { text-align: center; }
+        .self-assess td:first-child { text-align: left; }
+
+        @media (max-width: 600px) {
+            .section { padding: 24px 20px; }
+            .nav-links { gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Apollo.io - Обучение</h1>
+    <div class="subtitle">Неделя 1 / День 5: Обзор и практический тест</div>
+    <div class="badge">~ 45 минут</div>
+</div>
+
+<div class="container">
+
+    <div class="nav-links">
+        <a href="index.html">День 1</a>
+        <a href="day-2.html">День 2</a>
+        <a href="day-3.html">День 3</a>
+        <a href="day-4.html">День 4</a>
+        <a href="day-5.html" class="current">День 5</a>
+        <a href="day-6.html">День 6</a>
+        <a href="day-7.html">День 7</a>
+        <a href="day-8.html">День 8</a>
+        <a href="day-9.html">День 9</a>
+        <a href="day-10.html">День 10</a>
+    </div>
+
+    <div class="progress-bar">
+        <span class="label">Прогресс:</span>
+        <div class="progress-track">
+            <div class="progress-fill" style="width: 50%"></div>
+        </div>
+        <span class="day-label">День 5 из 10</span>
+    </div>
+
+    <div class="toc">
+        <h3>Содержание дня</h3>
+        <ol>
+            <li><a href="#section1">Обзор Недели 1</a> <span class="time">10 мин</span></li>
+            <li><a href="#section2">Практический тест</a> <span class="time">20 мин</span></li>
+            <li><a href="#section3">Самопроверка знаний</a> <span class="time">10 мин</span></li>
+            <li><a href="#section4">Оценка готовности</a> <span class="time">5 мин</span></li>
+        </ol>
+    </div>
+
+    <!-- Section 1: Week 1 Review -->
+    <div class="section" id="section1">
+        <h2><span class="num">1</span> Обзор Недели 1</h2>
+
+        <p>Прежде чем переходить к тесту, давай вспомним всё, что мы прошли за первую неделю. Вот сводная таблица по каждому дню:</p>
+
+        <table>
+            <tr>
+                <th>День</th>
+                <th>Тема</th>
+                <th>Ключевые навыки</th>
+            </tr>
+            <tr>
+                <td><strong>1</strong></td>
+                <td>Ориентация</td>
+                <td>UI, навигация, кредиты, Chrome extension</td>
+            </tr>
+            <tr>
+                <td><strong>2</strong></td>
+                <td>Поиск контактов</td>
+                <td>Фильтры, персоны, сохранение в списки</td>
+            </tr>
+            <tr>
+                <td><strong>3</strong></td>
+                <td>Списки и обогащение</td>
+                <td>RAW/READY система, Data Health Center, Job Changes</td>
+            </tr>
+            <tr>
+                <td><strong>4</strong></td>
+                <td>CRM Pipeline</td>
+                <td>9 стадий, сделки, заметки, задачи</td>
+            </tr>
+            <tr>
+                <td><strong>5</strong></td>
+                <td>Обзор</td>
+                <td>Тест, практика, самооценка</td>
+            </tr>
+        </table>
+
+        <div class="info">
+            <div class="title">Важно перед тестом</div>
+            <p>Если что-то из Дней 1-4 непонятно — вернись и перечитай. Лучше потратить лишний час сейчас, чем делать ошибки потом.</p>
+        </div>
+    </div>
+
+    <!-- Section 2: Practical Test -->
+    <div class="section" id="section2">
+        <h2><span class="num">2</span> Практический тест</h2>
+
+        <p>Это главное задание Недели 1. Оно объединяет все навыки, которые ты изучил за 4 дня. Выполни его полностью, шаг за шагом.</p>
+
+        <div class="practice-box">
+            <div class="practice-title">Главное задание Недели 1</div>
+            <ol>
+                <li>Открой Apollo &rarr; <strong>People</strong></li>
+                <li>Найди <strong>10 контактов</strong>, подходящих под наш ICP: владельцы/CEO бизнесов в UAE, отрасль: wellness, education или fitness</li>
+                <li>Проверь каждого: есть ли email, актуальная должность, правильная страна</li>
+                <li>Создай новый статический список: <strong>"Week 1 Test - [твоё имя]"</strong></li>
+                <li>Добавь всех 10 в этот список</li>
+                <li>Для каждого определи стадию pipeline (<strong>New Lead</strong> для всех новых)</li>
+                <li>Создай <strong>1 тестовую сделку</strong> для самого перспективного контакта</li>
+                <li>Добавь <strong>заметку к 3 контактам</strong>: почему они подходят под ICP</li>
+            </ol>
+        </div>
+
+        <div class="practice-box" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+            <div class="practice-title">Бонусное задание</div>
+            <ol>
+                <li>Используй <strong>Data Health Center</strong> — проверь статистику</li>
+                <li>Найди <strong>3 контакта со сменой работы</strong> (Job Changes)</li>
+                <li>Объясни, почему смена работы — хороший момент для outreach</li>
+            </ol>
+        </div>
+
+        <div class="warning">
+            <div class="title">Это тестовое задание</div>
+            <p>НЕ обогащай контакты (не трать кредиты). НЕ отправляй сообщения. Только ищи, сохраняй, организуй.</p>
+        </div>
+    </div>
+
+    <!-- Section 3: Knowledge Quiz -->
+    <div class="section" id="section3">
+        <h2><span class="num">3</span> Самопроверка знаний</h2>
+
+        <p>Ответь на все 15 вопросов. Они покрывают материал всех 4 дней обучения. Постарайся ответить самостоятельно, прежде чем смотреть ответы.</p>
+
+        <div class="quiz">
+            <div class="title">15 вопросов по Неделе 1:</div>
+            <ol>
+                <li>Где найти Chrome Extension для Apollo?</li>
+                <li>Что такое кредит и за что он тратится?</li>
+                <li>Как создать персону (Persona) в Apollo?</li>
+                <li>Какие 3 основных фильтра нужны для поиска контактов UAE?</li>
+                <li>Что такое динамический список?</li>
+                <li>Зачем нужна система RAW / READY?</li>
+                <li>Что показывает Data Health Center?</li>
+                <li>Тратится ли кредит, если email не найден при обогащении?</li>
+                <li>Что нужно установить при автоматическом обогащении?</li>
+                <li>Почему смена работы — хороший момент для продажи?</li>
+                <li>Сколько стадий в нашем pipeline?</li>
+                <li>Когда создавать Deal (сделку)?</li>
+                <li>Как правильно назвать сделку?</li>
+                <li>Что обязательно записать после каждого звонка?</li>
+                <li>Почему нельзя отправлять email из Apollo?</li>
+            </ol>
+        </div>
+
+        <details>
+            <summary style="cursor:pointer; color:#0f3460; font-weight:600; padding: 8px 0;">Нажми, чтобы увидеть ответы</summary>
+            <ol style="padding: 16px 20px; background:#f8f9fb; border-radius:8px; margin-top:8px;">
+                <li><strong>Chrome Web Store</strong> &rarr; поиск "Apollo.io" &rarr; Install</li>
+                <li><strong>Кредит</strong> = единица валюты Apollo. Тратится на: обогащение email, экспорт контактов, отправку email</li>
+                <li><strong>People &rarr; Saved Searches &rarr; Create Persona</strong> &rarr; задать фильтры</li>
+                <li><strong>Location:</strong> UAE, <strong>Seniority:</strong> Owner/Founder/CEO, <strong>Industry:</strong> по нашим вертикалям</li>
+                <li>Список, который <strong>автоматически обновляется</strong> по заданным фильтрам</li>
+                <li>Чтобы <strong>не отправлять письма непроверенным контактам</strong></li>
+                <li><strong>Job Changes, Credit Usage, Missing Emails</strong></li>
+                <li><strong>Нет</strong> — кредит тратится только при успешном нахождении</li>
+                <li><strong>Лимит кредитов</strong> (рекомендация: не более 50)</li>
+                <li>Новый бюджет, нужно показать результат, старые партнёры обнулились</li>
+                <li><strong>9 стадий</strong></li>
+                <li>Когда контакт в стадии <strong>Meeting Booked</strong> или выше</li>
+                <li><strong>"[Компания] - Meta Ads [Месяц]"</strong></li>
+                <li>Дату, что обсуждали, следующий шаг</li>
+                <li>Мы используем <strong>Smartlead</strong> — у него лучше доставляемость и warmup</li>
+            </ol>
+        </details>
+    </div>
+
+    <!-- Section 4: Readiness Assessment -->
+    <div class="section" id="section4">
+        <h2><span class="num">4</span> Оценка готовности</h2>
+
+        <p>Честно оцени себя по каждому навыку. Отметь, уверен ты или нужно повторить:</p>
+
+        <table class="self-assess">
+            <tr>
+                <th>Навык</th>
+                <th>Уверен</th>
+                <th>Нужно повторить</th>
+            </tr>
+            <tr>
+                <td>Навигация по Apollo</td>
+                <td>&#9744;</td>
+                <td>&#9744;</td>
+            </tr>
+            <tr>
+                <td>Поиск и фильтры</td>
+                <td>&#9744;</td>
+                <td>&#9744;</td>
+            </tr>
+            <tr>
+                <td>Работа со списками</td>
+                <td>&#9744;</td>
+                <td>&#9744;</td>
+            </tr>
+            <tr>
+                <td>Data Health Center</td>
+                <td>&#9744;</td>
+                <td>&#9744;</td>
+            </tr>
+            <tr>
+                <td>Pipeline и стадии</td>
+                <td>&#9744;</td>
+                <td>&#9744;</td>
+            </tr>
+            <tr>
+                <td>Сделки и заметки</td>
+                <td>&#9744;</td>
+                <td>&#9744;</td>
+            </tr>
+            <tr>
+                <td>Кредиты и лимиты</td>
+                <td>&#9744;</td>
+                <td>&#9744;</td>
+            </tr>
+        </table>
+
+        <div class="tip">
+            <div class="title">Правило перехода к Неделе 2</div>
+            <p>Если больше 2 пунктов "Нужно повторить" — потрать дополнительный день на повторение перед переходом к Неделе 2.</p>
+        </div>
+    </div>
+
+    <!-- Checklist -->
+    <div class="section">
+        <h2>Чек-лист Дня 5</h2>
+
+        <ul class="checklist">
+            <li><span class="check"></span> Я нашёл 10 контактов по ICP и сохранил в тестовый список</li>
+            <li><span class="check"></span> Я создал тестовую сделку</li>
+            <li><span class="check"></span> Я добавил заметки к 3 контактам</li>
+            <li><span class="check"></span> Я ответил на 12+ из 15 вопросов правильно</li>
+            <li><span class="check"></span> Я заполнил таблицу самооценки</li>
+        </ul>
+    </div>
+
+    <!-- Next day -->
+    <div class="section" style="border-left: 4px solid #0f3460;">
+        <div class="celebration">
+            <div class="emoji">&#127881;</div>
+            <div class="congrats">Поздравляю! Неделя 1 завершена!</div>
+        </div>
+
+        <h3>Неделя 2: Outreach & Workflows</h3>
+        <p>Поздравляю! Неделя 1 завершена. Неделя 2 начинается с работы с автоматизацией.</p>
+        <p style="margin-top: 12px;"><strong>День 6 - Sequences: создание email-последовательностей</strong></p>
+        <p>Научимся создавать автоматические последовательности писем, настраивать шаги и персонализацию для максимального отклика.</p>
+    </div>
+
+</div>
+
+<div class="footer">
+    <p>SF Agency - Внутреннее обучение Apollo.io</p>
+    <p>Создано: Март 2026</p>
+</div>
+
+</body>
+</html>
