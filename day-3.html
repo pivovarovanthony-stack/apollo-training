@@ -3,24 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apollo.io - День 3: Списки и обогащение данных</title>
+    <title>Apollo.io - День 3: Поиск компаний и списки</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fb; color: #1a1a2e; line-height: 1.7; }
-        .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; padding: 48px 0; text-align: center; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fb;
+            color: #1a1a2e;
+            line-height: 1.7;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            padding: 48px 0;
+            text-align: center;
+        }
+
         .header h1 { font-size: 2.4rem; margin-bottom: 8px; font-weight: 700; }
-        .header .subtitle { font-size: 1.1rem; opacity: 0.8; }
+        .header .subtitle { font-size: 1.1rem; opacity: 0.8; font-weight: 400; }
         .header .badge { display: inline-block; background: #e94560; color: white; padding: 4px 16px; border-radius: 20px; font-size: 0.85rem; margin-top: 12px; font-weight: 600; }
+
         .container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+
         .progress-bar { background: white; border-radius: 12px; padding: 24px 32px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 20px; }
         .progress-bar .label { font-weight: 600; white-space: nowrap; color: #555; }
         .progress-track { flex: 1; height: 10px; background: #e8ecf1; border-radius: 5px; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #e94560, #0f3460); border-radius: 5px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #e94560, #0f3460); border-radius: 5px; transition: width 0.5s; }
         .progress-bar .day-label { font-weight: 700; color: #0f3460; white-space: nowrap; }
-        .nav-links { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
-        .nav-links a { padding: 8px 16px; background: white; border-radius: 8px; text-decoration: none; color: #0f3460; font-weight: 600; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .nav-links a:hover { background: #0f3460; color: white; }
-        .nav-links a.current { background: #0f3460; color: white; }
+
         .toc { background: white; border-radius: 12px; padding: 28px 32px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .toc h3 { font-size: 1.1rem; margin-bottom: 16px; color: #0f3460; }
         .toc ol { padding-left: 20px; }
@@ -28,88 +40,44 @@
         .toc a { color: #0f3460; text-decoration: none; font-weight: 500; }
         .toc a:hover { text-decoration: underline; }
         .toc .time { color: #999; font-size: 0.85rem; margin-left: 8px; }
-        .section { background: white; border-radius: 12px; padding: 36px; margin-bottom: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+
+        .section { background: white; border-radius: 12px; padding: 36px 36px; margin-bottom: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .section h2 { font-size: 1.5rem; margin-bottom: 20px; color: #1a1a2e; padding-bottom: 12px; border-bottom: 2px solid #e8ecf1; }
         .section h2 .num { display: inline-block; background: #0f3460; color: white; width: 36px; height: 36px; border-radius: 50%; text-align: center; line-height: 36px; font-size: 1rem; margin-right: 12px; vertical-align: middle; }
         .section h3 { font-size: 1.15rem; margin: 24px 0 12px; color: #0f3460; }
         .section p { margin-bottom: 16px; color: #444; }
+
         .steps { counter-reset: step; list-style: none; padding: 0; }
         .steps li { counter-increment: step; padding: 12px 16px 12px 52px; position: relative; margin-bottom: 8px; background: #f8f9fb; border-radius: 8px; border-left: 3px solid #0f3460; }
         .steps li::before { content: counter(step); position: absolute; left: 14px; top: 12px; background: #0f3460; color: white; width: 26px; height: 26px; border-radius: 50%; text-align: center; line-height: 26px; font-size: 0.8rem; font-weight: 700; }
+
         .warning { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
         .warning .title { font-weight: 700; color: #856404; margin-bottom: 4px; }
         .warning p { color: #856404; margin: 0; font-size: 0.95rem; }
+
         .tip { background: #d4edda; border: 1px solid #28a745; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
         .tip .title { font-weight: 700; color: #155724; margin-bottom: 4px; }
         .tip p { color: #155724; margin: 0; font-size: 0.95rem; }
+
         .info { background: #d1ecf1; border: 1px solid #17a2b8; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
         .info .title { font-weight: 700; color: #0c5460; margin-bottom: 4px; }
         .info p { color: #0c5460; margin: 0; font-size: 0.95rem; }
+
         table { width: 100%; border-collapse: collapse; margin: 16px 0; }
         table th { background: #0f3460; color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 0.9rem; }
         table td { padding: 10px 16px; border-bottom: 1px solid #e8ecf1; font-size: 0.95rem; }
         table tr:nth-child(even) { background: #f8f9fb; }
 
-        .dhc-card {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 16px;
-            margin: 20px 0;
-        }
-        .dhc-item {
-            background: #f8f9fb;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            border: 2px solid #e8ecf1;
-        }
-        .dhc-item .dhc-icon { font-size: 2rem; margin-bottom: 8px; }
-        .dhc-item .dhc-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; color: #0f3460; }
-        .dhc-item .dhc-desc { font-size: 0.8rem; color: #666; }
-
-        .flow-diagram {
-            background: #f8f9fb;
-            border-radius: 12px;
-            padding: 24px;
-            margin: 20px 0;
-        }
-        .flow-step {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 12px 0;
-        }
-        .flow-step:not(:last-child) { border-bottom: 1px dashed #ccc; }
-        .flow-num {
-            background: #0f3460;
-            color: white;
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.9rem;
-            flex-shrink: 0;
-        }
-        .flow-content { flex: 1; }
-        .flow-content strong { color: #0f3460; }
-        .flow-arrow {
-            color: #0f3460;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-
-        .practice-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            padding: 24px;
-            margin: 20px 0;
-            color: white;
-        }
-        .practice-box .practice-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 12px; }
-        .practice-box ol { padding-left: 20px; }
-        .practice-box li { margin-bottom: 8px; }
+        .credit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+        .credit-card { background: #f8f9fb; border-radius: 10px; padding: 20px; text-align: center; border: 2px solid transparent; }
+        .credit-card.free { border-color: #28a745; }
+        .credit-card.paid { border-color: #e94560; }
+        .credit-card .credit-icon { font-size: 2rem; margin-bottom: 8px; }
+        .credit-card .credit-title { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+        .credit-card .credit-desc { font-size: 0.85rem; color: #666; }
+        .credit-card .credit-cost { font-size: 1.2rem; font-weight: 700; margin-top: 8px; }
+        .credit-card.free .credit-cost { color: #28a745; }
+        .credit-card.paid .credit-cost { color: #e94560; }
 
         .checklist { list-style: none; padding: 0; }
         .checklist li { padding: 10px 16px; margin-bottom: 6px; background: #f8f9fb; border-radius: 8px; font-size: 0.95rem; display: flex; align-items: center; gap: 12px; }
@@ -120,12 +88,34 @@
         .quiz ol { padding-left: 20px; }
         .quiz li { margin-bottom: 8px; color: #5b21b6; }
 
+        .link-btn { display: inline-block; background: #0f3460; color: white; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin: 8px 4px 8px 0; font-size: 0.9rem; }
+        .link-btn:hover { background: #1a4a8a; }
+        .link-btn.secondary { background: white; color: #0f3460; border: 2px solid #0f3460; }
+
+        .nav-links { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+        .nav-links a { padding: 8px 16px; background: white; border-radius: 8px; text-decoration: none; color: #0f3460; font-weight: 600; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .nav-links a:hover { background: #0f3460; color: white; }
+        .nav-links a.current { background: #0f3460; color: white; }
+
         .footer { text-align: center; padding: 40px 24px; color: #999; font-size: 0.85rem; }
 
+        .try-it { background: #e8f5e9; border: 2px dashed #28a745; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+        .try-it .title { font-weight: 700; color: #2e7d32; margin-bottom: 4px; }
+        .try-it p { color: #2e7d32; margin: 0; font-size: 0.95rem; }
+
+        details { margin: 12px 0; }
+        details summary { cursor: pointer; font-weight: 600; color: #0f3460; padding: 8px 0; }
+        details summary:hover { text-decoration: underline; }
+
+        .day-summary { background: linear-gradient(135deg, #f0e6ff, #e8ecf1); border-radius: 12px; padding: 24px; margin: 20px 0; }
+        .day-summary h3 { color: #5b21b6; margin-bottom: 12px; }
+
+        .rita-shortcut { background: #fff8e1; border: 1px solid #ff8f00; border-radius: 8px; padding: 12px 16px; margin: 16px 0; font-size: 0.9rem; }
+        .rita-shortcut .title { font-weight: 700; color: #e65100; margin-bottom: 4px; }
+
         @media (max-width: 600px) {
-            .dhc-card { grid-template-columns: 1fr; }
+            .credit-grid { grid-template-columns: 1fr; }
             .section { padding: 24px 20px; }
-            .nav-links { gap: 8px; }
         }
     </style>
 </head>
@@ -133,12 +123,13 @@
 
 <div class="header">
     <h1>Apollo.io - Обучение</h1>
-    <div class="subtitle">Неделя 1 / День 3: Списки и обогащение данных</div>
+    <div class="subtitle">Неделя 1 / День 3: Поиск компаний и списки</div>
     <div class="badge">~ 60 минут</div>
 </div>
 
 <div class="container">
 
+    <!-- Navigation -->
     <div class="nav-links">
         <a href="index.html">День 1</a>
         <a href="day-2.html">День 2</a>
@@ -152,415 +143,494 @@
         <a href="day-10.html">День 10</a>
     </div>
 
+    <!-- Progress -->
     <div class="progress-bar">
-        <span class="label">Прогресс:</span>
+        <span class="label">Прогресс обучения:</span>
         <div class="progress-track">
             <div class="progress-fill" style="width: 30%"></div>
         </div>
         <span class="day-label">День 3 из 10</span>
     </div>
 
+    <!-- TOC -->
     <div class="toc">
         <h3>Содержание дня</h3>
         <ol>
-            <li><a href="#section1">Продвинутая работа со списками</a> <span class="time">15 мин</span></li>
-            <li><a href="#section2">Data Health Center: панель здоровья данных</a> <span class="time">15 мин</span></li>
-            <li><a href="#section3">Обогащение: недостающие email и телефоны</a> <span class="time">10 мин</span></li>
-            <li><a href="#section4">Смена работы (Job Changes): как использовать</a> <span class="time">10 мин</span></li>
-            <li><a href="#section5">Практика: аудит и обогащение тестового списка</a> <span class="time">10 мин</span></li>
+            <li><a href="#review">Повторение: День 2</a> <span class="time">5 мин</span></li>
+            <li><a href="#section1">Основы поиска компаний</a> <span class="time">15 мин</span></li>
+            <li><a href="#section2">От компании к контактам (drill-down)</a> <span class="time">10 мин</span></li>
+            <li><a href="#section3">Списки: рабочий процесс RAW &rarr; READY</a> <span class="time">20 мин</span></li>
+            <li><a href="#section4">CSV: импорт и экспорт для Smartlead</a> <span class="time">10 мин</span></li>
+            <li><a href="#section5">Практическое задание и самопроверка</a> <span class="time">10 мин</span></li>
         </ol>
     </div>
 
-    <!-- Section 1: Advanced Lists -->
+    <!-- Quick Review -->
+    <div class="section" id="review" style="border-left: 4px solid #7c3aed;">
+        <h2>🔄 Повторение: День 2</h2>
+        <p>Ответь до того, как посмотришь ответы:</p>
+
+        <p><strong>Вопрос 1:</strong> Ты хочешь найти людей с должностью "Marketing Manager" ИЛИ "Head of Marketing", но НЕ "Assistant Marketing Manager". Напиши Boolean-запрос.</p>
+        <details><summary>Ответ</summary><p><code>("Marketing Manager" OR "Head of Marketing") NOT "Assistant"</code></p></details>
+
+        <p><strong>Вопрос 2:</strong> Ты создал Персону "UAE Business Owners" и применил её — видишь 5,000 результатов. Хочешь сузить до салонов красоты в Дубае с верифицированным email. Какие 3 фильтра добавишь?</p>
+        <details><summary>Ответ</summary><p>Industry: Beauty/Personal Care, Location: Dubai, Email Status: Verified.</p></details>
+
+        <p><strong>Вопрос 3:</strong> Лид с 45K подписчиков в Instagram, сетью из 3 фитнес-студий и недавним упоминанием в журнале. Какой Tier? Почему?</p>
+        <details><summary>Ответ</summary><p>Tier 1 — несколько квалифицирующих сигналов (большая аудитория, несколько локаций, пресс-покрытие). Заслуживает гиперперсонализированного outreach.</p></details>
+    </div>
+
+    <!-- Section 1 -->
     <div class="section" id="section1">
-        <h2><span class="num">1</span> Продвинутая работа со списками</h2>
+        <h2><span class="num">1</span> Основы поиска компаний</h2>
 
-        <p>Вчера ты создал свой первый список. Сегодня разберемся, как эффективно управлять списками и использовать их для работы.</p>
+        <p>Вчера ты искал ЛЮДЕЙ напрямую («покажи мне основателей в Дубае»). Сегодня научимся сначала искать КОМПАНИИ, а потом находить нужных людей внутри них. Это как два способа найти ресторан: можно искать «итальянских шеф-поваров в Дубае» (people-first) или «итальянские рестораны в Дубае», а потом спросить «кто главный шеф?» (company-first).</p>
 
-        <h3>Типы списков:</h3>
+        <h3>Когда какой подход использовать:</h3>
         <table>
             <tr>
-                <th>Тип</th>
-                <th>Что это</th>
-                <th>Когда использовать</th>
+                <th>Подход</th>
+                <th>Лучше всего для</th>
+                <th>Пример</th>
             </tr>
             <tr>
-                <td><strong>Статический</strong></td>
-                <td>Фиксированный набор контактов. Ты добавляешь и удаляешь вручную</td>
-                <td>Для конкретных кампаний: "UAE Fitness Owners - Март 2026"</td>
+                <td><strong>People-first</strong> (День 2)</td>
+                <td>Когда знаешь ДОЛЖНОСТЬ, которую ищешь</td>
+                <td>«Найди всех Marketing Manager в ОАЭ»</td>
             </tr>
             <tr>
-                <td><strong>Динамический</strong></td>
-                <td>Автоматически обновляется на основе фильтров (как сохраненный поиск)</td>
-                <td>Для постоянного мониторинга: "Все CEO в UAE с высоким Intent"</td>
+                <td><strong>Company-first</strong> (Сегодня)</td>
+                <td>Когда нужны определённые ТИПЫ компаний</td>
+                <td>«Найди салоны красоты на Shopify в Дубае»</td>
             </tr>
         </table>
 
-        <h3>Действия со списками:</h3>
+        <h3>Фильтры поиска компаний:</h3>
         <table>
             <tr>
-                <th>Действие</th>
-                <th>Как сделать</th>
-                <th>Стоимость</th>
-            </tr>
-            <tr>
-                <td><strong>Добавить в последовательность</strong></td>
-                <td>Выбрать контакты &rarr; Add to Sequence</td>
-                <td>Бесплатно</td>
-            </tr>
-            <tr>
-                <td><strong>Обогатить данные</strong></td>
-                <td>Выбрать контакты &rarr; Enrich</td>
-                <td>Кредиты за новые данные</td>
-            </tr>
-            <tr>
-                <td><strong>Экспортировать в CSV</strong></td>
-                <td>Выбрать контакты &rarr; Export</td>
-                <td>1 кредит / контакт</td>
-            </tr>
-            <tr>
-                <td><strong>Переместить в другой список</strong></td>
-                <td>Выбрать &rarr; Add to list (выбрать другой)</td>
-                <td>Бесплатно (уже сохранены)</td>
-            </tr>
-            <tr>
-                <td><strong>Удалить из списка</strong></td>
-                <td>Выбрать &rarr; Remove from list</td>
-                <td>Бесплатно</td>
-            </tr>
-            <tr>
-                <td><strong>Массовое выделение</strong></td>
-                <td>Чекбокс сверху &rarr; Select all (до 50,000)</td>
-                <td>Зависит от действия</td>
-            </tr>
-        </table>
-
-        <h3>Стратегия организации списков:</h3>
-        <div class="flow-diagram">
-            <div class="flow-step">
-                <div class="flow-num">1</div>
-                <div class="flow-content"><strong>Поиск</strong> — находим людей по персоне + фильтрам</div>
-            </div>
-            <div class="flow-step">
-                <div class="flow-num">2</div>
-                <div class="flow-content"><strong>Сырой список</strong> — сохраняем в список "[Регион] [Отрасль] - RAW"</div>
-            </div>
-            <div class="flow-step">
-                <div class="flow-num">3</div>
-                <div class="flow-content"><strong>Проверка</strong> — просматриваем, удаляем нерелевантных</div>
-            </div>
-            <div class="flow-step">
-                <div class="flow-num">4</div>
-                <div class="flow-content"><strong>Рабочий список</strong> — перемещаем проверенных в "[Регион] [Отрасль] - READY"</div>
-            </div>
-            <div class="flow-step">
-                <div class="flow-num">5</div>
-                <div class="flow-content"><strong>Отправка</strong> — экспортируем в Smartlead для email-кампании</div>
-            </div>
-        </div>
-
-        <div class="tip">
-            <div class="title">Совет: используй RAW / READY систему</div>
-            <p>Никогда не отправляй письма по "сырому" списку. Всегда проверяй контакты вручную перед переносом в рабочий список. Это экономит деньги и защищает репутацию отправителя.</p>
-        </div>
-    </div>
-
-    <!-- Section 2: Data Health Center -->
-    <div class="section" id="section2">
-        <h2><span class="num">2</span> Data Health Center: панель здоровья данных</h2>
-
-        <p>Data Health Center — это панель мониторинга качества твоих контактных данных. Она показывает, что нужно обновить, обогатить или исправить.</p>
-
-        <h3>Как попасть:</h3>
-        <ol class="steps">
-            <li>В левой навигации нажми <strong>Data enrichment</strong></li>
-            <li>Вверху выбери вкладку <strong>Data health center</strong></li>
-        </ol>
-
-        <h3>Что показывает панель:</h3>
-        <div class="dhc-card">
-            <div class="dhc-item">
-                <div class="dhc-icon">&#128188;</div>
-                <div class="dhc-title">Job Changes</div>
-                <div class="dhc-desc">Контакты, сменившие работу. % актуальных vs устаревших vs неизвестных</div>
-            </div>
-            <div class="dhc-item">
-                <div class="dhc-icon">&#128179;</div>
-                <div class="dhc-title">Credit Usage</div>
-                <div class="dhc-desc">Сколько кредитов потрачено и на что: email, телефоны, экспорт</div>
-            </div>
-            <div class="dhc-item">
-                <div class="dhc-icon">&#128231;</div>
-                <div class="dhc-title">Missing Emails</div>
-                <div class="dhc-desc">Контакты без email. Можно попробовать обогатить</div>
-            </div>
-        </div>
-
-        <h3>Что означают цвета в диаграммах:</h3>
-        <table>
-            <tr>
-                <th>Цвет</th>
-                <th>Значение</th>
-                <th>Что делать</th>
-            </tr>
-            <tr>
-                <td style="color: #28a745; font-weight: 700;">Зеленый / Синий</td>
-                <td>Данные актуальны, email есть</td>
-                <td>Ничего, все хорошо</td>
-            </tr>
-            <tr>
-                <td style="color: #ffc107; font-weight: 700;">Желтый</td>
-                <td>Нужно обновление (смена работы, данные устарели)</td>
-                <td>Запустить обогащение</td>
-            </tr>
-            <tr>
-                <td style="color: #999; font-weight: 700;">Серый</td>
-                <td>Неизвестно (Apollo не может определить)</td>
-                <td>Попробовать обогатить или проверить вручную</td>
-            </tr>
-        </table>
-
-        <h3>Кнопки на каждой карточке:</h3>
-        <table>
-            <tr>
-                <th>Кнопка</th>
+                <th>Фильтр</th>
                 <th>Что делает</th>
+                <th>Кейс для агентства</th>
             </tr>
             <tr>
-                <td><strong>View contacts</strong></td>
-                <td>Открывает список контактов с этой проблемой (например, все без email)</td>
+                <td><strong>Industry</strong></td>
+                <td>Фильтр по отраслевым категориям Apollo</td>
+                <td>Фитнес, красота, рестораны</td>
             </tr>
             <tr>
-                <td><strong>Schedule</strong></td>
-                <td>Настраивает автоматическое обогащение по расписанию</td>
+                <td><strong># Employees</strong></td>
+                <td>Размер компании</td>
+                <td>Фокус на МСБ: 1-50 сотрудников</td>
             </tr>
             <tr>
-                <td><strong>View credit usage</strong></td>
-                <td>Показывает детальную разбивку расходов кредитов</td>
-            </tr>
-        </table>
-    </div>
-
-    <!-- Section 3: Enrichment -->
-    <div class="section" id="section3">
-        <h2><span class="num">3</span> Обогащение: недостающие email и телефоны</h2>
-
-        <p>Обогащение (Enrichment) — это процесс, когда Apollo ищет недостающие данные о контактах: email, телефон, актуальную должность.</p>
-
-        <h3>Способы обогащения:</h3>
-        <table>
-            <tr>
-                <th>Способ</th>
-                <th>Как</th>
-                <th>Когда использовать</th>
+                <td><strong>Location</strong></td>
+                <td>Расположение штаб-квартиры</td>
+                <td>ОАЭ, Дубай, Абу-Даби</td>
             </tr>
             <tr>
-                <td><strong>Вручную</strong></td>
-                <td>Открой список &rarr; выбери контакты без email &rarr; нажми Enrich</td>
-                <td>Для маленьких списков (до 50 человек)</td>
+                <td><strong>Technologies</strong></td>
+                <td>Софт/инструменты, которые компания использует</td>
+                <td>Kajabi, Teachable (создатели курсов), Shopify (e-com)</td>
             </tr>
             <tr>
-                <td><strong>Через Data Health Center</strong></td>
-                <td>Data Health Center &rarr; Missing Emails &rarr; View contacts &rarr; Enrich</td>
-                <td>Для обогащения всех контактов без email сразу</td>
+                <td><strong>Revenue</strong></td>
+                <td>Диапазон годовой выручки</td>
+                <td>Валидация размера бизнеса</td>
             </tr>
             <tr>
-                <td><strong>По расписанию</strong></td>
-                <td>Data Health Center &rarr; Missing Emails &rarr; Schedule</td>
-                <td>Для автоматического обогащения (раз в неделю/месяц)</td>
+                <td><strong>Buying Intent</strong></td>
+                <td>Сигналы активного исследования (подробнее в Дне 4)</td>
+                <td>Компании, исследующие "digital marketing"</td>
             </tr>
             <tr>
-                <td><strong>CSV загрузка</strong></td>
-                <td>Data enrichment &rarr; CSV &rarr; загрузить файл</td>
-                <td>Если есть список контактов из другого источника</td>
-            </tr>
-        </table>
-
-        <h3>Настройка автоматического обогащения:</h3>
-        <ol class="steps">
-            <li>Перейди в <strong>Data enrichment &rarr; Data health center</strong></li>
-            <li>На карточке <strong>Missing Emails</strong> нажми <strong>Schedule</strong></li>
-            <li>Выбери тип: <strong>Contacts</strong></li>
-            <li>Выбери действие: <strong>Missing Emails</strong></li>
-            <li>Установи <strong>лимит кредитов</strong> (например, 50 в неделю) — это защита от перерасхода</li>
-            <li>Выбери частоту: <strong>Weekly</strong> (еженедельно)</li>
-            <li>Нажми <strong>Save</strong></li>
-        </ol>
-
-        <div class="warning">
-            <div class="title">Лимит кредитов обязателен!</div>
-            <p>Всегда устанавливай лимит кредитов при автоматическом обогащении. Без лимита Apollo может потратить все кредиты за одну сессию. Рекомендуем: <strong>не более 50 кредитов за одно обогащение</strong>.</p>
-        </div>
-
-        <div class="info">
-            <div class="title">Что происходит при обогащении?</div>
-            <p>Apollo проверяет свою базу данных и пытается найти email контакта. Успешность зависит от популярности компании и должности. В среднем Apollo находит email для 60-70% контактов. Если email не найден — кредит <strong>не тратится</strong>.</p>
-        </div>
-    </div>
-
-    <!-- Section 4: Job Changes -->
-    <div class="section" id="section4">
-        <h2><span class="num">4</span> Смена работы (Job Changes): как использовать</h2>
-
-        <p>Когда человек меняет работу, это один из лучших моментов для продажи. Вчера мы включили Job Change Alerts. Сегодня научимся с ними работать.</p>
-
-        <h3>Почему смена работы важна:</h3>
-        <table>
-            <tr>
-                <th>Причина</th>
-                <th>Как это помогает продавать</th>
-            </tr>
-            <tr>
-                <td><strong>Новая роль = новые задачи</strong></td>
-                <td>Человек ищет инструменты и партнеров для достижения целей на новой позиции</td>
-            </tr>
-            <tr>
-                <td><strong>Новый бюджет</strong></td>
-                <td>Часто на новой позиции выделяется бюджет на маркетинг</td>
-            </tr>
-            <tr>
-                <td><strong>Старые связи обнулились</strong></td>
-                <td>Предыдущее агентство осталось в старой компании</td>
-            </tr>
-            <tr>
-                <td><strong>Хотят показать результат</strong></td>
-                <td>Первые 90 дней — время доказать себя, поэтому готовы инвестировать</td>
-            </tr>
-        </table>
-
-        <h3>Как найти контакты со сменой работы:</h3>
-        <ol class="steps">
-            <li>Перейди в <strong>Data enrichment &rarr; Data health center</strong></li>
-            <li>На карточке <strong>Job Changes</strong> нажми <strong>View contacts</strong></li>
-            <li>Apollo откроет поиск с фильтром "контакты, сменившие работу"</li>
-            <li>Просмотри список — увидишь старую и новую должность/компанию</li>
-        </ol>
-
-        <h3>Или через поиск:</h3>
-        <ol class="steps">
-            <li>Перейди в <strong>People</strong></li>
-            <li>Нажми <strong>More Filters</strong></li>
-            <li>Найди фильтр <strong>Job Changes</strong></li>
-            <li>Выбери <strong>"Changed jobs"</strong></li>
-            <li>Добавь другие фильтры (персона, локация) для сужения результатов</li>
-        </ol>
-
-        <h3>Что делать с найденными контактами:</h3>
-        <table>
-            <tr>
-                <th>Действие</th>
-                <th>Как</th>
-            </tr>
-            <tr>
-                <td><strong>Обновить контакт</strong></td>
-                <td>Выбрать &rarr; Job change actions &rarr; Update existing contacts</td>
-            </tr>
-            <tr>
-                <td><strong>Создать новый контакт</strong></td>
-                <td>Если человек перешел в компанию-цель: Create new contact</td>
-            </tr>
-            <tr>
-                <td><strong>Добавить в отдельный список</strong></td>
-                <td>Создай список "Job Changes - [Месяц]" для отдельной кампании</td>
+                <td><strong>Funding</strong></td>
+                <td>Полученные инвестиции</td>
+                <td>Компании на стадии роста</td>
             </tr>
         </table>
 
         <div class="tip">
-            <div class="title">Идея для outreach</div>
-            <p>Письмо типа "Поздравляю с новой ролью в [Компания]! На новом месте часто нужно быстро показать результат в маркетинге — мы помогаем с этим компаниям в [отрасль]." Такие письма имеют в 3-5 раз более высокий отклик.</p>
-        </div>
-    </div>
-
-    <!-- Section 5: Practice -->
-    <div class="section" id="section5">
-        <h2><span class="num">5</span> Практика: аудит и обогащение тестового списка</h2>
-
-        <div class="practice-box">
-            <div class="practice-title">Задание 1: Аудит тестового списка</div>
-            <ol>
-                <li>Перейди в <strong>Lists</strong> и открой свой тестовый список из Дня 2</li>
-                <li>Посмотри, у скольких контактов есть email (зеленая иконка)</li>
-                <li>Посмотри, у скольких email отсутствует</li>
-                <li>Запиши результат: например, "15 из 20 с email, 5 без"</li>
-            </ol>
+            <div class="title">💡 Фильтры по технологиям — золото для поиска создателей курсов</div>
+            <p>Если компания использует Kajabi, Teachable или Thinkific — почти наверняка это создатель курсов. Технологические фильтры обходят ненадёжные отраслевые теги. Для e-commerce используй Shopify или WooCommerce.</p>
         </div>
 
-        <div class="practice-box" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
-            <div class="practice-title">Задание 2: Data Health Center</div>
-            <ol>
-                <li>Перейди в <strong>Data enrichment &rarr; Data health center</strong></li>
-                <li>Посмотри 3 карточки: Job Changes, Credit Usage, Missing Emails</li>
-                <li>Запиши текущие показатели (%, количество)</li>
-                <li>Нажми <strong>View contacts</strong> на карточке Missing Emails</li>
-                <li>Посмотри, какие контакты без email — есть ли среди них твои из тестового списка?</li>
-            </ol>
-        </div>
-
-        <div class="practice-box" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-            <div class="practice-title">Задание 3: Поиск смен работы</div>
-            <ol>
-                <li>Перейди в <strong>People</strong></li>
-                <li>Примени персону <strong>UAE Business Owner</strong></li>
-                <li>Добавь фильтр <strong>Job Changes &rarr; Changed jobs</strong></li>
-                <li>Сколько результатов? Просмотри 5-10 карточек</li>
-                <li>Обрати внимание на старую и новую позицию — какие переходы ты видишь?</li>
-            </ol>
-        </div>
+        <h3>Поиск компаний — шаг за шагом:</h3>
+        <ol class="steps">
+            <li>Перейди в <strong>Search &rarr; Companies</strong> (нажми вкладку "Companies")</li>
+            <li><strong>Фильтр 1 — Location:</strong> United Arab Emirates</li>
+            <li><strong>Фильтр 2 — Industry:</strong> Beauty, Personal Care</li>
+            <li><strong>Фильтр 3 — # Employees:</strong> 5-50</li>
+            <li>Проверь количество результатов</li>
+            <li><strong>Просмотри результаты (БЕСПЛАТНО):</strong> нажми на название компании — увидишь профиль: отрасль, размер, локация, технологии, сайт, ключевые люди</li>
+            <li>Посмотри на вкладку <strong>"People"</strong> в профиле компании — здесь лица, принимающие решения</li>
+        </ol>
 
         <div class="warning">
-            <div class="title">Не трать кредиты на обогащение сегодня</div>
-            <p>Сегодня мы только изучаем и просматриваем. Не нажимай "Enrich" на реальных контактах — это потратит кредиты. Просто ознакомься с интерфейсом и данными.</p>
+            <div class="title">⚠️ Отраслевые теги компаний часто ошибочны</div>
+            <p>Поиск "beauty salons" может вернуть оптовиков маникюрных принадлежностей, клиники пластической хирургии, франшизы бьюти-школ и производителей косметики. ВСЕГДА заходи в профили компаний и проверяй вручную. Выделяй 20-30 секунд на беглую проверку каждой компании.</p>
+        </div>
+
+        <div class="try-it">
+            <div class="title">🎯 Попробуй прямо сейчас: 3 поиска компаний (5 мин)</div>
+            <p><strong>Поиск 1:</strong> Beauty/салоны в Дубае, 5-50 сотрудников<br>
+            Результатов: ___________ | Из 5 проверенных — реально салоны: ___/5</p>
+            <p><strong>Поиск 2:</strong> Education/e-learning в ОАЭ. Добавь Technology: Kajabi OR Teachable<br>
+            Результатов: ___________ | Из 5 проверенных — реально создатели курсов: ___/5</p>
+            <p><strong>Поиск 3:</strong> Fitness/тренажёрные залы в Дубае<br>
+            Результатов: ___________ | Из 5 проверенных: ___/5</p>
+            <p><strong>Какой поиск дал лучшее качество?</strong> Скорее всего, Поиск 2 (технологические фильтры надёжнее отраслевых тегов).</p>
         </div>
     </div>
 
-    <!-- Checklist -->
-    <div class="section">
-        <h2>Чек-лист Дня 3</h2>
+    <!-- Section 2 -->
+    <div class="section" id="section2">
+        <h2><span class="num">2</span> От компании к контактам (drill-down)</h2>
 
+        <p>Ты нашёл 20 салонов красоты, которые выглядят перспективно. Теперь нужно найти ВЛАДЕЛЬЦА каждого. Это drill-down — переход от компании к нужному человеку.</p>
+
+        <h3>Поиск ЛПР в конкретной компании:</h3>
+        <ol class="steps">
+            <li>Из результатов поиска компаний нажми на название компании</li>
+            <li>На странице профиля компании нажми вкладку <strong>"People"</strong></li>
+            <li>Увидишь список людей, которых Apollo знает в этой компании</li>
+            <li>Отфильтруй по должности или seniority (например, "Owner" или "C-Suite")</li>
+            <li>Это просто другой способ найти тех же людей, что и через People Search</li>
+        </ol>
+
+        <h3>Два подхода в сравнении:</h3>
+        <table>
+            <tr>
+                <th>Шаг</th>
+                <th>People-First (День 2)</th>
+                <th>Company-First (Сегодня)</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>Ищи «Владельцев бьюти в Дубае»</td>
+                <td>Ищи «бьюти-компании в Дубае»</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Просматривай людей напрямую</td>
+                <td>Заходи в профиль каждой компании</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>—</td>
+                <td>Найди владельца через вкладку People</td>
+            </tr>
+            <tr>
+                <td><strong>Лучше для</strong></td>
+                <td>Объём — быстро находишь много ЛПР</td>
+                <td>Качество — сначала проверяешь компанию, потом ищешь человека</td>
+            </tr>
+        </table>
+
+        <div class="rita-shortcut">
+            <div class="title">⚡ Совет для продвинутых</div>
+            Company-first для Tier 1 лидов (исследуй компанию, потом найди нужного человека). People-first для Tier 3 (находи людей быстро, фильтруй позже).
+        </div>
+
+        <div class="try-it">
+            <div class="title">🎯 Попробуй прямо сейчас: Drill-down от компании к контакту (5 мин)</div>
+            <p>Из поиска бьюти-компаний (Поиск 1 выше):</p>
+            <p>1. Выбери 3 компании, которые РЕАЛЬНО являются салонами красоты (ты проверил)<br>
+            2. Зайди в каждую &rarr; вкладка People<br>
+            3. Найди владельца/основателя каждой<br>
+            4. Запиши:</p>
+            <table>
+                <tr>
+                    <th>Компания</th>
+                    <th>Имя владельца</th>
+                    <th>Должность</th>
+                    <th>Верифицированный email?</th>
+                </tr>
+                <tr>
+                    <td>1.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Да / Нет</td>
+                </tr>
+                <tr>
+                    <td>2.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Да / Нет</td>
+                </tr>
+                <tr>
+                    <td>3.</td>
+                    <td></td>
+                    <td></td>
+                    <td>Да / Нет</td>
+                </tr>
+            </table>
+            <p><strong>НЕ сохраняй и не раскрывай эти контакты</strong> — сначала научимся работать со списками.</p>
+        </div>
+    </div>
+
+    <!-- Section 3 -->
+    <div class="section" id="section3">
+        <h2><span class="num">3</span> Списки: рабочий процесс RAW &rarr; READY</h2>
+
+        <p>Представь фабрику с двумя контейнерами: «Сырьё» и «Готово к отправке». Ты не отправляешь сырьё клиентам — оно проходит контроль качества. Твои списки в Apollo работают так же. RAW-списки — необработанные результаты поиска. READY-списки — проверенные, квалифицированные контакты, которых действительно стоит писать.</p>
+
+        <h3>Рабочий процесс RAW &rarr; READY:</h3>
+        <p style="background: #f8f9fb; padding: 16px; border-radius: 8px; font-family: monospace; font-size: 0.9rem; text-align: center;">
+            [Результаты поиска] &rarr; [RAW-список] &rarr; [Ручная проверка] &rarr; [READY-список] &rarr; [Экспорт CSV] &rarr; [Smartlead]
+        </p>
+
+        <table>
+            <tr>
+                <th>Шаг</th>
+                <th>Что происходит</th>
+                <th>Кто делает</th>
+                <th>Время</th>
+            </tr>
+            <tr>
+                <td>1. Поиск</td>
+                <td>Найди лидов с фильтрами + Персоной</td>
+                <td>Рита</td>
+                <td>5 мин</td>
+            </tr>
+            <tr>
+                <td>2. Сохранить в RAW</td>
+                <td>Добавь результаты поиска в RAW-список</td>
+                <td>Рита</td>
+                <td>2 мин</td>
+            </tr>
+            <tr>
+                <td>3. Проверка</td>
+                <td>Каждый контакт: реальный бизнес? ЛПР? Правильная вертикаль?</td>
+                <td>Рита или Папа</td>
+                <td>10-15 мин</td>
+            </tr>
+            <tr>
+                <td>4. Квалификация</td>
+                <td>Перенеси хорошие контакты в READY-список</td>
+                <td>Рита</td>
+                <td>5 мин</td>
+            </tr>
+            <tr>
+                <td>5. Экспорт</td>
+                <td>Скачай READY-список как CSV (только verified)</td>
+                <td>Рита</td>
+                <td>2 мин</td>
+            </tr>
+            <tr>
+                <td>6. Smartlead</td>
+                <td>Загрузи CSV в кампанию Smartlead</td>
+                <td>Рита</td>
+                <td>5 мин</td>
+            </tr>
+        </table>
+
+        <h3>Конвенция именования списков (используй ТОЧНО ТАК):</h3>
+        <ul style="margin: 12px 0 16px 20px; color: #444;">
+            <li><strong>RAW-списки:</strong> <code>RAW - [Вертикаль] - [Дата]</code> &rarr; Пример: "RAW - Dubai Fitness - Mar 2026"</li>
+            <li><strong>READY-списки:</strong> <code>READY - [Вертикаль] - [Дата]</code> &rarr; Пример: "READY - Dubai Fitness - Mar 2026"</li>
+        </ul>
+
+        <h3>Зачем два списка? Три причины:</h3>
+        <ol style="margin: 12px 0 16px 20px; color: #444;">
+            <li><strong>Защита кредитов:</strong> добавление в список стоит 1-5 email-кредитов (зависит от waterfall). Экспорт — 1 export-кредит. Если экспортируешь неквалифицированных — тратишь ОБА типа зря.</li>
+            <li><strong>Защита доставляемости:</strong> отправка на неверифицированные/ошибочные контакты портит репутацию отправителя в Smartlead.</li>
+            <li><strong>Контроль качества:</strong> ручная проверка ловит 30-70% мусора в отраслевых классификациях Apollo.</li>
+        </ol>
+
+        <div class="warning">
+            <div class="title">⚠️ Добавление в список автоматически раскрывает email (тратит кредиты)</div>
+            <p>Когда нажимаешь "Add to List" на новом контакте, Apollo автоматически раскрывает email и списывает 1-5 email-кредитов (зависит от количества waterfall-провайдеров). Это НЕ просто организация — это расход денег. Думай о RAW-списке как о «корзине покупок». Добавление каждого человека стоит денег. Не бросай туда случайных людей — сначала посмотри бесплатный превью в поиске, добавляй только тех, кто выглядит как реальный лид.</p>
+        </div>
+
+        <h3>Создание списков и перенос контактов — шаг за шагом:</h3>
+        <ol class="steps">
+            <li>Перейди в <strong>Lists</strong> в сайдбаре</li>
+            <li>Нажми <strong>"Create a list"</strong></li>
+            <li>Назови: <strong>"RAW - Dubai Fitness - Practice"</strong> &rarr; нажми Create</li>
+            <li>Создай второй список: <strong>"READY - Dubai Fitness - Practice"</strong></li>
+            <li>Перейди в <strong>Search &rarr; People</strong></li>
+            <li>Примени Saved Search "Dubai Fitness Owners - Verified" (из Дня 2)</li>
+            <li>Выбери 5 контактов (чекбоксы рядом с именами)</li>
+            <li>Нажми <strong>"Add to List"</strong> &rarr; выбери <strong>"RAW - Dubai Fitness - Practice"</strong></li>
+            <li>Подтверди — Apollo добавит их (и раскроет email = 5 email-кредитов потрачено)</li>
+        </ol>
+
+        <h3>Перенос из RAW в READY:</h3>
+        <ol class="steps">
+            <li>Перейди в <strong>Lists</strong> &rarr; открой "RAW - Dubai Fitness - Practice"</li>
+            <li>Нажми на каждый контакт — проверь: это реально владелец фитнес-бизнеса? (не поставщик оборудования и не фитнес-блогер)</li>
+            <li>Email верифицирован?</li>
+            <li>Компания реальная? (проверь сайт, если есть)</li>
+            <li>Контакты, прошедшие проверку: выбери их &rarr; "Add to List" &rarr; "READY - Dubai Fitness - Practice"</li>
+            <li>Это БЕСПЛАТНО (они уже сохранённые контакты)</li>
+        </ol>
+
+        <div class="try-it">
+            <div class="title">🎯 Попробуй прямо сейчас: Создай RAW и READY списки (8 мин)</div>
+            <p>1. Создай 2 списка: "RAW - Dubai Fitness - Practice" и "READY - Dubai Fitness - Practice"<br>
+            2. Перейди в Search &rarr; People. Примени поиск по фитнес-владельцам<br>
+            3. Добавь 5 контактов в RAW-список (это стоит 5 email-кредитов — подтверди, что ок)<br>
+            4. Открой RAW-список. Зайди в каждый профиль<br>
+            5. Проверь: это реальный ЛПР фитнес-бизнеса?<br>
+            6. Перенеси 2-3 прошедших проверку в READY-список<br>
+            7. Сделай скриншот обоих списков с количеством контактов</p>
+            <p><strong>Критерии успеха:</strong></p>
+            <ul class="checklist">
+                <li><span class="check"></span> RAW-список: 5 контактов</li>
+                <li><span class="check"></span> READY-список: 2-3 контакта (меньше, чем RAW — в этом и смысл фильтрации)</li>
+                <li><span class="check"></span> Все контакты в READY — реальные ЛПР фитнес-бизнеса</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- Section 4 -->
+    <div class="section" id="section4">
+        <h2><span class="num">4</span> CSV: импорт и экспорт для Smartlead</h2>
+
+        <p>Apollo может принимать списки контактов (импорт) и выдавать их (экспорт). Импорт полезен, когда у тебя есть список из другого источника (Google Maps, мероприятие) и ты хочешь, чтобы Apollo нашёл контактные данные. Экспорт — то, что ты делаешь каждый раз, когда хочешь отправить контакты в Smartlead.</p>
+
+        <h3>Импорт — загрузка контактов В Apollo:</h3>
+        <ul style="margin: 12px 0 16px 20px; color: #444;">
+            <li>Путь: <strong>Lists &rarr; Create a list &rarr; upload CSV</strong></li>
+            <li>Требуется минимум одна из комбинаций:
+                <ul>
+                    <li>Имя + Фамилия + URL или название компании</li>
+                    <li>LinkedIn URL</li>
+                    <li>Email-адрес</li>
+                </ul>
+            </li>
+            <li>Лимит: максимум 100,000 строк на файл (рекомендация: не более 10,000)</li>
+        </ul>
+
+        <h3>Экспорт — выгрузка контактов ИЗ Apollo (для Smartlead):</h3>
+        <ul style="margin: 12px 0 16px 20px; color: #444;">
+            <li>Путь: <strong>Lists &rarr; выбери список &rarr; Export</strong></li>
+            <li>Стоимость: 1 export-кредит за контакт</li>
+            <li><strong>Критически важно:</strong> всегда выбирай "Verified emails only"</li>
+            <li>Полученный CSV можно напрямую импортировать в Smartlead</li>
+        </ul>
+
+        <div class="warning">
+            <div class="title">⚠️ Всегда экспортируй только "Verified Emails Only"</div>
+            <p>При экспорте для Smartlead ВСЕГДА выбирай опцию "Verified emails only". Отправка на неверифицированные email портит репутацию отправителя и может ухудшить доставляемость ВСЕХ кампаний на ВСЕХ доменах. Одна плохая рассылка может навредить всему.</p>
+        </div>
+
+        <h3>Экспорт для Smartlead — шаг за шагом:</h3>
+        <ol class="steps">
+            <li>Перейди в <strong>Lists</strong> &rarr; открой <strong>"READY - Dubai Fitness - Practice"</strong></li>
+            <li>Нажми кнопку <strong>Export</strong> (иконка скачивания или текст "Export")</li>
+            <li>В настройках экспорта: выбери <strong>"Verified emails only"</strong>, формат: CSV</li>
+            <li>Нажми Export — CSV-файл скачается</li>
+            <li>Открой CSV — проверь наличие колонок: First Name, Last Name, Email, Company Name, Title</li>
+            <li><strong>Сохрани копию</strong> каждого экспортированного CSV как бэкап</li>
+        </ol>
+
+        <div class="tip">
+            <div class="title">💡 Подсказка</div>
+            <p>Храни экспортированные CSV в отдельной папке (например, <code>~/Documents/Apollo Exports/</code>). Называй файлы по шаблону: "READY-Dubai-Fitness-Mar-2026.csv"</p>
+        </div>
+
+        <h3>Импорт CSV в Smartlead (справочно):</h3>
+        <ol style="margin: 12px 0 16px 20px; color: #444;">
+            <li>Открой Smartlead</li>
+            <li>Создай или открой кампанию</li>
+            <li>Import CSV &rarr; соотнеси поля: First Name, Last Name, Email, Company, Title</li>
+            <li>Запусти кампанию по процессу Smartlead</li>
+        </ol>
+
+        <div class="try-it">
+            <div class="title">🎯 Попробуй прямо сейчас: Экспорт READY-списка (4 мин)</div>
+            <p>1. Открой "READY - Dubai Fitness - Practice"<br>
+            2. Экспортируй в CSV (verified emails only)<br>
+            3. Открой CSV на компьютере<br>
+            4. Проверь колонки: First Name, Last Name, Email, Company Name, Title<br>
+            5. Посчитай строки — совпадает с числом контактов в READY-списке?</p>
+        </div>
+    </div>
+
+    <!-- Section 5: Practice + Quiz -->
+    <div class="section" id="section5">
+        <h2><span class="num">5</span> Практическое задание и самопроверка</h2>
+
+        <div style="border-left: 4px solid #e94560; padding-left: 20px; margin-bottom: 24px;">
+            <h3>🎯 Финальное задание: Полный pipeline от компании до Smartlead (10 мин)</h3>
+            <p>Собери всё из сегодняшнего дня в один сквозной процесс:</p>
+            <ol class="steps">
+                <li><strong>(2 мин)</strong> Запусти поиск КОМПАНИЙ: education/e-learning в ОАЭ (добавь Technology: Kajabi или Teachable)</li>
+                <li><strong>(2 мин)</strong> Выбери 3 подходящие компании. Перейди во вкладку People каждой &rarr; найди владельца/основателя (company-first подход)</li>
+                <li><strong>(2 мин)</strong> Добавь этих 3 владельцев в новый RAW-список: "RAW - UAE Course Creators - Practice"</li>
+                <li><strong>(2 мин)</strong> Проверь каждого. Перенеси квалифицированных в "READY - UAE Course Creators - Practice"</li>
+                <li><strong>(2 мин)</strong> Экспортируй READY-список в CSV (verified emails only)</li>
+            </ol>
+            <p><strong>Самоконтроль:</strong> ты только что прошёл весь pipeline: Поиск компаний &rarr; Найти ЛПР &rarr; RAW-список &rarr; Проверка &rarr; READY-список &rarr; Экспорт CSV. Это твой основной еженедельный рабочий процесс.</p>
+        </div>
+
+        <h3>Чек-лист Дня 3:</h3>
         <ul class="checklist">
-            <li><span class="check"></span> Я понимаю разницу между статическими и динамическими списками</li>
-            <li><span class="check"></span> Я знаю систему RAW / READY для организации списков</li>
-            <li><span class="check"></span> Я знаю, где найти Data Health Center и что показывают 3 карточки</li>
-            <li><span class="check"></span> Я понимаю, как работает обогащение email и как установить лимит кредитов</li>
-            <li><span class="check"></span> Я знаю, как найти контакты, сменившие работу</li>
-            <li><span class="check"></span> Я знаю, почему смена работы — хороший момент для outreach</li>
-            <li><span class="check"></span> Я провел аудит тестового списка и посмотрел Data Health Center</li>
+            <li><span class="check"></span> Умею искать компании по отрасли, локации, размеру и технологиям</li>
+            <li><span class="check"></span> Могу перейти от профиля компании к поиску ЛПР</li>
+            <li><span class="check"></span> Создал(а) RAW и READY списки с правильной конвенцией именования</li>
+            <li><span class="check"></span> Умею переносить контакты из RAW в READY после проверки</li>
+            <li><span class="check"></span> Могу экспортировать READY-список в CSV для Smartlead</li>
+            <li><span class="check"></span> Знаю, как импортировать CSV в Apollo (процесс)</li>
         </ul>
 
         <div class="quiz">
-            <div class="title">Самопроверка:</div>
+            <div class="title">🧪 Проверь себя</div>
+
+            <p><strong>Вопрос 1:</strong> Ты делаешь поиск компаний по "beauty salons" в Дубае. Часть результатов — оптовики маникюрных принадлежностей. Почему?</p>
             <ol>
-                <li>Чем статический список отличается от динамического?</li>
-                <li>Что нужно обязательно установить при автоматическом обогащении?</li>
-                <li>Тратится ли кредит, если Apollo не нашел email при обогащении?</li>
-                <li>Почему первые 90 дней на новой работе — лучшее время для продажи?</li>
-                <li>Зачем нужна система RAW / READY для списков?</li>
+                <li>Отраслевые теги Apollo ненадёжны для нишевых вертикалей</li>
+                <li>Ты забыл добавить фильтр по локации</li>
+                <li>Салоны красоты не существуют в базе Apollo</li>
+                <li>Твой Boolean-запрос неправильный</li>
             </ol>
+            <details><summary>Показать ответ</summary><p><strong>a)</strong> Отраслевые теги Apollo дают до 70% мусора для нишевых вертикалей. Всегда проверяй профили компаний вручную.</p></details>
+
+            <p><strong>Вопрос 2:</strong> Зачем в процессе RAW &rarr; READY два отдельных списка вместо прямого экспорта из поиска? Ответь 1-2 предложениями.</p>
+            <details><summary>Показать ответ</summary><p>Чтобы не тратить export-кредиты на неквалифицированных лидов и поддерживать качество данных через ручную проверку перед отправкой в Smartlead. Ручной контроль отсеивает 30-70% мусора в отраслевых классификациях Apollo.</p></details>
+
+            <p><strong>Вопрос 3:</strong> Сколько кредитов стоит: (a) добавить 100 новых контактов в RAW, (b) перенести 60 квалифицированных в READY, (c) экспортировать 60 из READY?</p>
+            <details><summary>Показать ответ</summary><p>(a) 100 email-кредитов. (b) 0 — уже сохранены. (c) 60 export-кредитов. <strong>Итого: 160 кредитов.</strong> Поэтому проверяешь до экспорта — сэкономил 40 export-кредитов, не экспортируя 40 неквалифицированных.</p></details>
+
+            <p><strong>Вопрос 4:</strong> Ты хочешь найти создателей курсов в ОАЭ. Какой фильтр НАДЁЖНЕЕ: Industry = "Education" или Technology = "Kajabi, Teachable"?</p>
+            <ol>
+                <li>Industry — стандартный фильтр</li>
+                <li>Technology — напрямую определяет инструменты создателей курсов</li>
+                <li>Оба одинаково надёжны</li>
+                <li>Ни один не работает — используй people search</li>
+            </ol>
+            <details><summary>Показать ответ</summary><p><strong>b)</strong> Технологические фильтры напрямую определяют компании, использующие платформы для создания курсов, обходя часто ненадёжные отраслевые классификации Apollo. Компания на Kajabi — почти наверняка создатель курсов.</p></details>
         </div>
 
-        <details>
-            <summary style="cursor:pointer; color:#0f3460; font-weight:600; padding: 8px 0;">Нажми, чтобы увидеть ответы</summary>
-            <ol style="padding: 16px 20px; background:#f8f9fb; border-radius:8px; margin-top:8px;">
-                <li><strong>Статический</strong> — контакты добавляются вручную. <strong>Динамический</strong> — обновляется автоматически на основе фильтров</li>
-                <li><strong>Лимит кредитов</strong> — без него Apollo может потратить все кредиты за одну сессию</li>
-                <li><strong>Нет</strong> — кредит тратится только при успешном обогащении</li>
-                <li>Новый бюджет, нужно показать результат, старые партнеры обнулились, открыты к новым предложениям</li>
-                <li>Чтобы <strong>не отправлять письма непроверенным контактам</strong> — сначала проверяем (RAW), потом отправляем (READY)</li>
+        <div class="day-summary">
+            <h3>Итоги Дня 3</h3>
+            <ol style="color: #444;">
+                <li><strong>Company-first поиск</strong> находит ПРАВИЛЬНЫЕ компании, потом переходит к ПРАВИЛЬНЫМ людям</li>
+                <li><strong>Технологические фильтры</strong> (Kajabi, Shopify) надёжнее отраслевых тегов для нишевых вертикалей</li>
+                <li><strong>RAW &rarr; READY workflow</strong> защищает от траты кредитов на неквалифицированные контакты</li>
+                <li><strong>Добавление в список стоит кредитов.</strong> Экспорт стоит дополнительных кредитов. Планируй бюджет.</li>
+                <li><strong>Всегда экспортируй</strong> с опцией "Verified emails only" для защиты доставляемости Smartlead</li>
             </ol>
-        </details>
+        </div>
     </div>
 
-    <!-- Next day -->
+    <!-- Next day preview -->
     <div class="section" style="border-left: 4px solid #0f3460;">
-        <h3>Завтра: День 4 - CRM Pipeline и управление сделками</h3>
-        <p>Научимся работать с нашим pipeline из 9 стадий, создавать сделки, двигать контакты по стадиям, и вести заметки о взаимодействиях.</p>
+        <h3>Завтра: День 4 — Качество данных</h3>
+        <p>Изучим обогащение данных (Enrichment), Data Health Center, и самое интересное: оповещения о смене работы (Job Change Alerts) и сигналы покупательского намерения (Buying Intent). Эти сигналы — то, что отличает хороший поиск лидов от отличного.</p>
+    </div>
+
+    <!-- Bottom nav -->
+    <div style="text-align: center; margin: 32px 0;">
+        <a href="day-2.html" class="link-btn secondary">&larr; Предыдущий день</a>
+        <a href="day-4.html" class="link-btn">Следующий день &rarr;</a>
     </div>
 
 </div>
 
 <div class="footer">
-    <p>SF Agency - Внутреннее обучение Apollo.io</p>
-    <p>Создано: Март 2026</p>
+    Apollo.io Обучение — День 3 из 10 | Создано для SF Agency
 </div>
 
 </body>

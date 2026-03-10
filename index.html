@@ -76,7 +76,6 @@
         }
 
         .progress-fill {
-            width: 20%;
             height: 100%;
             background: linear-gradient(90deg, #e94560, #0f3460);
             border-radius: 5px;
@@ -490,6 +489,55 @@
             font-size: 0.85rem;
         }
 
+        /* Try It Now micro-exercise */
+        .try-it {
+            background: #e8f5e9;
+            border: 2px dashed #28a745;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+        .try-it .title {
+            font-weight: 700;
+            color: #2e7d32;
+            margin-bottom: 4px;
+        }
+        .try-it p { color: #2e7d32; margin: 0; font-size: 0.95rem; }
+
+        /* Expandable details styling */
+        details { margin: 12px 0; }
+        details summary {
+            cursor: pointer;
+            font-weight: 600;
+            color: #0f3460;
+            padding: 8px 0;
+        }
+        details summary:hover { text-decoration: underline; }
+
+        /* Day summary box */
+        .day-summary {
+            background: linear-gradient(135deg, #f0e6ff, #e8ecf1);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+        .day-summary h3 { color: #5b21b6; margin-bottom: 12px; }
+
+        /* Rita shortcut callout */
+        .rita-shortcut {
+            background: #fff8e1;
+            border: 1px solid #ff8f00;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 16px 0;
+            font-size: 0.9rem;
+        }
+        .rita-shortcut .title {
+            font-weight: 700;
+            color: #e65100;
+            margin-bottom: 4px;
+        }
+
         @media (max-width: 600px) {
             .credit-grid { grid-template-columns: 1fr; }
             .nav-diagram { grid-template-columns: 1fr; }
@@ -525,7 +573,7 @@
     <div class="progress-bar">
         <span class="label">Прогресс обучения:</span>
         <div class="progress-track">
-            <div class="progress-fill"></div>
+            <div class="progress-fill" style="width: 10%"></div>
         </div>
         <span class="day-label">День 1 из 10</span>
     </div>
@@ -534,20 +582,24 @@
     <div class="toc">
         <h3>Содержание дня</h3>
         <ol>
-            <li><a href="#section1">Что такое Apollo.io и зачем он нам нужен</a> <span class="time">10 мин</span></li>
-            <li><a href="#section2">Создание аккаунта и первый вход</a> <span class="time">5 мин</span></li>
-            <li><a href="#section3">Установка Chrome-расширения</a> <span class="time">5 мин</span></li>
-            <li><a href="#section4">Обзор интерфейса: навигация по платформе</a> <span class="time">15 мин</span></li>
-            <li><a href="#section5">Система кредитов: что платно, что бесплатно</a> <span class="time">15 мин</span></li>
+            <li><a href="#section1">Настройка аккаунта и первый вход</a> <span class="time">15 мин</span></li>
+            <li><a href="#section2">Установка Chrome-расширения</a> <span class="time">15 мин</span></li>
+            <li><a href="#section3">Обзор интерфейса: навигация по платформе</a> <span class="time">15 мин</span></li>
+            <li><a href="#section4">Система кредитов: что платно, что бесплатно</a> <span class="time">15 мин</span></li>
+            <li><a href="#section5">Практическое задание</a> <span class="time">10 мин</span></li>
             <li><a href="#section6">Чек-лист и самопроверка</a> <span class="time">10 мин</span></li>
         </ol>
     </div>
 
     <!-- Section 1 -->
     <div class="section" id="section1">
-        <h2><span class="num">1</span> Что такое Apollo.io и зачем он нам нужен</h2>
+        <h2><span class="num">1</span> Настройка аккаунта и первый вход</h2>
 
-        <p>Apollo.io - это платформа для поиска клиентов и автоматизации продаж. Представь это как огромную базу данных компаний и людей (210+ миллионов контактов, 35+ миллионов компаний) с инструментами для работы с ними.</p>
+        <h3>Что такое Apollo и зачем он нужен</h3>
+
+        <p>Apollo.io — это платформа для поиска клиентов и автоматизации продаж. Представь огромную базу данных компаний и людей с инструментами для работы с ними.</p>
+
+        <p>Apollo заявляет 275+ миллионов контактов по данным их маркетинговых материалов (точная цифра варьируется — ранее указывали 210М+). Это крупнейшая B2B база контактов на рынке.</p>
 
         <h3>Что Apollo делает для нас:</h3>
         <table>
@@ -578,46 +630,59 @@
         </table>
 
         <div class="info">
-            <div class="title">Наш подход</div>
+            <div class="title">ℹ️ Наш подход</div>
             <p>Мы используем Apollo для <strong>поиска и квалификации лидов</strong>, а для отправки холодных писем используем отдельный инструмент (Smartlead). Apollo = данные и CRM, Smartlead = отправка.</p>
+        </div>
+
+        <p>Думай об Apollo как о своем «разведывательном штабе». Это как иметь помощника-исследователя, который знает каждого предпринимателя в ОАЭ — имя, email, компанию, должность. Ты задаешь вопросы («покажи мне владельцев фитнес-студий в Дубае»), и Apollo отвечает. Но Apollo НЕ отправляет письма — это работа Smartlead. Apollo находит людей. Smartlead с ними связывается.</p>
+
+        <h3>Шаги для регистрации:</h3>
+        <ol class="steps">
+            <li>Перейди на <a href="https://www.apollo.io" target="_blank">apollo.io</a> и нажми <strong>"Sign Up Free"</strong></li>
+            <li>Зарегистрируйся через рабочий email (Google-аккаунт — быстрее всего)</li>
+            <li>Заполни профиль: имя, компания, должность</li>
+            <li>Apollo покажет <strong>Onboarding Hub</strong> — список рекомендованных шагов. Пока пропусти его — мы пройдём всё по нашему плану</li>
+            <li>Проверь, что ты видишь главную панель (<strong>Home</strong>) с навигацией слева</li>
+        </ol>
+
+        <div class="tip">
+            <div class="title">💡 Подсказка</div>
+            <p>Если тебя пригласили в команду, используй ссылку-приглашение вместо обычной регистрации. Так ты сразу окажешься в нашем рабочем пространстве с общими настройками.</p>
+        </div>
+
+        <h3>Первый вход и проверка настроек</h3>
+        <ol class="steps">
+            <li>Открой браузер. Перейди на <code>app.apollo.io</code></li>
+            <li>Войди со своим email и паролем</li>
+            <li>Ты попадёшь на главную панель <strong>Home</strong> — это твоя отправная точка</li>
+            <li>Нажми на иконку <strong>шестерёнки</strong> (⚙️) в <strong>левом нижнем углу</strong> сайдбара — это <strong>Settings</strong></li>
+            <li>В настройках увидишь категории: <strong>Users and Teams</strong> (пользователи), <strong>Objects, Fields, Stages</strong> (настроим на 6-й день), <strong>Billing</strong> (кредиты и план)</li>
+            <li>Нажми <strong>Billing</strong> в меню настроек</li>
+            <li>Запиши три вещи: название текущего плана (Free / Basic / Professional / Organization), остаток email-кредитов, остаток export-кредитов</li>
+        </ol>
+
+        <div class="warning">
+            <div class="title">⚠️ Кредиты сгорают ежемесячно</div>
+            <p>Кредиты обнуляются в конце биллинг-цикла. Они <strong>НЕ переносятся</strong> на следующий месяц. Если у тебя 500 неиспользованных export-кредитов в последний день — они просто исчезнут. Планируй экспорт заранее.</p>
+        </div>
+
+        <div class="try-it">
+            <div class="title">🎯 Попробуй прямо сейчас (5 мин)</div>
+            <p>1. Войди в Apollo на <code>app.apollo.io</code><br>
+            2. Нажми иконку шестерёнки (⚙️) слева внизу<br>
+            3. Перейди в <strong>Billing</strong><br>
+            4. Запиши: (а) название плана: _____ (б) email-кредитов: _____ (в) export-кредитов: _____<br>
+            5. Сделай скриншот страницы Billing</p>
         </div>
     </div>
 
     <!-- Section 2 -->
     <div class="section" id="section2">
-        <h2><span class="num">2</span> Создание аккаунта и первый вход</h2>
+        <h2><span class="num">2</span> Установка Chrome-расширения</h2>
 
-        <h3>Шаги для регистрации:</h3>
-        <ol class="steps">
-            <li>Перейди на <a href="https://www.apollo.io" target="_blank">apollo.io</a> и нажми <strong>"Sign Up Free"</strong></li>
-            <li>Зарегистрируйся через рабочий email (Google аккаунт - быстрее всего)</li>
-            <li>Заполни профиль: имя, компания, должность</li>
-            <li>Apollo покажет <strong>Onboarding Hub</strong> - список рекомендованных шагов. Пока пропусти его - мы пройдем все по нашему плану</li>
-            <li>Проверь, что ты видишь главную панель (Home) с навигацией слева</li>
-        </ol>
+        <p>Chrome-расширение Apollo — это как «очки Apollo» для браузера. Когда ты заходишь на чей-то профиль LinkedIn, расширение показывает данные Apollo о человеке — email, телефон, информацию о компании — прямо на странице LinkedIn. Не нужно переключаться между вкладками.</p>
 
-        <div class="tip">
-            <div class="title">Подсказка</div>
-            <p>Если тебя пригласили в команду, используй ссылку-приглашение вместо обычной регистрации. Так ты сразу окажешься в нашем рабочем пространстве с общими настройками.</p>
-        </div>
-    </div>
-
-    <!-- Section 3 -->
-    <div class="section" id="section3">
-        <h2><span class="num">3</span> Установка Chrome-расширения</h2>
-
-        <p>Chrome-расширение Apollo позволяет находить контактные данные людей прямо на LinkedIn, на сайтах компаний и в Gmail.</p>
-
-        <h3>Установка:</h3>
-        <ol class="steps">
-            <li>Открой Chrome Web Store и найди <strong>"Apollo.io"</strong> (или попроси ссылку)</li>
-            <li>Нажми <strong>"Add to Chrome"</strong> (Добавить в Chrome)</li>
-            <li>Подтверди разрешения - расширение запросит доступ к LinkedIn и другим сайтам</li>
-            <li>Войди в расширение через свой Apollo-аккаунт</li>
-            <li>Проверь: открой LinkedIn профиль любого человека - справа должна появиться панель Apollo с данными</li>
-        </ol>
-
-        <h3>Что умеет расширение:</h3>
+        <h3>Где работает расширение:</h3>
         <table>
             <tr>
                 <th>Где работает</th>
@@ -641,50 +706,127 @@
             </tr>
         </table>
 
+        <h3>Установка шаг за шагом:</h3>
+        <ol class="steps">
+            <li>Открой <strong>Google Chrome</strong> (только Chrome — не Safari и не Firefox)</li>
+            <li>Зайди в Chrome Web Store и найди <strong>"Apollo.io"</strong> или перейди через <strong>Settings &rarr; Chrome Extension</strong> в Apollo</li>
+            <li>Нажми <strong>"Add to Chrome"</strong></li>
+            <li>Нажми <strong>"Add extension"</strong> в popup-окне</li>
+            <li>Иконка Apollo появится в панели Chrome (справа вверху, рядом с адресной строкой)</li>
+            <li>Нажми на иконку Apollo &rarr; войди со своими учётными данными Apollo</li>
+            <li>Перейди на LinkedIn: открой любой бизнес-профиль</li>
+            <li>Справа на странице LinkedIn появится панель Apollo с данными</li>
+            <li><strong>НАБЛЮДАЙ, но НЕ нажимай "Access email"</strong> — мы пока только смотрим</li>
+        </ol>
+
         <div class="warning">
-            <div class="title">Важно!</div>
-            <p>Каждый раз, когда ты открываешь контактные данные нового человека через расширение, это <strong>тратит кредиты</strong>. Не кликай бездумно "Reveal" на каждом профиле. Подробнее о кредитах - в разделе 5.</p>
+            <div class="title">⚠️ Расширение тратит кредиты</div>
+            <p>Каждый раз, когда ты нажимаешь <strong>"Access email"</strong> или <strong>"Access mobile"</strong> на LinkedIn-профиле через расширение, это тратит 1-5 email-кредитов (или 1-5 mobile-кредитов), если человек новый в твоей базе Apollo. Точное количество зависит от того, сколько waterfall-провайдеров задействуется. Просто ПРОСМОТР панели — бесплатный. Нажатие "Access email" — НЕ бесплатное. Не нажимай без необходимости.</p>
         </div>
+
+        <div class="try-it">
+            <div class="title">🎯 Попробуй прямо сейчас (7 мин)</div>
+            <p>1. Установи Chrome-расширение (шаги выше)<br>
+            2. Перейди на LinkedIn<br>
+            3. Найди профиль знакомого человека (друг, коллега)<br>
+            4. Посмотри на панель Apollo: какие данные показываются БЕЗ нажатия? Видишь должность? Компанию? Локацию?<br>
+            5. Сделай скриншот панели<br>
+            6. <strong>НЕ нажимай "Access email"</strong> — просто наблюдай</p>
+        </div>
+
+        <p><strong>Критерий успеха:</strong> расширение установлено, панель видна на LinkedIn, ноль кредитов потрачено.</p>
 
         <a href="https://knowledge.apollo.io/hc/en-us/articles/4409154350477-Install-the-Apollo-Chrome-Extension" target="_blank" class="link-btn">Apollo: гайд по установке (англ.)</a>
     </div>
 
-    <!-- Section 4 -->
-    <div class="section" id="section4">
-        <h2><span class="num">4</span> Обзор интерфейса: навигация по платформе</h2>
+    <!-- Section 3 -->
+    <div class="section" id="section3">
+        <h2><span class="num">3</span> Обзор интерфейса: навигация по платформе</h2>
 
-        <p>Apollo состоит из нескольких основных разделов. Вот карта навигации с объяснением каждого раздела:</p>
+        <p>Apollo состоит из нескольких основных разделов. Представь Apollo как офисное здание с несколькими кабинетами. У каждого кабинета одна задача. Сегодня мы просто пройдём по коридору и заглянем в каждый — заходить внутрь пока не будем.</p>
+
+        <h3>Основные разделы Apollo (левый сайдбар):</h3>
+
+        <table>
+            <tr>
+                <th>#</th>
+                <th>Раздел</th>
+                <th>Описание</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td><strong>Home</strong></td>
+                <td>Твоя главная панель — последние действия, быстрые кнопки, обзор эффективности</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><strong>Search</strong></td>
+                <td>Поиск людей и компаний (самый используемый раздел) — вкладки <strong>People</strong> и <strong>Companies</strong></td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td><strong>Engage</strong></td>
+                <td>Центр коммуникации — содержит <strong>Sequences</strong>, <strong>Dialer</strong>, <strong>Meetings</strong>, <strong>Conversations</strong>, <strong>Tasks</strong>, <strong>Templates</strong> и <strong>Analytics</strong></td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td><strong>Workflows</strong></td>
+                <td>Автоматизации и триггеры (ранее называлось "Plays")</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td><strong>Enrich</strong></td>
+                <td>Обогащение данных (Enrichment), Data Health Center, Job Change Alerts</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td><strong>Deals</strong></td>
+                <td>Pipeline сделок — от первого контакта до закрытия (твоя CRM)</td>
+            </tr>
+        </table>
+
+        <h3>Также важно:</h3>
+        <ul style="margin: 12px 0 16px 20px; color: #444;">
+            <li><strong>Lists</strong> — доступны из сайдбара и из результатов поиска; организуй сохранённые контакты в группы</li>
+            <li><strong>Settings</strong> (иконка шестерёнки) — настройки, биллинг, управление командой</li>
+            <li><strong>Tasks</strong> — задачи на выполнение (также доступны внутри <strong>Engage</strong>)</li>
+        </ul>
+
+        <div class="info">
+            <div class="title">ℹ️ Для справки</div>
+            <p>Apollo может менять расположение разделов со временем. Если чего-то нет на ожидаемом месте, используй строку поиска или иконку помощи (<strong>?</strong>), чтобы найти нужный раздел.</p>
+        </div>
+
+        <h3>Визуальная карта навигации:</h3>
 
         <div class="nav-diagram">
             <div class="nav-sidebar">
-                <div class="nav-item"><span class="icon">&#9750;</span> Home</div>
-                <div class="nav-item"><span class="icon">&#9733;</span> Assistant</div>
+                <div class="nav-item active"><span class="icon">&#9750;</span> Home</div>
                 <div class="nav-section">Поиск</div>
-                <div class="nav-item active"><span class="icon">&#128269;</span> People</div>
-                <div class="nav-item"><span class="icon">&#127970;</span> Companies</div>
+                <div class="nav-item"><span class="icon">&#128269;</span> Search</div>
                 <div class="nav-item"><span class="icon">&#128203;</span> Lists</div>
-                <div class="nav-item"><span class="icon">&#128200;</span> Data enrichment</div>
                 <div class="nav-section">Коммуникация</div>
-                <div class="nav-item"><span class="icon">&#9993;</span> Sequences</div>
-                <div class="nav-item"><span class="icon">&#128231;</span> Emails</div>
-                <div class="nav-item"><span class="icon">&#128222;</span> Calls</div>
-                <div class="nav-item"><span class="icon">&#9745;</span> Tasks</div>
+                <div class="nav-item"><span class="icon">&#9993;</span> Engage</div>
+                <div class="nav-item" style="padding-left: 36px; font-size: 0.82rem; opacity: 0.8;">├ Sequences</div>
+                <div class="nav-item" style="padding-left: 36px; font-size: 0.82rem; opacity: 0.8;">├ Dialer</div>
+                <div class="nav-item" style="padding-left: 36px; font-size: 0.82rem; opacity: 0.8;">├ Tasks</div>
+                <div class="nav-item" style="padding-left: 36px; font-size: 0.82rem; opacity: 0.8;">└ Analytics</div>
+                <div class="nav-section">Данные</div>
+                <div class="nav-item"><span class="icon">&#128200;</span> Enrich</div>
                 <div class="nav-section">Сделки</div>
-                <div class="nav-item"><span class="icon">&#128197;</span> Meetings</div>
-                <div class="nav-item"><span class="icon">&#128172;</span> Conversations</div>
                 <div class="nav-item"><span class="icon">&#128176;</span> Deals</div>
-                <div class="nav-section">Автоматизация</div>
                 <div class="nav-item"><span class="icon">&#9881;</span> Workflows</div>
-                <div class="nav-item"><span class="icon">&#128202;</span> Analytics</div>
+                <div class="nav-section"></div>
+                <div class="nav-item"><span class="icon">&#9881;</span> Settings</div>
             </div>
             <div class="nav-main">
-                Основная рабочая область - здесь отображается контент выбранного раздела
+                Основная рабочая область — здесь отображается контент выбранного раздела
             </div>
         </div>
 
-        <h3>Разделы по группам:</h3>
+        <h3>Разделы подробнее:</h3>
 
-        <h3>Prospect and Enrich (Поиск и обогащение)</h3>
+        <h3>Search и Enrich (Поиск и обогащение)</h3>
         <table>
             <tr>
                 <th>Раздел</th>
@@ -692,23 +834,23 @@
                 <th>Как часто используем</th>
             </tr>
             <tr>
-                <td><strong>People</strong></td>
+                <td><strong>Search &rarr; People</strong></td>
                 <td>Поиск конкретных людей по фильтрам (должность, компания, локация)</td>
                 <td>Каждый день</td>
             </tr>
             <tr>
-                <td><strong>Companies</strong></td>
+                <td><strong>Search &rarr; Companies</strong></td>
                 <td>Поиск компаний по отрасли, размеру, локации, технологиям</td>
                 <td>Несколько раз в неделю</td>
             </tr>
             <tr>
                 <td><strong>Lists</strong></td>
-                <td>Сохраненные списки контактов и компаний для работы</td>
+                <td>Сохранённые списки контактов и компаний для работы</td>
                 <td>Каждый день</td>
             </tr>
             <tr>
-                <td><strong>Data enrichment</strong></td>
-                <td>Обновление и обогащение данных контактов, Data Health Center</td>
+                <td><strong>Enrich</strong></td>
+                <td>Обогащение данных контактов, Data Health Center, Job Change Alerts</td>
                 <td>Раз в неделю</td>
             </tr>
         </table>
@@ -726,12 +868,7 @@
                 <td>Используем для планирования, отправляем через Smartlead</td>
             </tr>
             <tr>
-                <td><strong>Emails</strong></td>
-                <td>Просмотр отправленных писем и статистики</td>
-                <td>Мониторинг</td>
-            </tr>
-            <tr>
-                <td><strong>Calls</strong></td>
+                <td><strong>Dialer</strong></td>
                 <td>Встроенный номеронабиратель для звонков</td>
                 <td>На будущее</td>
             </tr>
@@ -740,42 +877,95 @@
                 <td>Задачи по работе с контактами (позвонить, написать в LinkedIn)</td>
                 <td>Регулярно</td>
             </tr>
+            <tr>
+                <td><strong>Meetings</strong></td>
+                <td>Планирование встреч, ссылки на бронирование</td>
+                <td>По необходимости</td>
+            </tr>
+            <tr>
+                <td><strong>Conversations</strong></td>
+                <td>Запись и анализ звонков</td>
+                <td>На будущее</td>
+            </tr>
+            <tr>
+                <td><strong>Analytics</strong></td>
+                <td>Отчёты и метрики эффективности</td>
+                <td>Еженедельно</td>
+            </tr>
         </table>
 
-        <h3>Win Deals (Закрытие сделок)</h3>
+        <h3>Deals и Workflows (Сделки и автоматизация)</h3>
         <table>
             <tr>
                 <th>Раздел</th>
                 <th>Для чего</th>
             </tr>
             <tr>
-                <td><strong>Meetings</strong></td>
-                <td>Планирование встреч, ссылки на бронирование</td>
-            </tr>
-            <tr>
-                <td><strong>Conversations</strong></td>
-                <td>Запись и анализ звонков</td>
-            </tr>
-            <tr>
                 <td><strong>Deals</strong></td>
-                <td>Pipeline сделок - от первого контакта до закрытия</td>
+                <td>Pipeline сделок — от первого контакта до закрытия</td>
+            </tr>
+            <tr>
+                <td><strong>Workflows</strong></td>
+                <td>Автоматизация действий: триггеры, условия, автозадачи</td>
             </tr>
         </table>
 
-        <img src="https://www.apollo.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fcontact-account-search.ca09a7e6.png&w=3840&q=75" alt="Apollo.io фильтры поиска" class="screenshot">
-        <div class="screenshot-caption">Панель фильтров поиска: Lists, Job Titles, Persona, Company, Location, Industry и другие</div>
+        <div class="rita-shortcut">
+            <div class="title">⚡ Совет для продвинутых</div>
+            Используй строку поиска вверху Apollo для быстрого перехода к любому разделу, контакту или компании. Также можешь нажать на иконку <strong>?</strong> (помощь), чтобы найти нужную функцию или документацию.
+        </div>
 
-        <div class="tip">
-            <div class="title">Задание</div>
-            <p>Пройди по каждому разделу в левой навигации и посмотри, что там находится. Не нажимай "Reveal" и не раскрывай контакты - просто ознакомься с интерфейсом. Потрать на это 10 минут.</p>
+        <div class="try-it">
+            <div class="title">🎯 Попробуй прямо сейчас (7 мин)</div>
+            <p><strong>Часть A — Обзор (3 мин):</strong><br>
+            Пройдись по всем разделам: <strong>Home</strong> &rarr; <strong>Search</strong> &rarr; <strong>Lists</strong> &rarr; <strong>Engage</strong> (открой подразделы: Sequences, Tasks) &rarr; <strong>Workflows</strong> &rarr; <strong>Enrich</strong> &rarr; <strong>Deals</strong>. Засеки время — цель: уложиться в 60 секунд.</p>
+            <p><strong>Часть B — По памяти (2 мин):</strong><br>
+            Не подглядывая в список выше, перейди к:<br>
+            1. Разделу, где ищешь людей &rarr; ___________<br>
+            2. Разделу, где организуешь контакты в группы &rarr; ___________<br>
+            3. Разделу, где отслеживаешь сделки &rarr; ___________</p>
+            <p><strong>Часть C — Запиши (2 мин):</strong><br>
+            Для каждого раздела напиши ОДНО предложение о том, что он делает. Не волнуйся о точности — мы всё проверим в ходе курса.</p>
         </div>
     </div>
 
-    <!-- Section 5 -->
-    <div class="section" id="section5">
-        <h2><span class="num">5</span> Система кредитов: что платно, что бесплатно</h2>
+    <!-- Section 4 -->
+    <div class="section" id="section4">
+        <h2><span class="num">4</span> Система кредитов: что платно, что бесплатно</h2>
 
-        <p>Apollo работает на системе кредитов. <strong>Кредиты - это валюта платформы.</strong> Каждое действие по раскрытию данных тратит кредиты. Это самое важное, что нужно понять в первый день.</p>
+        <p>Apollo работает на системе кредитов. <strong>Кредиты — это валюта платформы.</strong> Каждое действие по раскрытию данных тратит кредиты. Это самое важное, что нужно понять в первый день.</p>
+
+        <p>Кредиты — как минуты на предоплаченном тарифе. Ты получаешь определённое количество каждый месяц. Разные действия «тратят» разные кредиты. Когда они заканчиваются — ждёшь следующего месяца или покупаешь ещё. Ключевое отличие: у Apollo ЧЕТЫРЕ типа кредитов — как если бы у тебя были отдельные бюджеты на звонки, SMS, интернет и роуминг.</p>
+
+        <h3>4 типа кредитов:</h3>
+
+        <table>
+            <tr>
+                <th>Тип кредитов</th>
+                <th>Что оплачивает</th>
+                <th>Аналогия</th>
+            </tr>
+            <tr>
+                <td><strong>Email Credits</strong></td>
+                <td>Раскрытие email-адреса человека</td>
+                <td>«Узнать телефонный номер»</td>
+            </tr>
+            <tr>
+                <td><strong>Mobile Credits</strong></td>
+                <td>Раскрытие мобильного номера</td>
+                <td>«Узнать личный сотовый»</td>
+            </tr>
+            <tr>
+                <td><strong>Export Credits</strong></td>
+                <td>Выгрузка контактов в CSV-файл</td>
+                <td>«Распечатать список контактов»</td>
+            </tr>
+            <tr>
+                <td><strong>Data Credits</strong></td>
+                <td>API-операции (техническое, редко вручную)</td>
+                <td>«Фоновая обработка»</td>
+            </tr>
+        </table>
 
         <h3>Что тратит кредиты:</h3>
 
@@ -783,27 +973,32 @@
             <div class="credit-card paid">
                 <div class="credit-icon">&#128231;</div>
                 <div class="credit-title">Email контакта</div>
-                <div class="credit-desc">Раскрытие рабочего email</div>
-                <div class="credit-cost">1 кредит</div>
+                <div class="credit-desc">Раскрытие рабочего email (новый контакт)</div>
+                <div class="credit-cost">1-5 email-кредитов</div>
             </div>
             <div class="credit-card paid">
                 <div class="credit-icon">&#128241;</div>
                 <div class="credit-title">Мобильный телефон</div>
-                <div class="credit-desc">Раскрытие прямого номера</div>
-                <div class="credit-cost">5 кредитов</div>
+                <div class="credit-desc">Раскрытие прямого мобильного номера (отдельный пул кредитов)</div>
+                <div class="credit-cost">1-5 mobile-кредитов</div>
             </div>
             <div class="credit-card paid">
                 <div class="credit-icon">&#128228;</div>
                 <div class="credit-title">Экспорт контакта</div>
                 <div class="credit-desc">Выгрузка в CSV или CRM</div>
-                <div class="credit-cost">1 кредит</div>
+                <div class="credit-cost">1 export-кредит</div>
             </div>
             <div class="credit-card paid">
                 <div class="credit-icon">&#127970;</div>
-                <div class="credit-title">Обогащение компании</div>
-                <div class="credit-desc">Получение подробных данных о компании</div>
-                <div class="credit-cost">1 кредит</div>
+                <div class="credit-title">Обогащение (если найдены данные)</div>
+                <div class="credit-desc">Заполнение пропущенных полей</div>
+                <div class="credit-cost">1-5 email-кредитов</div>
             </div>
+        </div>
+
+        <div class="info">
+            <div class="title">ℹ️ Почему 1-5, а не просто 1?</div>
+            <p>Стоимость зависит от того, сколько провайдеров данных (waterfall sources) были задействованы при поиске информации. Если Apollo находит email из своей базы — 1 кредит. Если приходится опрашивать несколько внешних провайдеров — стоимость растёт до 5 кредитов. Это касается раскрытия email, мобильного номера и обогащения.</p>
         </div>
 
         <h3>Что НЕ тратит кредиты (бесплатно):</h3>
@@ -813,32 +1008,109 @@
                 <div class="credit-icon">&#128269;</div>
                 <div class="credit-title">Поиск</div>
                 <div class="credit-desc">Поиск людей и компаний по фильтрам</div>
-                <div class="credit-cost">Бесплатно</div>
+                <div class="credit-cost">БЕСПЛАТНО</div>
             </div>
             <div class="credit-card free">
                 <div class="credit-icon">&#128203;</div>
-                <div class="credit-title">Списки</div>
-                <div class="credit-desc">Создание и управление списками</div>
-                <div class="credit-cost">Бесплатно</div>
+                <div class="credit-title">Списки (уже сохранённые)</div>
+                <div class="credit-desc">Добавление уже сохранённого контакта в новый список</div>
+                <div class="credit-cost">БЕСПЛАТНО</div>
             </div>
             <div class="credit-card free">
                 <div class="credit-icon">&#128276;</div>
                 <div class="credit-title">Оповещения</div>
                 <div class="credit-desc">Job Change Alerts, Intent Signals</div>
-                <div class="credit-cost">Бесплатно</div>
+                <div class="credit-cost">БЕСПЛАТНО</div>
             </div>
             <div class="credit-card free">
                 <div class="credit-icon">&#128200;</div>
                 <div class="credit-title">Pipeline / CRM</div>
                 <div class="credit-desc">Управление сделками и стадиями</div>
-                <div class="credit-cost">Бесплатно</div>
+                <div class="credit-cost">БЕСПЛАТНО</div>
             </div>
         </div>
 
+        <h3>Полная таблица стоимости действий:</h3>
+        <table>
+            <tr>
+                <th>Действие</th>
+                <th>Стоимость</th>
+                <th>Тип кредитов</th>
+            </tr>
+            <tr>
+                <td>Поиск людей/компаний по фильтрам</td>
+                <td><strong>БЕСПЛАТНО</strong></td>
+                <td>—</td>
+            </tr>
+            <tr>
+                <td>Просмотр результатов поиска</td>
+                <td><strong>БЕСПЛАТНО</strong></td>
+                <td>—</td>
+            </tr>
+            <tr>
+                <td>Клик на профиль контакта</td>
+                <td><strong>БЕСПЛАТНО</strong></td>
+                <td>—</td>
+            </tr>
+            <tr>
+                <td>Добавление НОВОГО контакта в список</td>
+                <td><strong>1-5 кредитов</strong></td>
+                <td>Email</td>
+            </tr>
+            <tr>
+                <td>Добавление УЖЕ СОХРАНЁННОГО контакта в список</td>
+                <td><strong>БЕСПЛАТНО</strong></td>
+                <td>—</td>
+            </tr>
+            <tr>
+                <td>Раскрытие мобильного номера</td>
+                <td><strong>1-5 кредитов</strong></td>
+                <td>Mobile</td>
+            </tr>
+            <tr>
+                <td>Экспорт контакта в CSV</td>
+                <td><strong>1 кредит</strong></td>
+                <td>Export</td>
+            </tr>
+            <tr>
+                <td>Обогащение (данные найдены)</td>
+                <td><strong>1-5 кредитов</strong></td>
+                <td>Email</td>
+            </tr>
+            <tr>
+                <td>Обогащение (данные НЕ найдены)</td>
+                <td><strong>БЕСПЛАТНО</strong></td>
+                <td>—</td>
+            </tr>
+            <tr>
+                <td>Добавление НОВОГО контакта в Sequence</td>
+                <td><strong>1-5 кредитов</strong></td>
+                <td>Email</td>
+            </tr>
+            <tr>
+                <td>Добавление СОХРАНЁННОГО контакта в Sequence</td>
+                <td><strong>БЕСПЛАТНО</strong></td>
+                <td>—</td>
+            </tr>
+        </table>
+
         <div class="warning">
-            <div class="title">ЗОЛОТОЕ ПРАВИЛО</div>
-            <p><strong>Никогда не раскрывай контакт, если ты не уверен, что он подходит под нашу целевую аудиторию (ICP).</strong> Сначала убедись, что компания и человек нам подходят, и только потом нажимай "Reveal". Каждый потраченный впустую кредит - это потерянные деньги.</p>
+            <div class="title">⚠️ ЗОЛОТОЕ ПРАВИЛО</div>
+            <p><strong>Никогда не раскрывай контакт, если ты не уверен(а), что он подходит под нашу целевую аудиторию (ICP).</strong> Сначала убедись, что компания и человек нам подходят, и только потом нажимай "Reveal". Каждый потраченный впустую кредит — это потерянные деньги.</p>
         </div>
+
+        <div class="warning">
+            <div class="title">⚠️ «Добавить в список» = потратить кредиты</div>
+            <p>Это сюрприз №1 для новичков. Когда нажимаешь <strong>"Add to List"</strong> на контакте, которого ещё нет в базе, Apollo автоматически раскрывает email. Это 1-5 email-кредитов (зависит от waterfall). Выглядит как простая организация — но ты тратишь деньги. Думай об «Добавить в список» как о «Купить информацию об этом человеке». Сначала смотри бесплатный превью в результатах поиска — добавляй в список только тех, кого точно стоит контактировать.</p>
+        </div>
+
+        <h3>Важные нюансы по кредитам:</h3>
+        <ul style="margin: 12px 0 16px 20px; color: #444;">
+            <li><strong>Email-кредиты «безлимитные»</strong> на всех планах, но регулируются политикой Fair Use. На бесплатном плане лимит около ~250 раскрытий email в день.</li>
+            <li><strong>Mobile-кредиты</strong> идут из ОТДЕЛЬНОГО, меньшего пула (Free: 5/мес, Basic: 75/мес, Pro: 100/мес). Не путай с email-кредитами.</li>
+            <li><strong>Рабочие телефоны (office phone)</strong> раскрываются БЕСПЛАТНО при раскрытии email. Только МОБИЛЬНЫЕ номера требуют mobile-кредитов.</li>
+            <li><strong>Дополнительные кредиты (add-on)</strong> стоят $0.20 за штуку, минимальная покупка — 250 кредитов ($50).</li>
+        </ul>
 
         <h3>Наши лимиты по кредитам:</h3>
         <table>
@@ -849,34 +1121,83 @@
             </tr>
             <tr>
                 <td>Email кредиты</td>
-                <td>Безлимитно (fair use ~250/день)</td>
-                <td>Ежедневно</td>
+                <td>Безлимитно (fair use ~250/день на бесплатном плане)</td>
+                <td>Ежедневный лимит</td>
             </tr>
             <tr>
                 <td>Mobile кредиты</td>
-                <td>Зависит от плана (5-100/мес)</td>
+                <td>Зависит от плана (5-200/мес)</td>
                 <td>Начало billing cycle</td>
             </tr>
             <tr>
                 <td>Export кредиты</td>
-                <td>Зависит от плана (10-250/мес)</td>
+                <td>Зависит от плана (10-4,000/мес)</td>
                 <td>Начало billing cycle</td>
             </tr>
         </table>
 
         <div class="info">
-            <div class="title">Где проверить баланс</div>
-            <p>Перейди в <strong>Settings &rarr; Billing and Credits</strong>, чтобы увидеть текущий баланс кредитов и дату их обновления. Неиспользованные кредиты <strong>не переносятся</strong> на следующий месяц!</p>
+            <div class="title">ℹ️ Где проверить баланс</div>
+            <p>Перейди в <strong>Settings &rarr; Billing</strong>, чтобы увидеть текущий баланс кредитов и дату их обновления. Неиспользованные кредиты <strong>не переносятся</strong> на следующий месяц!</p>
         </div>
 
         <h3>5 правил работы с кредитами:</h3>
         <ol class="steps">
-            <li><strong>Всегда используй Персоны</strong> - не ищи контакты "вручную", используй наши сохраненные фильтры</li>
-            <li><strong>Проверь компанию перед раскрытием контакта</strong> - подходит ли она под наш ICP?</li>
-            <li><strong>Не раскрывай телефоны</strong> без необходимости - они стоят в 5 раз дороже email</li>
-            <li><strong>Не экспортируй ради экспорта</strong> - экспортируй только когда готов работать с данными</li>
+            <li><strong>Всегда используй Персоны</strong> — не ищи контакты «вручную», используй сохранённые шаблоны фильтров</li>
+            <li><strong>Проверь компанию перед раскрытием контакта</strong> — подходит ли она под наш ICP?</li>
+            <li><strong>Не раскрывай мобильные без необходимости</strong> — они из отдельного, маленького пула</li>
+            <li><strong>Не экспортируй ради экспорта</strong> — экспортируй только когда готов работать с данными</li>
             <li><strong>Проверяй баланс</strong> в начале каждого рабочего дня</li>
         </ol>
+
+        <div class="try-it">
+            <div class="title">🎯 Попробуй прямо сейчас: Квиз по кредитам (7 мин)</div>
+            <p>Ответь на бумаге БЕЗ подглядывания:</p>
+            <p><strong>Сценарий 1:</strong> Ты ищешь людей в Дубае с должностью "Founder". Видишь 500 результатов. Сколько кредитов потрачено?</p>
+            <p><strong>Сценарий 2:</strong> Нажимаешь "Add to list" на 50 новых контактах. Сколько кредитов?</p>
+            <p><strong>Сценарий 3:</strong> Экспортируешь этот список из 50 человек в CSV. Сколько ДОПОЛНИТЕЛЬНЫХ кредитов?</p>
+            <p><strong>Сценарий 4:</strong> Добавляешь тех же 50 человек во ВТОРОЙ список. Сколько кредитов?</p>
+            <p><strong>Сценарий 5:</strong> Ищешь компании в Дубае и просматриваешь 200 профилей компаний. Сколько кредитов?</p>
+        </div>
+
+        <details>
+            <summary>Показать ответы</summary>
+            <ol style="padding: 16px 20px; background:#f8f9fb; border-radius:8px; margin-top:8px;">
+                <li><strong>0</strong> — поиск бесплатный</li>
+                <li><strong>50 email-кредитов</strong> (1 за каждый новый контакт)</li>
+                <li><strong>50 export-кредитов</strong> (1 за контакт). Итого: 50 email + 50 export = 100 кредитов</li>
+                <li><strong>0</strong> — они уже сохранены в Apollo</li>
+                <li><strong>0</strong> — просмотр компаний бесплатный. Кредиты только за раскрытие ОТДЕЛЬНЫХ контактов</li>
+            </ol>
+        </details>
+    </div>
+
+    <!-- Section 5: Practice -->
+    <div class="section" id="section5" style="border-left: 4px solid #e94560;">
+        <h2>🎯 Практическое задание</h2>
+
+        <h3>Охота за сокровищами: найди конкретный контакт (10 мин)</h3>
+
+        <p>Твоя миссия: найти CEO/Owner конкретной реальной компании с помощью Apollo, <strong>НЕ потратив ни одного кредита</strong>.</p>
+
+        <ol class="steps">
+            <li>Перейди в <strong>Search &rarr; People</strong></li>
+            <li>В фильтре Job Title введи: <code>"CEO" OR "Owner" OR "Founder"</code></li>
+            <li>В фильтре Company Location выбери: <strong>United Arab Emirates</strong></li>
+            <li>В фильтре # Employees выбери: <strong>11-50</strong></li>
+            <li>Пролистай результаты — посмотри на имена, должности, компании</li>
+            <li>Найди ОДНОГО контакта, который управляет фитнес-студией, тренажёрным залом или спортивным клубом</li>
+            <li>Нажми на его имя, чтобы увидеть превью профиля (БЕСПЛАТНО — кредиты не тратятся)</li>
+            <li>Запиши: имя, должность, название компании, локация</li>
+            <li><strong>НЕ нажимай "Add to List" или "Access Email"</strong> — просто наблюдай</li>
+        </ol>
+
+        <h3>Критерии успеха:</h3>
+        <ul class="checklist">
+            <li><span class="check"></span> Нашёл реального владельца фитнес-бизнеса в ОАЭ</li>
+            <li><span class="check"></span> НЕ потратил ни одного кредита</li>
+            <li><span class="check"></span> Могу описать, какая информация видна бесплатно, а какая требует кредитов</li>
+        </ul>
     </div>
 
     <!-- Section 6 -->
@@ -887,36 +1208,49 @@
         <ul class="checklist">
             <li><span class="check"></span> Аккаунт Apollo создан и я могу войти</li>
             <li><span class="check"></span> Chrome-расширение установлено и работает</li>
-            <li><span class="check"></span> Я прошел по всем разделам навигации и понимаю, что где находится</li>
+            <li><span class="check"></span> Я прошёл(а) по всем разделам навигации и понимаю, что где находится</li>
             <li><span class="check"></span> Я знаю, что тратит кредиты, а что бесплатно</li>
             <li><span class="check"></span> Я знаю, где посмотреть баланс кредитов</li>
             <li><span class="check"></span> Я понимаю разницу: Apollo = данные/CRM, Smartlead = отправка писем</li>
         </ul>
 
         <div class="quiz">
-            <div class="title">Самопроверка - ответь на вопросы:</div>
+            <div class="title">🧪 Проверь себя</div>
+            <p><strong>Вопрос 1:</strong> Ты хочешь проверить, сколько export-кредитов осталось. Куда идёшь?</p>
             <ol>
-                <li>Сколько кредитов стоит раскрытие мобильного телефона контакта?</li>
-                <li>В каком разделе находится поиск людей по фильтрам?</li>
-                <li>Где посмотреть текущий баланс кредитов?</li>
-                <li>Переносятся ли неиспользованные кредиты на следующий месяц?</li>
-                <li>Через какой инструмент мы отправляем холодные письма - Apollo или Smartlead?</li>
-                <li>Что нужно проверить перед тем, как раскрыть контакт человека?</li>
+                <li>Search &rarr; Filters</li>
+                <li>Settings &rarr; Billing</li>
+                <li>Engage &rarr; Analytics &rarr; Credits</li>
+                <li>Enrich &rarr; Credits</li>
             </ol>
+            <details><summary>Показать ответ</summary><p><strong>b) Settings &rarr; Billing</strong> — иконка шестерёнки в левом нижнем углу ведёт в Settings, затем нажми Billing.</p></details>
+
+            <p><strong>Вопрос 2:</strong> Правда или ложь: поиск людей и просмотр результатов тратит email-кредиты.</p>
+            <details><summary>Показать ответ</summary><p><strong>Ложь.</strong> Поиск и просмотр — полностью бесплатны. Кредиты тратятся только когда ты раскрываешь/сохраняешь данные нового контакта.</p></details>
+
+            <p><strong>Вопрос 3:</strong> Для чего мы используем Apollo, а для чего Smartlead?</p>
+            <details><summary>Показать ответ</summary><p><strong>Apollo</strong> — для поиска, обогащения и организации контактов + CRM-pipeline. <strong>Smartlead</strong> — для отправки холодных писем.</p></details>
+
+            <p><strong>Вопрос 4:</strong> Ты видишь интересного человека на LinkedIn. Панель Apollo появилась. Ты читаешь должность и компанию. Затем нажимаешь "Access email". Сколько это стоило?</p>
+            <ol>
+                <li>0 — расширение бесплатное</li>
+                <li>1-5 email-кредитов (если человек новый в базе)</li>
+                <li>2 кредита (1 за просмотр, 1 за email)</li>
+                <li>Зависит от плана</li>
+            </ol>
+            <details><summary>Показать ответ</summary><p><strong>b) 1-5 email-кредитов</strong>, но только если контакт новый и ещё не сохранён в твоей базе Apollo. Точное количество зависит от того, сколько провайдеров waterfall были задействованы для поиска данных. Если контакт уже сохранён — бесплатно.</p></details>
         </div>
 
-        <h3>Правильные ответы:</h3>
-        <details>
-            <summary style="cursor:pointer; color:#0f3460; font-weight:600; padding: 8px 0;">Нажми, чтобы увидеть ответы</summary>
-            <ol style="padding: 16px 20px; background:#f8f9fb; border-radius:8px; margin-top:8px;">
-                <li><strong>5 кредитов</strong></li>
-                <li><strong>Prospect and Enrich &rarr; People</strong></li>
-                <li><strong>Settings &rarr; Billing and Credits</strong></li>
-                <li><strong>Нет</strong> - сгорают в конце billing cycle</li>
-                <li><strong>Smartlead</strong> - Apollo только для данных и CRM</li>
-                <li>Что <strong>компания подходит под наш ICP</strong> (целевой профиль клиента)</li>
+        <div class="day-summary">
+            <h3>Итоги Дня 1</h3>
+            <ol style="color: #444;">
+                <li><strong>Apollo = поиск и организация контактов. Smartlead = отправка писем.</strong> Вместе они — твой двигатель outbound-продаж.</li>
+                <li><strong>Поиск и просмотр — всегда БЕСПЛАТНО.</strong> Сохранение/раскрытие/экспорт — тратит кредиты.</li>
+                <li><strong>Кредиты сгорают ежемесячно</strong> — без переноса. Проверяй баланс каждую неделю.</li>
+                <li><strong>Chrome-расширение</strong> показывает данные Apollo на LinkedIn, но «Access email» тратит кредиты.</li>
+                <li><strong>Основные разделы:</strong> Home, Search, Engage (Sequences, Tasks, Analytics и др.), Workflows, Enrich, Deals.</li>
             </ol>
-        </details>
+        </div>
 
         <div style="margin-top: 32px; padding-top: 20px; border-top: 2px solid #e8ecf1;">
             <h3>Полезные ссылки для дополнительного изучения:</h3>
@@ -924,24 +1258,24 @@
                 <a href="https://www.apollo.io/academy" target="_blank" class="link-btn">Apollo Academy (бесплатные курсы)</a>
                 <a href="https://knowledge.apollo.io/hc/en-us" target="_blank" class="link-btn secondary">Knowledge Base</a>
             </p>
-            <p>
-                <a href="https://www.apollo.io/academy/master-classes" target="_blank" class="link-btn secondary">Мастер-классы</a>
-                <a href="https://www.apollo.io/files/quick-start-guide.pdf" target="_blank" class="link-btn secondary">Quick Start Guide (PDF)</a>
-            </p>
         </div>
     </div>
 
     <!-- Next day preview -->
     <div class="section" style="border-left: 4px solid #0f3460;">
-        <h3>Завтра: День 2 - Поиск контактов (Prospecting)</h3>
-        <p>Научимся искать людей по фильтрам, использовать наши 3 сохраненные Персоны, и сохраним первые 20 контактов в тестовый список.</p>
+        <h3>Завтра: День 2 — Поиск людей (People Search)</h3>
+        <p>Научимся искать людей по фильтрам, работать с Boolean-запросами, создавать Персоны (шаблоны ICP) и сохранять поиски с еженедельными уведомлениями. Также освоим 3-уровневую систему приоритизации лидов.</p>
+    </div>
+
+    <!-- Bottom nav -->
+    <div style="text-align: center; margin: 32px 0;">
+        <a href="day-2.html" class="link-btn">Следующий день &rarr;</a>
     </div>
 
 </div>
 
 <div class="footer">
-    <p>SF Agency - Внутреннее обучение Apollo.io</p>
-    <p>Создано: Март 2026</p>
+    Apollo.io Обучение — День 1 из 10 | Создано для SF Agency
 </div>
 
 </body>

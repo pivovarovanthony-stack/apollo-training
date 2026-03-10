@@ -1,0 +1,1208 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apollo.io - День 8: Workflows и автоматизация</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fb;
+            color: #1a1a2e;
+            line-height: 1.7;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            padding: 48px 0;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.4rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        .header .badge {
+            display: inline-block;
+            background: #e94560;
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .progress-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 24px 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .progress-bar .label {
+            font-weight: 600;
+            white-space: nowrap;
+            color: #555;
+        }
+
+        .progress-track {
+            flex: 1;
+            height: 10px;
+            background: #e8ecf1;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 80%;
+            height: 100%;
+            background: linear-gradient(90deg, #e94560, #0f3460);
+            border-radius: 5px;
+            transition: width 0.5s;
+        }
+
+        .progress-bar .day-label {
+            font-weight: 700;
+            color: #0f3460;
+            white-space: nowrap;
+        }
+
+        .toc {
+            background: white;
+            border-radius: 12px;
+            padding: 28px 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .toc h3 {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: #0f3460;
+        }
+
+        .toc ol {
+            padding-left: 20px;
+        }
+
+        .toc li {
+            margin-bottom: 8px;
+        }
+
+        .toc a {
+            color: #0f3460;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .toc .time {
+            color: #999;
+            font-size: 0.85rem;
+            margin-left: 8px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 36px 36px;
+            margin-bottom: 28px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #1a1a2e;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e8ecf1;
+        }
+
+        .section h2 .num {
+            display: inline-block;
+            background: #0f3460;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 36px;
+            font-size: 1rem;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+
+        .section h3 {
+            font-size: 1.15rem;
+            margin: 24px 0 12px;
+            color: #0f3460;
+        }
+
+        .section p {
+            margin-bottom: 16px;
+            color: #444;
+        }
+
+        .steps {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+        }
+
+        .steps li {
+            counter-increment: step;
+            padding: 12px 16px 12px 52px;
+            position: relative;
+            margin-bottom: 8px;
+            background: #f8f9fb;
+            border-radius: 8px;
+            border-left: 3px solid #0f3460;
+        }
+
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            left: 14px;
+            top: 12px;
+            background: #0f3460;
+            color: white;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 26px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .warning .title {
+            font-weight: 700;
+            color: #856404;
+            margin-bottom: 4px;
+        }
+
+        .warning p {
+            color: #856404;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .tip {
+            background: #d4edda;
+            border: 1px solid #28a745;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .tip .title {
+            font-weight: 700;
+            color: #155724;
+            margin-bottom: 4px;
+        }
+
+        .tip p {
+            color: #155724;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #17a2b8;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .info .title {
+            font-weight: 700;
+            color: #0c5460;
+            margin-bottom: 4px;
+        }
+
+        .info p {
+            color: #0c5460;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        table th {
+            background: #0f3460;
+            color: white;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #e8ecf1;
+            font-size: 0.95rem;
+        }
+
+        table tr:nth-child(even) {
+            background: #f8f9fb;
+        }
+
+        .nav-diagram {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 0;
+            border: 2px solid #0f3460;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .nav-sidebar {
+            background: #1a1a2e;
+            color: white;
+            padding: 20px 0;
+        }
+
+        .nav-sidebar .nav-item {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            cursor: default;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-sidebar .nav-item.active {
+            background: #0f3460;
+        }
+
+        .nav-sidebar .nav-item .icon {
+            opacity: 0.7;
+            font-size: 0.85rem;
+        }
+
+        .nav-sidebar .nav-section {
+            padding: 8px 20px 4px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            opacity: 0.5;
+            letter-spacing: 1px;
+            margin-top: 8px;
+        }
+
+        .nav-main {
+            background: #f8f9fb;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-style: italic;
+        }
+
+        .credit-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .credit-card {
+            background: #f8f9fb;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+
+        .credit-card.free {
+            border-color: #28a745;
+        }
+
+        .credit-card.paid {
+            border-color: #e94560;
+        }
+
+        .credit-card .credit-icon {
+            font-size: 2rem;
+            margin-bottom: 8px;
+        }
+
+        .credit-card .credit-title {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .credit-card .credit-desc {
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .credit-card .credit-cost {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .credit-card.free .credit-cost {
+            color: #28a745;
+        }
+
+        .credit-card.paid .credit-cost {
+            color: #e94560;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 10px 16px;
+            margin-bottom: 6px;
+            background: #f8f9fb;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .checklist li .check {
+            width: 22px;
+            height: 22px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .quiz {
+            background: #f0e6ff;
+            border: 1px solid #7c3aed;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .quiz .title {
+            font-weight: 700;
+            color: #5b21b6;
+            margin-bottom: 12px;
+            font-size: 1.05rem;
+        }
+
+        .quiz ol {
+            padding-left: 20px;
+        }
+
+        .quiz li {
+            margin-bottom: 8px;
+            color: #5b21b6;
+        }
+
+        .link-btn {
+            display: inline-block;
+            background: #0f3460;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 8px 4px 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .link-btn:hover {
+            background: #1a4a8a;
+        }
+
+        .link-btn.secondary {
+            background: white;
+            color: #0f3460;
+            border: 2px solid #0f3460;
+        }
+
+        .nav-links { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+        .nav-links a { padding: 8px 16px; background: white; border-radius: 8px; text-decoration: none; color: #0f3460; font-weight: 600; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .nav-links a:hover { background: #0f3460; color: white; }
+        .nav-links a.current { background: #0f3460; color: white; }
+
+        .footer {
+            text-align: center;
+            padding: 40px 24px;
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        /* Try It Now micro-exercise */
+        .try-it {
+            background: #e8f5e9;
+            border: 2px dashed #28a745;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+        .try-it .title { font-weight: 700; color: #2e7d32; margin-bottom: 4px; }
+        .try-it p { color: #2e7d32; margin: 0; font-size: 0.95rem; }
+
+        /* Expandable details */
+        details { margin: 12px 0; }
+        details summary { cursor: pointer; font-weight: 600; color: #0f3460; padding: 8px 0; }
+        details summary:hover { text-decoration: underline; }
+
+        /* Day summary box */
+        .day-summary {
+            background: linear-gradient(135deg, #f0e6ff, #e8ecf1);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+        .day-summary h3 { color: #5b21b6; margin-bottom: 12px; }
+
+        /* Rita shortcut */
+        .rita-shortcut {
+            background: #fff8e1;
+            border: 1px solid #ff8f00;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 16px 0;
+            font-size: 0.9rem;
+        }
+        .rita-shortcut .title { font-weight: 700; color: #e65100; margin-bottom: 4px; }
+
+        /* Workflow diagram */
+        .workflow-diagram {
+            background: #1a1a2e;
+            color: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            text-align: center;
+        }
+        .workflow-diagram .arrow { color: #e94560; font-weight: bold; }
+        .workflow-diagram .node { background: #0f3460; padding: 4px 12px; border-radius: 6px; display: inline-block; margin: 4px; }
+
+        @media (max-width: 600px) {
+            .credit-grid { grid-template-columns: 1fr; }
+            .nav-diagram { grid-template-columns: 1fr; }
+            .section { padding: 24px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Apollo.io - Обучение</h1>
+    <div class="subtitle">Неделя 2 / День 8: Workflows и автоматизация</div>
+    <div class="badge">~ 60 минут</div>
+</div>
+
+<div class="container">
+
+    <!-- Navigation -->
+    <div class="nav-links">
+        <a href="index.html">День 1</a>
+        <a href="day-2.html">День 2</a>
+        <a href="day-3.html">День 3</a>
+        <a href="day-4.html">День 4</a>
+        <a href="day-5.html">День 5</a>
+        <a href="day-6.html">День 6</a>
+        <a href="day-7.html">День 7</a>
+        <a href="day-8.html" class="current">День 8</a>
+        <a href="day-9.html">День 9</a>
+        <a href="day-10.html">День 10</a>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-bar">
+        <span class="label">Прогресс обучения:</span>
+        <div class="progress-track">
+            <div class="progress-fill"></div>
+        </div>
+        <span class="day-label">День 8 из 10</span>
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+        <h3>Содержание дня</h3>
+        <ol>
+            <li><a href="#review">Повторение Дня 7</a> <span class="time">5 мин</span></li>
+            <li><a href="#section1">Что такое Workflows и как они работают</a> <span class="time">15 мин</span></li>
+            <li><a href="#section2">Workflow: Повторный контакт при смене работы</a> <span class="time">15 мин</span></li>
+            <li><a href="#section3">Workflow: Маршрутизация по intent-сигналам</a> <span class="time">15 мин</span></li>
+            <li><a href="#section4">Плейбук автоматизации агентства</a> <span class="time">10 мин</span></li>
+        </ol>
+    </div>
+
+    <!-- Quick Review -->
+    <div class="section" id="review">
+        <h2><span class="num">0</span> Повторение: День 7</h2>
+
+        <p>Прежде чем двигаться дальше, проверим, что ты помнишь из прошлого дня. Попробуй ответить сам, потом раскрой ответ.</p>
+
+        <details>
+            <summary>Q1: Какие 5 незыблемых правил холодного email? Назови хотя бы 4.</summary>
+            <p style="padding: 12px; background:#f8f9fb; border-radius:8px; margin-top:8px; color:#444;">
+                (1) До 80 слов. (2) Тема письма 2-4 слова. (3) Один CTA. (4) Начинай с ИХ проблемы, не с себя. (5) Никакого форматирования (без жирного, курсива, списков, картинок).
+            </p>
+        </details>
+
+        <details>
+            <summary>Q2: Твой open rate ниже 20%. Что исправить в первую очередь?</summary>
+            <p style="padding: 12px; background:#f8f9fb; border-radius:8px; margin-top:8px; color:#444;">
+                Тему письма (subject line). Open rate зависит в первую очередь от темы + имени отправителя. Ниже 20% = тема не работает.
+            </p>
+        </details>
+
+        <details>
+            <summary>Q3: Объясни 4-T Framework одним предложением на каждый: Trigger, Think, Third-Party, Talk.</summary>
+            <p style="padding: 12px; background:#f8f9fb; border-radius:8px; margin-top:8px; color:#444;">
+                <strong>Trigger</strong> = наблюдение про их бизнес. <strong>Think</strong> = что обычно испытывают компании вроде их. <strong>Third-Party</strong> = социальное доказательство от похожего клиента. <strong>Talk</strong> = мягкий CTA с низким порогом входа.
+            </p>
+        </details>
+    </div>
+
+    <!-- Section 1: Workflows Overview -->
+    <div class="section" id="section1">
+        <h2><span class="num">1</span> Что такое Workflows и как они работают</h2>
+
+        <p>До сих пор ты каждый день вручную проверял Apollo: есть ли новые сигналы, сменил ли кто-то работу, появились ли компании с высоким intent? Workflows ставят все это на автопилот.</p>
+
+        <p><strong>Ты задаешь правила один раз</strong> ("когда кто-то сменит работу, добавь его в список и создай задачу"), и Apollo выполняет их автоматически. Ты все еще принимаешь решения -- workflow просто гарантирует, что ни один сигнал не пройдет мимо.</p>
+
+        <div class="info">
+            <div class="title">Workflows = бывшие "Plays"</div>
+            <p>В старой документации Apollo эта функция называлась <strong>"Plays"</strong> -- сейчас это <strong>"Workflows"</strong>. Если встретишь "Plays" в статьях -- это то же самое.</p>
+        </div>
+
+        <h3>Из чего состоит workflow:</h3>
+
+        <ol class="steps">
+            <li><strong>Trigger (триггер)</strong> -- КОГДА запускать? (смена работы, расписание, смена стадии)</li>
+            <li><strong>Enrollment filters (фильтры входа)</strong> -- К КОМУ применять? (только контакты из ОАЭ, только verified email)</li>
+            <li><strong>Actions (действия)</strong> -- ЧТО делать? (добавить в список, создать задачу, обновить поле)</li>
+        </ol>
+
+        <h3>Два типа триггеров:</h3>
+
+        <table>
+            <tr>
+                <th>Тип триггера</th>
+                <th>Когда срабатывает</th>
+                <th>Пример</th>
+            </tr>
+            <tr>
+                <td><strong>Event-based</strong> (по событию)</td>
+                <td>Когда что-то ПРОИЗОШЛО</td>
+                <td>Обнаружена смена работы, получен ответ на email, проведена встреча</td>
+            </tr>
+            <tr>
+                <td><strong>Schedule-based</strong> (по расписанию)</td>
+                <td>По заданному графику</td>
+                <td>Каждый понедельник в 9:00</td>
+            </tr>
+        </table>
+
+        <h3>Доступные действия (actions):</h3>
+
+        <table>
+            <tr>
+                <th>Действие</th>
+                <th>Что делает</th>
+                <th>Пример для агентства</th>
+            </tr>
+            <tr>
+                <td><strong>Add to list</strong></td>
+                <td>Добавляет контакт в определенный список</td>
+                <td>Переместить в "Job Changes - Март"</td>
+            </tr>
+            <tr>
+                <td><strong>Remove from list</strong></td>
+                <td>Убирает контакт из списка</td>
+                <td>Очистить после export</td>
+            </tr>
+            <tr>
+                <td><strong>Create task</strong></td>
+                <td>Создает задачу для члена команды</td>
+                <td>"Проверить эту смену работы" для Риты</td>
+            </tr>
+            <tr>
+                <td><strong>Update field</strong></td>
+                <td>Меняет значение поля контакта/компании</td>
+                <td>Обновить стадию на "Approaching"</td>
+            </tr>
+            <tr>
+                <td><strong>Add to sequence</strong></td>
+                <td>Добавляет в sequence Apollo</td>
+                <td>Концептуально (мы используем Smartlead)</td>
+            </tr>
+            <tr>
+                <td><strong>Push to CRM</strong></td>
+                <td>Синхронизирует с внешними инструментами</td>
+                <td>На будущее: HubSpot, Zapier</td>
+            </tr>
+        </table>
+
+        <div class="info">
+            <div class="title">Доступность</div>
+            <p>Workflows доступны только на <strong>платных планах</strong>. На Free-плане эта функция недоступна.</p>
+        </div>
+
+        <div class="warning">
+            <div class="title">ВСЕГДА устанавливай фильтры входа!</div>
+            <p>Workflow без фильтров применяется ко <strong>ВСЕМ контактам в ТВОЕЙ базе Apollo</strong> -- ко всем записям, которые ты или твоя команда сохранили. Это может засорить твои списки нерелевантными контактами и потратить кредиты впустую. <strong>Всегда устанавливай фильтры входа в workflow.</strong></p>
+        </div>
+
+        <p>Представь фильтры входа как охранника на входе в клуб -- они решают, кого пускать. Без охранника заходят все подряд, включая тех, кто тебе не нужен. Фильтры гарантируют, что только ТВОИ целевые проспекты попадут в workflow.</p>
+
+        <h3>Создание workflow -- пошагово:</h3>
+
+        <ol class="steps">
+            <li>Открой <strong>Workflows</strong> в левом меню</li>
+            <li>Нажми <strong>"Create a workflow"</strong></li>
+            <li>Выбери один из 3 вариантов:
+                <br>-- <strong>AI assistant</strong> (опиши словами, что хочешь)
+                <br>-- <strong>From a template</strong> (из готового шаблона)
+                <br>-- <strong>From scratch</strong> (с нуля)</li>
+            <li>Выбери <strong>"From scratch"</strong> -- чтобы понять строительные блоки</li>
+            <li><strong>Шаг A: Выбери триггер</strong> -- нажми "Select trigger". Увидишь варианты: Schedule-based, Meeting actions, Email replies, Stage changes, Job changes и др.</li>
+            <li><strong>Шаг B: Установи фильтры входа</strong> -- нажми "Edit filters". Добавь условия, которые ограничивают, какие записи попадают в workflow</li>
+            <li><strong>Шаг C: Добавь действия</strong> -- нажми "Add action". Выбери: add to list, create task, update field и т.д.</li>
+            <li>Назови workflow и сохрани</li>
+        </ol>
+
+        <div class="try-it">
+            <div class="title">Попробуй сейчас: Изучи шаблоны Workflows (5 мин)</div>
+            <p>
+                1. Открой <strong>Workflows</strong><br>
+                2. Посмотри <strong>библиотеку шаблонов</strong><br>
+                3. Найди и запиши 3 шаблона, которые могут быть полезны агентству:
+            </p>
+        </div>
+
+        <table>
+            <tr>
+                <th>Шаблон</th>
+                <th>Триггер</th>
+                <th>Действие</th>
+                <th>Чем полезен</th>
+            </tr>
+            <tr>
+                <td>1. ___________</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>2. ___________</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>3. ___________</td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Section 2: Job Change Workflow -->
+    <div class="section" id="section2">
+        <h2><span class="num">2</span> Workflow: Повторный контакт при смене работы</h2>
+
+        <h3>Почему это САМЫЙ теплый сигнал?</h3>
+
+        <p>Помнишь из Дня 4: смена работы -- это золото. Человек, который перешел в новую компанию: (a) имеет полномочия на бюджет, (b) хочет проявить себя, (c) уже знает тебя, если был в списке проспектов. Сегодня мы автоматизируем реакцию, чтобы ни один такой сигнал не потерялся.</p>
+
+        <p><strong>Скорость реакции важна -- факты:</strong></p>
+        <ul style="padding-left: 20px; margin-bottom: 16px; color: #444;">
+            <li>Топ-команды реагируют на сигналы в течение <strong>30 минут</strong></li>
+            <li>Процент ответов значительно падает после 24 часов</li>
+            <li>Автоматическая маршрутизация гарантирует, что сигнал дойдет до тебя, даже если ты не в Apollo</li>
+        </ul>
+
+        <h3>Workflow, который мы построим:</h3>
+
+        <div class="workflow-diagram">
+            <span class="node">TRIGGER: Обнаружена смена работы</span><br>
+            <span class="arrow">|</span><br>
+            <span class="node">FILTER: Контакт в нашем Watch List</span><br>
+            <span class="arrow">|</span><br>
+            <span class="node">ACTION 1: Добавить в "Job Changes - [Месяц] [Год]"</span><br>
+            <span class="arrow">|</span><br>
+            <span class="node">ACTION 2: Создать задачу для Риты: "Проверить смену работы"</span><br>
+            <span class="arrow">|</span><br>
+            <span class="node">ACTION 3: Обновить стадию на "Approaching"</span><br>
+            <span class="arrow">|</span><br>
+            <span class="node">[РУЧНОЙ ШАГ: Рита проверяет]</span><br>
+            <span class="arrow">|</span><br>
+            <span class="node">Если подходит -> Export в Smartlead</span>
+        </div>
+
+        <h3>Шаблон email для повторного контакта:</h3>
+
+        <div style="background: #f8f9fb; border-radius: 8px; padding: 20px; margin: 16px 0; font-family: monospace; font-size: 0.9rem; color: #444;">
+            <strong>Subject:</strong> congrats on the move<br><br>
+            Hi {{first_name}},<br><br>
+            Saw you joined {{company}} -- congrats on the new role!<br><br>
+            At your previous company, [ссылка на предыдущее взаимодействие или контекст отрасли].<br><br>
+            Since you're settling in at {{company}}, thought this might be relevant: [ценностное предложение, связанное с их новой ситуацией].<br><br>
+            No rush -- just wanted to say congrats and reconnect.
+        </div>
+
+        <h3>Структура 12-дневного sequence повторного контакта:</h3>
+
+        <table>
+            <tr>
+                <th>День</th>
+                <th>Содержание</th>
+            </tr>
+            <tr>
+                <td><strong>День 1</strong></td>
+                <td>Поздравление + легкое ценностное предложение</td>
+            </tr>
+            <tr>
+                <td><strong>День 4</strong></td>
+                <td>Follow-up с кейсом, релевантным вертикали новой компании</td>
+            </tr>
+            <tr>
+                <td><strong>День 8</strong></td>
+                <td>Новый угол или insight по отрасли</td>
+            </tr>
+            <tr>
+                <td><strong>День 12</strong></td>
+                <td>Финальное мягкое касание ("No worries if timing isn't right")</td>
+            </tr>
+        </table>
+
+        <h3>Построение workflow -- пошагово:</h3>
+
+        <ol class="steps">
+            <li>Открой <strong>Workflows</strong> > <strong>Create a workflow</strong> > <strong>From scratch</strong></li>
+            <li><strong>Trigger:</strong> Выбери <strong>"Job Change"</strong> из event-based триггеров</li>
+            <li><strong>Enrollment filter:</strong> Нажми "Edit filters" > Добавь: Lists > Include > <strong>"Job Change Watch List"</strong>. Это гарантирует, что ТОЛЬКО контакты, которых ты специально мониторишь, попадут в workflow</li>
+            <li><strong>Action 1:</strong> Add to list > <strong>"Job Changes - Март 2026"</strong></li>
+            <li><strong>Action 2:</strong> Create task > Название: "Review job change for [contact]" > Assigned to: Rita</li>
+            <li><strong>Action 3:</strong> Update contact stage > <strong>"Approaching"</strong></li>
+            <li>Название workflow: <strong>"Job Change Re-Engagement"</strong></li>
+            <li>Сохрани и <strong>Activate</strong></li>
+        </ol>
+
+        <div class="try-it">
+            <div class="title">Попробуй сейчас: Построй workflow (7 мин)</div>
+            <p>
+                Создай workflow повторного контакта при смене работы по шагам выше:<br>
+                1. Trigger: Job Change (event-based)<br>
+                2. Filter: Контакты в "Job Change Watch List"<br>
+                3. Action 1: Добавить в "Job Changes - Март 2026" (создай список, если нужно)<br>
+                4. Action 2: Создать задачу для Риты<br>
+                5. Action 3: Обновить стадию на "Approaching"<br>
+                6. Активируй workflow<br><br>
+                <strong>Критерий успеха:</strong> Workflow активен, имеет правильный триггер, фильтр и все 3 действия.
+            </p>
+        </div>
+
+        <div class="rita-shortcut">
+            <div class="title">Rita Shortcut</div>
+            Создай отдельные списки для каждого месяца ("Job Changes - Март 2026", "Job Changes - Апрель 2026"). Так проще отслеживать свежесть сигналов и не путать новые смены работы с прошлогодними.
+        </div>
+    </div>
+
+    <!-- Section 3: Intent-Based Lead Routing -->
+    <div class="section" id="section3">
+        <h2><span class="num">3</span> Workflow: Маршрутизация по intent-сигналам</h2>
+
+        <h3>Возможность (на основе настроек из Дня 4)</h3>
+
+        <p>На Дне 4 ты настроил buying intent topics. Теперь мы создадим workflow, который автоматически собирает компании с высоким intent каждую неделю. Вместо того чтобы каждый понедельник вручную проверять фильтры intent, Apollo сам соберет их в список и скажет тебе действовать.</p>
+
+        <h3>Почему Intent + ICP match = высший приоритет:</h3>
+
+        <ul style="padding-left: 20px; margin-bottom: 16px; color: #444;">
+            <li>Email с персонализацией по сигналу: <strong>18% response rate</strong> (в 5 раз выше обычного)</li>
+            <li>Мультисигнальный outreach: <strong>25-40% reply rates</strong></li>
+            <li>Мультиканальный подход в <strong>3.5 раз эффективнее</strong>, чем только email</li>
+            <li>Intent-сигналы протухают за неделю -- автоматизация не дает их упустить</li>
+        </ul>
+
+        <h3>Workflow, который мы построим:</h3>
+
+        <div class="workflow-diagram">
+            <span class="node">TRIGGER: Schedule -- каждый понедельник в 9:00</span><br>
+            <span class="arrow">|</span><br>
+            <span class="node">FILTER: Buying Intent = High + ОАЭ + 1-50 сотр. + ICP-вертикали</span><br>
+            <span class="arrow">|</span><br>
+            <span class="node">ACTION 1: Добавить в "High Intent - Неделя [X]"</span><br>
+            <span class="arrow">|</span><br>
+            <span class="node">ACTION 2: Задача для Риты: "Export high-intent leads в Smartlead"</span><br>
+            <span class="arrow">|</span><br>
+            <span class="node">ACTION 3: Обновить стадию на "Approaching"</span>
+        </div>
+
+        <h3>Signal-specific email шаблон:</h3>
+
+        <div style="background: #f8f9fb; border-radius: 8px; padding: 20px; margin: 16px 0; font-family: monospace; font-size: 0.9rem; color: #444;">
+            <strong>Subject:</strong> {{company}} + Meta Ads<br><br>
+            Hi {{first_name}},<br><br>
+            I work with [вертикаль] businesses in the UAE that are looking to grow through Instagram and Facebook ads.<br><br>
+            Companies similar to {{company}} typically see [конкретный результат] within the first 60 days.<br><br>
+            Would it make sense to share how we do this?<br>
+            No pressure either way.
+        </div>
+
+        <h3>Пять фаз Signal Operating Model:</h3>
+
+        <table>
+            <tr>
+                <th>Фаза</th>
+                <th>Сроки</th>
+                <th>Действие</th>
+                <th>Кто</th>
+            </tr>
+            <tr>
+                <td><strong>1. Signal Discovery</strong></td>
+                <td>Однократно</td>
+                <td>Настройка intent topics, job change alerts</td>
+                <td>Рита</td>
+            </tr>
+            <tr>
+                <td><strong>2. Signal Scoring</strong></td>
+                <td>Еженедельно (авто)</td>
+                <td>Workflow оценивает и маршрутизирует лидов</td>
+                <td>Apollo</td>
+            </tr>
+            <tr>
+                <td><strong>3. Signal Routing</strong></td>
+                <td>Через workflow</td>
+                <td>Авто-добавление в списки, создание задач</td>
+                <td>Apollo</td>
+            </tr>
+            <tr>
+                <td><strong>4. Signal Execution</strong></td>
+                <td>В тот же день</td>
+                <td>Export в Smartlead, персонализированный outreach</td>
+                <td>Рита</td>
+            </tr>
+            <tr>
+                <td><strong>5. Signal Optimization</strong></td>
+                <td>Ежемесячно</td>
+                <td>Анализ: какие сигналы конвертируют? Корректировка topics</td>
+                <td>Оба</td>
+            </tr>
+        </table>
+
+        <div class="warning">
+            <div class="title">Intent-сигналы протухают быстро -- действуй в тот же день!</div>
+            <p>Если ты видишь high-intent лида в понедельник, но экспортируешь в Smartlead только в пятницу -- сигнал уже устарел. Компания могла выбрать подрядчика или передумать. Стандарт -- выполнение в тот же день.</p>
+        </div>
+
+        <div class="warning">
+            <div class="title">Не каждая high-intent компания -- хороший fit</div>
+            <p>Компания, исследующая "digital marketing", может быть конкурентом-агентством, SaaS-инструментом или крупным энтерпрайзом -- ничего из этого не подходит под твой ICP. Workflow маршрутизирует лидов в список; <strong>Рита все равно проверяет вручную</strong> перед export. Никогда не пропускай человеческую проверку.</p>
+        </div>
+
+        <h3>Построение workflow -- пошагово:</h3>
+
+        <ol class="steps">
+            <li>Открой <strong>Workflows</strong> > <strong>Create a workflow</strong> > <strong>From scratch</strong></li>
+            <li><strong>Trigger:</strong> Schedule-based > Weekly > Monday > 9:00 AM</li>
+            <li><strong>Enrollment filters:</strong>
+                <br>-- Buying Intent: High
+                <br>-- Location: United Arab Emirates
+                <br>-- # Employees: 1-50
+                <br>-- Industry: выбери свои ICP-вертикали</li>
+            <li><strong>Action 1:</strong> Add to list > <strong>"High Intent Leads - Неделя [X]"</strong></li>
+            <li><strong>Action 2:</strong> Create task > "Export high-intent leads to Smartlead" > Assigned to: Rita</li>
+            <li>Название: <strong>"High Intent Weekly Routing"</strong></li>
+            <li>Активируй</li>
+        </ol>
+
+        <div class="try-it">
+            <div class="title">Попробуй сейчас: Построй Intent Workflow (7 мин)</div>
+            <p>
+                Создай workflow маршрутизации по intent-сигналам по шагам выше. Сделай скриншот готового workflow.<br><br>
+                <strong>Критерий успеха:</strong> Workflow активен, триггер = расписание (понедельник), фильтры включают Intent High + UAE + 1-50 сотрудников.
+            </p>
+        </div>
+
+        <div class="tip">
+            <div class="title">Подсказка</div>
+            <p>Если при первом запуске мало или ноль контактов совпадают -- это нормально. Intent data покрывает крупные компании лучше, чем SMB. Workflow будет накапливать результаты по мере обновления данных каждую неделю.</p>
+        </div>
+    </div>
+
+    <!-- Section 4: Agency Automation Playbook -->
+    <div class="section" id="section4">
+        <h2><span class="num">4</span> Плейбук автоматизации агентства</h2>
+
+        <p>Ты построил два главных workflow. Теперь задокументируем полный плейбук автоматизации -- каждый workflow, который твоему агентству стоит запустить, что его запускает и что он выдает.</p>
+
+        <h3>Полный плейбук агентства:</h3>
+
+        <table>
+            <tr>
+                <th>#</th>
+                <th>Workflow</th>
+                <th>Триггер</th>
+                <th>Частота</th>
+                <th>Output</th>
+                <th>Кто</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td><strong>Job Change Re-Engagement</strong></td>
+                <td>Event: смена работы</td>
+                <td>В реальном времени</td>
+                <td>Список + задача</td>
+                <td>Рита</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td><strong>High Intent Weekly Routing</strong></td>
+                <td>Schedule: еженедельно</td>
+                <td>Понедельник 9:00</td>
+                <td>Список + задача</td>
+                <td>Рита</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>New Lead Alert</td>
+                <td>Event: контакт добавлен в READY-список</td>
+                <td>В реальном времени</td>
+                <td>Задача для Риты</td>
+                <td>Рита</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Stalled Deal Nudge</td>
+                <td>Event: сделка без движения >7 дней</td>
+                <td>В реальном времени</td>
+                <td>Задача</td>
+                <td>Папа</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Meeting No-Show</td>
+                <td>Event: пропущенная встреча</td>
+                <td>В реальном времени</td>
+                <td>Задача перебронирования</td>
+                <td>Папа</td>
+            </tr>
+        </table>
+
+        <div class="tip">
+            <div class="title">Начни с малого</div>
+            <p>Workflows 3-5 -- это <strong>опциональные улучшения</strong>. Начни с workflows 1-2 (уже построены). Добавляй 3-5 по мере привыкания к системе.</p>
+        </div>
+
+        <h3>Как workflows связаны со Smartlead:</h3>
+
+        <div class="workflow-diagram">
+            <span class="node">Apollo Workflows</span> <span class="arrow">--></span> <span class="node">Output: СПИСКИ</span><br>
+            <span class="arrow">|</span><br>
+            <span class="node">Рита экспортирует списки в CSV еженедельно</span><br>
+            <span class="arrow">|</span><br>
+            <span class="node">CSV импортируется в Smartlead кампании</span><br>
+            <span class="arrow">|</span><br>
+            <span class="node">Smartlead отправляет email</span><br>
+            <span class="arrow">|</span><br>
+            <span class="node">Ответы обрабатываются вручную -> логируются в Apollo</span>
+        </div>
+
+        <h3>Бонус: Outbound Copilot</h3>
+
+        <p><strong>Outbound Copilot</strong> -- это AI-инструмент внутри Apollo, который помогает быстрее запускать outbound кампании:</p>
+        <ul style="padding-left: 20px; margin-bottom: 16px; color: #444;">
+            <li>Находит контакты, совпадающие с ICP</li>
+            <li>Помогает с messaging и текстами</li>
+            <li>Создает evergreen-списки</li>
+            <li>Полезен для быстрого исследования новых вертикалей, которые ты еще не шаблонизировал</li>
+        </ul>
+
+        <div class="try-it">
+            <div class="title">Попробуй сейчас: Задокументируй свой плейбук (7 мин)</div>
+            <p>
+                Запиши плейбук автоматизации ТВОЕГО агентства. Начни с 2 построенных workflows, потом добавь 1-2 новых:
+            </p>
+        </div>
+
+        <table>
+            <tr>
+                <th>Workflow</th>
+                <th>Триггер</th>
+                <th>Фильтр</th>
+                <th>Действия</th>
+                <th>Статус</th>
+            </tr>
+            <tr>
+                <td>Job Change Re-Engagement</td>
+                <td>Смена работы</td>
+                <td>Watch List</td>
+                <td>Список + задача + стадия</td>
+                <td>Активен</td>
+            </tr>
+            <tr>
+                <td>High Intent Weekly Routing</td>
+                <td>Понедельник 9:00</td>
+                <td>High intent + UAE + 1-50</td>
+                <td>Список + задача</td>
+                <td>Активен</td>
+            </tr>
+            <tr>
+                <td>___________</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>___________</td>
+                <td></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+
+        <div class="rita-shortcut">
+            <div class="title">Бонус-задание</div>
+            Если осталось время -- построй workflow #3 (New Lead Alert): триггер = контакт добавлен в любой READY-список > создать задачу для Риты на export в Smartlead.
+        </div>
+    </div>
+
+    <!-- Practice Exercise -->
+    <div class="section">
+        <h2>Практика: Стресс-тест workflows (5 мин)</h2>
+
+        <p>Проверь, что твои workflows настроены правильно:</p>
+
+        <h3>1. Job Change Re-Engagement Workflow:</h3>
+        <ul class="checklist">
+            <li><span class="check"></span> Триггер: "Job Change" (event-based)</li>
+            <li><span class="check"></span> Фильтр: включает "Job Change Watch List"</li>
+            <li><span class="check"></span> 3 действия (список + задача + обновление стадии)</li>
+            <li><span class="check"></span> Статус: ACTIVE</li>
+        </ul>
+
+        <h3>2. High Intent Weekly Routing Workflow:</h3>
+        <ul class="checklist">
+            <li><span class="check"></span> Триггер: "Schedule" (weekly, Monday)</li>
+            <li><span class="check"></span> Фильтры: Intent High + UAE + 1-50 сотрудников</li>
+            <li><span class="check"></span> 2 действия (список + задача)</li>
+            <li><span class="check"></span> Статус: ACTIVE</li>
+        </ul>
+
+        <p>3. Создай задачу: <strong>"Review workflow outputs next Monday"</strong> -- напоминание проверить, выдали ли workflows результаты за первую неделю.</p>
+    </div>
+
+    <!-- Day Summary -->
+    <div class="day-summary">
+        <h3>Итоги Дня 8</h3>
+        <ol style="padding-left: 20px; color: #444;">
+            <li><strong>Workflows = автопилот.</strong> Задай правила один раз -- Apollo выполняет автоматически.</li>
+            <li><strong>Всегда устанавливай фильтры входа</strong> -- workflow без фильтров может затронуть всю твою базу данных.</li>
+            <li><strong>Job change workflow = автоматизация самого теплого сигнала.</strong> Скорость реакции критична.</li>
+            <li><strong>Intent-based routing = еженедельная автоматическая подборка</strong> высокоприоритетных проспектов.</li>
+            <li><strong>Workflows выдают СПИСКИ.</strong> Рита экспортирует эти списки в Smartlead для выполнения.</li>
+        </ol>
+    </div>
+
+    <!-- Checklist -->
+    <div class="section">
+        <h3>Чек-лист -- Теперь я умею:</h3>
+        <ul class="checklist">
+            <li><span class="check"></span> Создавать workflows с event-based и schedule-based триггерами</li>
+            <li><span class="check"></span> Построить и активировать workflow повторного контакта при смене работы</li>
+            <li><span class="check"></span> Построить и активировать workflow еженедельной маршрутизации по intent</li>
+            <li><span class="check"></span> Объяснить Five-Phase Signal Operating Model</li>
+            <li><span class="check"></span> Задокументировать полный плейбук автоматизации агентства</li>
+        </ul>
+    </div>
+
+    <!-- Quiz -->
+    <div class="section">
+        <div class="quiz">
+            <div class="title">Квиз Дня 8 (4 вопроса)</div>
+            <ol>
+                <li><strong>Ты создал workflow для смены работы, но забыл добавить фильтры входа. Что может случиться?</strong>
+                    <br>a) Ничего -- workflow просто не запустится
+                    <br>b) Каждый контакт в ТВОЕЙ базе Apollo, у которого обнаружится смена работы, может попасть в workflow -- это засорит твои списки нерелевантными контактами и потратит кредиты
+                    <br>c) Только твои сохраненные контакты будут затронуты
+                    <br>d) Apollo предупредит и не даст активировать
+                </li>
+                <li><strong>Компания показывает "High" buying intent по теме "Social media advertising". Ты нашел verified email CEO. Какая оптимальная последовательность из 3 действий?</strong></li>
+                <li><strong>Почему speed-to-signal важен для intent data?</strong></li>
+                <li><strong>Плейбук автоматизации агентства должен содержать workflows минимум для каких 2 сигналов?</strong></li>
+            </ol>
+        </div>
+
+        <details>
+            <summary>Показать ответы</summary>
+            <div style="padding: 16px; background:#f8f9fb; border-radius:8px; margin-top:8px; color:#444;">
+                <p><strong>Q1:</strong> b) Без фильтров входа workflow применяется ко ВСЕМ контактам в твоей базе Apollo. Любая смена работы у любого сохраненного контакта запустит workflow -- это засорит списки нерелевантными контактами и потратит кредиты.</p>
+                <p><strong>Q2:</strong> (1) Добавить в приоритетный список (intent-based). (2) Кратко исследовать компанию (сайт, Instagram) -- подтвердить ICP-match и собрать детали для персонализации. (3) Экспортировать в Smartlead с signal-specific шаблоном, который упоминает их интерес к social media advertising.</p>
+                <p><strong>Q3:</strong> Intent-сигналы протухают за неделю. Компания, исследующая "digital marketing" на этой неделе, может уже выбрать подрядчика к следующей. Топ-команды реагируют на intent-сигналы В ТОТ ЖЕ ДЕНЬ. Workflow автоматизирует маршрутизацию, но тебе все равно нужна same-day execution на этапе export в Smartlead.</p>
+                <p><strong>Q4:</strong> (1) Смена работы (event-based -- самый теплый сигнал, предыдущие контакты в новых компаниях) и (2) Buying intent (schedule-based -- компании, активно исследующие твои услуги). Это два самых ценных типа сигналов для outbound агентства.</p>
+            </div>
+        </details>
+    </div>
+
+    <!-- Next day preview -->
+    <div class="section" style="border-left: 4px solid #0f3460;">
+        <h3>Завтра: День 9 -- Аналитика, отчетность и интеграция со Smartlead</h3>
+        <p>Научимся читать дашборды Apollo, понимать бенчмарки, строить еженедельный feedback loop между Smartlead и Apollo, и настроим утреннюю понедельничную рутину, которая держит твой pipeline здоровым.</p>
+    </div>
+
+</div>
+
+<div class="footer">
+    <p>SF Agency - Внутреннее обучение Apollo.io</p>
+    <p>Создано: Март 2026</p>
+</div>
+
+</body>
+</html>

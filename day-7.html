@@ -1,0 +1,1249 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apollo.io - День 7: Последовательности и email-стратегия</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fb;
+            color: #1a1a2e;
+            line-height: 1.7;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            padding: 48px 0;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.4rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        .header .badge {
+            display: inline-block;
+            background: #e94560;
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .progress-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 24px 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .progress-bar .label {
+            font-weight: 600;
+            white-space: nowrap;
+            color: #555;
+        }
+
+        .progress-track {
+            flex: 1;
+            height: 10px;
+            background: #e8ecf1;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #e94560, #0f3460);
+            border-radius: 5px;
+            transition: width 0.5s;
+        }
+
+        .progress-bar .day-label {
+            font-weight: 700;
+            color: #0f3460;
+            white-space: nowrap;
+        }
+
+        .toc {
+            background: white;
+            border-radius: 12px;
+            padding: 28px 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .toc h3 {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: #0f3460;
+        }
+
+        .toc ol {
+            padding-left: 20px;
+        }
+
+        .toc li {
+            margin-bottom: 8px;
+        }
+
+        .toc a {
+            color: #0f3460;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .toc .time {
+            color: #999;
+            font-size: 0.85rem;
+            margin-left: 8px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 36px 36px;
+            margin-bottom: 28px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #1a1a2e;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e8ecf1;
+        }
+
+        .section h2 .num {
+            display: inline-block;
+            background: #0f3460;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 36px;
+            font-size: 1rem;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+
+        .section h3 {
+            font-size: 1.15rem;
+            margin: 24px 0 12px;
+            color: #0f3460;
+        }
+
+        .section p {
+            margin-bottom: 16px;
+            color: #444;
+        }
+
+        .steps {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+        }
+
+        .steps li {
+            counter-increment: step;
+            padding: 12px 16px 12px 52px;
+            position: relative;
+            margin-bottom: 8px;
+            background: #f8f9fb;
+            border-radius: 8px;
+            border-left: 3px solid #0f3460;
+        }
+
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            left: 14px;
+            top: 12px;
+            background: #0f3460;
+            color: white;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 26px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .warning .title {
+            font-weight: 700;
+            color: #856404;
+            margin-bottom: 4px;
+        }
+
+        .warning p {
+            color: #856404;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .tip {
+            background: #d4edda;
+            border: 1px solid #28a745;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .tip .title {
+            font-weight: 700;
+            color: #155724;
+            margin-bottom: 4px;
+        }
+
+        .tip p {
+            color: #155724;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #17a2b8;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .info .title {
+            font-weight: 700;
+            color: #0c5460;
+            margin-bottom: 4px;
+        }
+
+        .info p {
+            color: #0c5460;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        table th {
+            background: #0f3460;
+            color: white;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #e8ecf1;
+            font-size: 0.95rem;
+        }
+
+        table tr:nth-child(even) {
+            background: #f8f9fb;
+        }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 10px 16px;
+            margin-bottom: 6px;
+            background: #f8f9fb;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .checklist li .check {
+            width: 22px;
+            height: 22px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .quiz {
+            background: #f0e6ff;
+            border: 1px solid #7c3aed;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .quiz .title {
+            font-weight: 700;
+            color: #5b21b6;
+            margin-bottom: 12px;
+            font-size: 1.05rem;
+        }
+
+        .quiz ol {
+            padding-left: 20px;
+        }
+
+        .quiz li {
+            margin-bottom: 8px;
+            color: #5b21b6;
+        }
+
+        .link-btn {
+            display: inline-block;
+            background: #0f3460;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 8px 4px 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .link-btn:hover {
+            background: #1a4a8a;
+        }
+
+        .link-btn.secondary {
+            background: white;
+            color: #0f3460;
+            border: 2px solid #0f3460;
+        }
+
+        .nav-links { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+        .nav-links a { padding: 8px 16px; background: white; border-radius: 8px; text-decoration: none; color: #0f3460; font-weight: 600; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .nav-links a:hover { background: #0f3460; color: white; }
+        .nav-links a.current { background: #0f3460; color: white; }
+
+        .footer {
+            text-align: center;
+            padding: 40px 24px;
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        /* Try It Now micro-exercise */
+        .try-it {
+            background: #e8f5e9;
+            border: 2px dashed #28a745;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+        .try-it .title { font-weight: 700; color: #2e7d32; margin-bottom: 4px; }
+        .try-it p { color: #2e7d32; margin: 0; font-size: 0.95rem; }
+
+        /* Expandable details */
+        details { margin: 12px 0; }
+        details summary { cursor: pointer; font-weight: 600; color: #0f3460; padding: 8px 0; }
+        details summary:hover { text-decoration: underline; }
+
+        /* Day summary box */
+        .day-summary {
+            background: linear-gradient(135deg, #f0e6ff, #e8ecf1);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+        .day-summary h3 { color: #5b21b6; margin-bottom: 12px; }
+
+        /* Rita shortcut */
+        .rita-shortcut {
+            background: #fff8e1;
+            border: 1px solid #ff8f00;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 16px 0;
+            font-size: 0.9rem;
+        }
+        .rita-shortcut .title { font-weight: 700; color: #e65100; margin-bottom: 4px; }
+
+        /* Milestone celebration */
+        .milestone {
+            background: linear-gradient(135deg, #ffd700, #ffb347);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: center;
+        }
+        .milestone h3 { color: #5d3a00; margin-bottom: 8px; }
+        .milestone p { color: #5d3a00; }
+
+        /* Email template display */
+        .email-template {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 16px 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-size: 0.9rem;
+            line-height: 1.6;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+        }
+        .email-template .subject {
+            font-weight: 700;
+            color: #0f3460;
+            border-bottom: 1px solid #e8ecf1;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .section { padding: 24px 20px; }
+            .header h1 { font-size: 1.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Apollo.io - Обучение</h1>
+    <div class="subtitle">Неделя 2 / День 7: Последовательности и email-стратегия</div>
+    <div class="badge">~ 75 минут</div>
+</div>
+
+<div class="container">
+
+    <!-- Navigation -->
+    <div class="nav-links">
+        <a href="index.html">День 1</a>
+        <a href="day-2.html">День 2</a>
+        <a href="day-3.html">День 3</a>
+        <a href="day-4.html">День 4</a>
+        <a href="day-5.html">День 5</a>
+        <a href="day-6.html">День 6</a>
+        <a href="day-7.html" class="current">День 7</a>
+        <a href="day-8.html">День 8</a>
+        <a href="day-9.html">День 9</a>
+        <a href="day-10.html">День 10</a>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-bar">
+        <span class="label">Прогресс обучения:</span>
+        <div class="progress-track"><div class="progress-fill" style="width: 70%"></div></div>
+        <span class="day-label">День 7 из 10</span>
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+        <h3>Содержание дня</h3>
+        <ol>
+            <li><a href="#review">Повторение: День 6</a> <span class="time">5 мин</span></li>
+            <li><a href="#section1">Последовательности (Sequences) -- концепция и структура</a> <span class="time">15 мин</span></li>
+            <li><a href="#section2">Email-шаблоны и персонализация</a> <span class="time">20 мин</span></li>
+            <li><a href="#section3">A/B-тестирование</a> <span class="time">10 мин</span></li>
+            <li><a href="#section4">Вертикаль-специфичные email-углы</a> <span class="time">15 мин</span></li>
+            <li><a href="#section5">Правила последовательностей (Rulesets)</a> <span class="time">5 мин</span></li>
+            <li><a href="#practice">Практическое задание</a> <span class="time">5 мин</span></li>
+        </ol>
+    </div>
+
+    <!-- Quick Review -->
+    <div class="section" id="review" style="border-left: 4px solid #7c3aed;">
+        <h2>Повторение: День 6</h2>
+
+        <p><strong>Вопрос 1:</strong> Назови 9 стадий deal pipeline по порядку.</p>
+        <details>
+            <summary>Ответ</summary>
+            <p>New Lead &rarr; Contacted &rarr; Replied &rarr; Interested &rarr; Meeting Scheduled &rarr; Proposal Sent &rarr; Negotiation &rarr; Won &rarr; Lost.</p>
+        </details>
+
+        <p><strong>Вопрос 2:</strong> Ты только что забронировал discovery call с лидом. Какие 3 действия в Apollo?</p>
+        <details>
+            <summary>Ответ</summary>
+            <p>(1) Обновить стадию сделки на "Meeting Scheduled". (2) Записать заметку с тем, что уже знаешь. (3) Создать задачу: "Подготовиться к встрече с [Имя]" со сроком за день до звонка.</p>
+        </details>
+
+        <p><strong>Вопрос 3:</strong> Какой формат шаблона заметок? Назови 5 из 7 полей.</p>
+        <details>
+            <summary>Ответ</summary>
+            <p>Дата, Контакт, Тип, Главная боль, Бюджет, Срочность, Возражения, Следующий шаг (любые 5 из 7).</p>
+        </details>
+    </div>
+
+    <!-- Section 1: Sequences Concept -->
+    <div class="section" id="section1">
+        <h2><span class="num">1</span> Последовательности (Sequences) -- концепция и структура</h2>
+
+        <h3>Как это применяется к ТВОЕМУ агентству (критически важный контекст):</h3>
+        <p>В Apollo есть встроенная система отправки email -- Sequences (Последовательности). Мы НЕ будем использовать её для отправки -- этим занимается Smartlead. Но мы БУДЕМ использовать конструктор последовательностей Apollo для <strong>ПЛАНИРОВАНИЯ и СТРУКТУРИРОВАНИЯ</strong> наших кампаний. Думай о Apollo как об архитекторе (проектирует здание), а о Smartlead -- как о строительной бригаде (строит его). Сегодня ты учишься архитектуре.</p>
+
+        <div class="info">
+            <div class="title">Важно запомнить</div>
+            <p>Apollo = ПЛАНИРУЕМ последовательности. Smartlead = ОТПРАВЛЯЕМ письма. Такое разделение защищает репутацию отправителя и даёт больше контроля.</p>
+        </div>
+
+        <h3>Что такое последовательность (sequence):</h3>
+        <p>Последовательность -- это многошаговая кампания аутрича. Шаг 1 -- email. Шаг 2 (через 3 дня) -- follow-up email. Шаг 3 -- запрос на LinkedIn-подключение. Каждый шаг имеет цель и тайминг.</p>
+
+        <h3>5 типов шагов в последовательностях Apollo:</h3>
+        <table>
+            <tr>
+                <th>Тип шага</th>
+                <th>Что это</th>
+                <th>Как мы используем</th>
+            </tr>
+            <tr>
+                <td><strong>Automatic Email</strong></td>
+                <td>Отправляется автоматически по расписанию</td>
+                <td>Планируем для выполнения в Smartlead</td>
+            </tr>
+            <tr>
+                <td><strong>Manual Email</strong></td>
+                <td>Требует ручной проверки перед отправкой</td>
+                <td>Для Tier 1 гиперперсонализированных сообщений</td>
+            </tr>
+            <tr>
+                <td><strong>Phone Call</strong></td>
+                <td>Напоминание о звонке</td>
+                <td>Задача в Apollo (Папа звонит)</td>
+            </tr>
+            <tr>
+                <td><strong>LinkedIn Task</strong></td>
+                <td>Напоминание о LinkedIn-взаимодействии</td>
+                <td>Рита выполняет (connection, message)</td>
+            </tr>
+            <tr>
+                <td><strong>Action Item</strong></td>
+                <td>Любая ручная задача</td>
+                <td>Исследование, подготовка предложения и т.д.</td>
+            </tr>
+        </table>
+
+        <h3>Рекомендуемые структуры последовательностей для агентства:</h3>
+
+        <h3>Tier 2 -- Стандартная последовательность (5 шагов, 16 дней):</h3>
+        <table>
+            <tr>
+                <th>День</th>
+                <th>Шаг</th>
+                <th>Цель</th>
+                <th>Объём</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>Email: персонализированное вступление</td>
+                <td>Ценность в первую очередь, упоминание их бизнеса</td>
+                <td>&lt;80 слов</td>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>LinkedIn: запрос на подключение</td>
+                <td>Прогрев отношений (короткая заметка)</td>
+                <td>&lt;40 слов</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Email: follow-up с кейсом</td>
+                <td>Новый ракурс, социальное доказательство</td>
+                <td>&lt;80 слов</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>Email: другой ценностный ракурс</td>
+                <td>Другая болевая точка</td>
+                <td>&lt;80 слов</td>
+            </tr>
+            <tr>
+                <td>16</td>
+                <td>Email: breakup/мягкое закрытие</td>
+                <td>"Ничего страшного, если сейчас не время"</td>
+                <td>&lt;60 слов</td>
+            </tr>
+        </table>
+
+        <h3>Tier 3 -- Массовая последовательность (3 шага, 16 дней):</h3>
+        <table>
+            <tr>
+                <th>День</th>
+                <th>Шаг</th>
+                <th>Цель</th>
+                <th>Объём</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>Email: автоматическое вступление</td>
+                <td>4 предложения, динамические переменные</td>
+                <td>&lt;80 слов</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>Email: follow-up в том же треде</td>
+                <td>Тот же тред, новый ракурс</td>
+                <td>&lt;60 слов</td>
+            </tr>
+            <tr>
+                <td>16</td>
+                <td>Email: breakup</td>
+                <td>Последнее касание, мягкое закрытие</td>
+                <td>&lt;50 слов</td>
+            </tr>
+        </table>
+
+        <h3>Ключевая статистика по таймингу:</h3>
+        <ul style="padding-left: 20px; margin-bottom: 16px;">
+            <li><strong>58%</strong> ответов приходят из ПЕРВОГО email</li>
+            <li><strong>42% ответов приходят из follow-up писем (письмо 2+)</strong> -- поэтому follow-up ОБЯЗАТЕЛЕН</li>
+            <li><strong>Лучшие дни</strong> для отправки: четверг (6.87% reply rate), среда, вторник</li>
+            <li><strong>Худший:</strong> понедельник (5.29%)</li>
+            <li><strong>Лучшее время:</strong> 6-8 утра в часовом поясе получателя</li>
+        </ul>
+
+        <h3>Два типа email (фреймворк Jed Mahrle):</h3>
+        <table>
+            <tr>
+                <th>Тип</th>
+                <th>Что это</th>
+                <th>Когда использовать</th>
+            </tr>
+            <tr>
+                <td><strong>Value Emails</strong></td>
+                <td>Самостоятельный инсайт, кейс или наблюдение. Можно переслать, и он всё равно имеет смысл.</td>
+                <td>Первое касание, третий email</td>
+            </tr>
+            <tr>
+                <td><strong>Context Emails</strong></td>
+                <td>Follow-up в том же треде. Короткие. Ссылаются на предыдущий email.</td>
+                <td>Второй email, breakup</td>
+            </tr>
+        </table>
+
+        <div class="warning">
+            <div class="title">Не усложняй последовательности</div>
+            <p>Тебе не нужно 15 шагов. Больше шагов НЕ равно больше ответов. Что важно: (1) Ценность в каждом email, (2) Правильный тайминг между шагами, (3) Знать, когда остановиться. Качественная 3-email последовательность бьёт 10-email последовательность, состоящую из "just checking in".</p>
+        </div>
+
+        <div class="try-it">
+            <div class="title">Попробуй сейчас: изучи шаблоны последовательностей (10 мин)</div>
+            <p>1. Перейди в <strong>Engage &gt; Sequences</strong> в левом меню<br>
+            2. Просмотри библиотеку шаблонов (Apollo имеет готовые последовательности)<br>
+            3. Найди 2 шаблона, подходящих для агентства, продающего SMB-клиентам<br>
+            4. Для каждого шаблона запиши:<br>
+            &nbsp;&nbsp;-- Название шаблона: ___________<br>
+            &nbsp;&nbsp;-- Количество шагов: ___________<br>
+            &nbsp;&nbsp;-- Используемые каналы (email, LinkedIn, call): ___________<br>
+            &nbsp;&nbsp;-- Общая длительность последовательности в днях: ___________<br>
+            5. Какой шаблон ближе всего к нашей Tier 2 структуре?</p>
+        </div>
+    </div>
+
+    <!-- Section 2: Email Templates & Personalization -->
+    <div class="section" id="section2">
+        <h2><span class="num">2</span> Email-шаблоны и персонализация</h2>
+
+        <h3>5 железных правил cold email (подкреплены данными):</h3>
+        <table>
+            <tr>
+                <th>Правило</th>
+                <th>Данные</th>
+                <th>Что делать</th>
+            </tr>
+            <tr>
+                <td><strong>Менее 80 слов</strong></td>
+                <td>Короткие email получают больше ответов</td>
+                <td>Первое касание: 4-6 предложений максимум</td>
+            </tr>
+            <tr>
+                <td><strong>Тема 2-4 слова</strong></td>
+                <td>46% open rate (лучший показатель)</td>
+                <td>"{{company}} bookings?" -- а НЕ "How We Can Help Your Business Grow with Meta Ads"</td>
+            </tr>
+            <tr>
+                <td><strong>Один CTA</strong></td>
+                <td>35-42% больше ответов</td>
+                <td>Один вопрос, одна просьба. Не три.</td>
+            </tr>
+            <tr>
+                <td><strong>Начни с ИХ проблемы</strong></td>
+                <td>--</td>
+                <td>Первое предложение о НИХ, не о тебе</td>
+            </tr>
+            <tr>
+                <td><strong>Без форматирования</strong></td>
+                <td>Bold, italic, маркеры -- триггеры спам-фильтров</td>
+                <td>Только plain text. Никаких картинок в первом email.</td>
+            </tr>
+        </table>
+
+        <div class="info">
+            <div class="title">О метриках open rate</div>
+            <p>Показатели open rate сильно варьируются (25-50%) в зависимости от метода измерения. Apple Mail Privacy Protection искусственно завышает open rate. <strong>Ориентируйся на REPLY RATE как главную метрику.</strong> Средний reply rate: 3-5%. Хороший: 5-10%. Топ: 10%+. Элитные кампании с signal-based таргетингом: 15-25%.</p>
+        </div>
+
+        <h3>Динамические переменные в Apollo:</h3>
+        <table>
+            <tr>
+                <th>Переменная</th>
+                <th>Что подставляет</th>
+                <th>Пример</th>
+            </tr>
+            <tr>
+                <td><code>{{first_name}}</code></td>
+                <td>Имя контакта</td>
+                <td>"Hi Ahmed"</td>
+            </tr>
+            <tr>
+                <td><code>{{last_name}}</code></td>
+                <td>Фамилия контакта</td>
+                <td>"Mr. Al Maktoum"</td>
+            </tr>
+            <tr>
+                <td><code>{{company}}</code></td>
+                <td>Название компании</td>
+                <td>"Dubai Glow Salon"</td>
+            </tr>
+            <tr>
+                <td><code>{{title}}</code></td>
+                <td>Должность</td>
+                <td>"Founder"</td>
+            </tr>
+            <tr>
+                <td><code>{{city}}</code></td>
+                <td>Город контакта</td>
+                <td>"Dubai"</td>
+            </tr>
+        </table>
+
+        <h3>Стратегии тем письма (по данным):</h3>
+        <table>
+            <tr>
+                <th>Стратегия</th>
+                <th>Средний open rate</th>
+                <th>Пример</th>
+            </tr>
+            <tr>
+                <td>Персонализированная (имя/компания)</td>
+                <td>46%</td>
+                <td>"{{company}} bookings"</td>
+            </tr>
+            <tr>
+                <td>Формат вопроса</td>
+                <td>46%</td>
+                <td>"filling quiet days?"</td>
+            </tr>
+            <tr>
+                <td>С числом</td>
+                <td>+113% улучшение</td>
+                <td>"40% more bookings"</td>
+            </tr>
+            <tr>
+                <td>2-4 слова</td>
+                <td>Лучший показатель</td>
+                <td>"quick question"</td>
+            </tr>
+        </table>
+
+        <h3>Стратегии CTA (по данным):</h3>
+        <table>
+            <tr>
+                <th>Тип CTA</th>
+                <th>Результат</th>
+                <th>Пример</th>
+            </tr>
+            <tr>
+                <td>Interest-based (мягкий)</td>
+                <td>15% booking rate</td>
+                <td>"Is [specific goal] on your roadmap?"</td>
+            </tr>
+            <tr>
+                <td>Permission-based</td>
+                <td>Выше, чем прямой</td>
+                <td>"Feel free to say no"</td>
+            </tr>
+            <tr>
+                <td>Time-specific</td>
+                <td>Лучшая конверсия</td>
+                <td>"10 minutes this week?"</td>
+            </tr>
+            <tr>
+                <td>Прямой запрос на встречу</td>
+                <td>Ниже</td>
+                <td>"Book a call here" -- избегай в первом email</td>
+            </tr>
+        </table>
+
+        <div class="warning">
+            <div class="title">"Hi, My Name Is..." = мгновенное удаление</div>
+            <p>Никогда не начинай cold email с имени, должности или компании. Получателю пока всё равно, кто ты. Ему важна ЕГО проблема. Начни с наблюдения о его бизнесе, а не с представления себя.</p>
+        </div>
+
+        <div class="warning">
+            <div class="title">{{first_name}} -- это НЕ персонализация</div>
+            <p>Каждый cold email на земле использует {{first_name}}. Это базовый минимум, не персонализация. Настоящая персонализация ссылается на что-то КОНКРЕТНОЕ из их бизнеса: контент в Instagram, свежий отзыв на Google, сайт, новая локация.</p>
+        </div>
+
+        <h3>Создание email-шаблона в Apollo:</h3>
+        <ol class="steps">
+            <li>Перейди в <strong>Engage &gt; Sequences</strong> или найди <strong>Templates</strong> в навигации</li>
+            <li>Нажми <strong>"Create Template"</strong> (или "New Template")</li>
+            <li>Напиши шаблон с динамическими переменными</li>
+            <li>Сохрани с понятным именем</li>
+        </ol>
+
+        <h3>Пример: шаблон для салона красоты</h3>
+        <div class="email-template">
+            <div class="subject">Тема: {{company}} bookings</div>
+            <p>Hi {{first_name}},</p>
+            <p>Noticed {{company}} is getting great reviews on Google.<br>
+            Question -- are you running Instagram ads to fill quiet days,<br>
+            or relying mainly on walk-ins and word of mouth?</p>
+            <p>We helped a Dubai salon increase bookings by 40% in 8 weeks<br>
+            using targeted Meta Ads (not boosted posts).</p>
+            <p>If you're curious what that could look like for {{company}},<br>
+            happy to share the specifics. No pressure either way.</p>
+            <p>[Sender name]</p>
+        </div>
+
+        <h3>Анатомия этого email (почему он работает):</h3>
+        <ul style="padding-left: 20px; margin-bottom: 16px;">
+            <li><strong>Тема:</strong> 2 слова + название компании. Персонализирована. До 36 символов.</li>
+            <li><strong>Строка 1:</strong> Наблюдение о ИХ бизнесе (Google-отзывы). Показывает, что ты смотрел.</li>
+            <li><strong>Строка 2:</strong> Вопрос о их текущем подходе (вовлекает, а не питчит).</li>
+            <li><strong>Строка 3:</strong> Кейс с конкретными числами (40%, 8 недель). Социальное доказательство.</li>
+            <li><strong>Строка 4:</strong> CTA: мягкий, interest-based. "No pressure" снижает барьер.</li>
+            <li><strong>Объём:</strong> ~70 слов. Менее 80.</li>
+        </ul>
+
+        <div class="try-it">
+            <div class="title">Попробуй сейчас: создай 2 email-шаблона (8 мин)</div>
+            <p><strong>Шаблон 1: Beauty Salon First Touch</strong><br>
+            Используя пример выше как модель, создай свою версию (или используй пример как есть). Сохрани в Apollo.</p>
+            <p><strong>Шаблон 2: Fitness Studio First Touch</strong><br>
+            Напиши похожий email для владельцев фитнес-студий. Используй:<br>
+            -- Фитнес-специфичное наблюдение (напр., "I see {{company}} has some strong class reviews")<br>
+            -- Фитнес-специфичный кейс (напр., "filled 50 class slots per week")<br>
+            -- Interest-based CTA<br>
+            -- Менее 80 слов<br>
+            -- Минимум 2 динамические переменные</p>
+            <p>Сохрани оба шаблона. Сделай скриншот.</p>
+        </div>
+    </div>
+
+    <!-- Section 3: A/B Testing -->
+    <div class="section" id="section3">
+        <h2><span class="num">3</span> A/B-тестирование</h2>
+
+        <h3>Что тестировать (по приоритету -- наибольшее влияние первым):</h3>
+        <table>
+            <tr>
+                <th>Приоритет</th>
+                <th>Переменная</th>
+                <th>Влияет на</th>
+                <th>Мин. выборка</th>
+            </tr>
+            <tr>
+                <td>1. <strong>Темы писем</strong></td>
+                <td>Subject line</td>
+                <td>Open rate</td>
+                <td>100-200 на вариант</td>
+            </tr>
+            <tr>
+                <td>2. <strong>CTA</strong></td>
+                <td>Призыв к действию</td>
+                <td>Reply rate</td>
+                <td>100-200 на вариант</td>
+            </tr>
+            <tr>
+                <td>3. <strong>Тело email</strong></td>
+                <td>Тон, длина, структура</td>
+                <td>Reply rate</td>
+                <td>200-300 на вариант</td>
+            </tr>
+            <tr>
+                <td>4. <strong>Время отправки</strong></td>
+                <td>День недели, время</td>
+                <td>Open + reply rate</td>
+                <td>200+ на вариант</td>
+            </tr>
+            <tr>
+                <td>5. <strong>Имя отправителя</strong></td>
+                <td>Только имя vs. полное имя</td>
+                <td>Open rate</td>
+                <td>200+ на вариант</td>
+            </tr>
+        </table>
+
+        <h3>Протокол тестирования (один тест за раз):</h3>
+        <ol class="steps">
+            <li>Меняй ТОЛЬКО ОДНУ переменную за тест (напр., только тему письма)</li>
+            <li>Раздели аудиторию равномерно (50/50 или 33/33/33)</li>
+            <li>Отправь минимум 100-200 email на вариант</li>
+            <li>Подожди 5-7 дней для стабилизации результатов</li>
+            <li>Победитель = вариант, который используешь дальше. Потом тестируй СЛЕДУЮЩУЮ переменную.</li>
+        </ol>
+
+        <h3>Пороги для принятия решений:</h3>
+        <table>
+            <tr>
+                <th>Метрика</th>
+                <th>Порог</th>
+                <th>Действие</th>
+            </tr>
+            <tr>
+                <td>Open rate ниже 20%</td>
+                <td>Тема не работает</td>
+                <td>Тестируй новые темы немедленно</td>
+            </tr>
+            <tr>
+                <td>Reply rate ниже 4%</td>
+                <td>Тело/CTA не работает</td>
+                <td>Переписывай CTA, пробуй другой ракурс</td>
+            </tr>
+            <tr>
+                <td>Interested rate ниже 1%</td>
+                <td>Весь подход не работает</td>
+                <td>Пересмотри таргетинг, оффер или месседжинг</td>
+            </tr>
+            <tr>
+                <td>Bounce rate выше 5%</td>
+                <td>Качество списка не работает</td>
+                <td>Немедленный аудит гигиены списка</td>
+            </tr>
+        </table>
+
+        <h3>Apollo vs. Smartlead -- где что делать:</h3>
+        <ul style="padding-left: 20px; margin-bottom: 16px;">
+            <li><strong>Планируй</strong> A/B-тесты в системе шаблонов Apollo (варианты A и B)</li>
+            <li><strong>Выполняй</strong> тесты в Smartlead (где есть встроенный A/B splitting)</li>
+            <li><strong>Анализируй</strong> результаты в отчётности Smartlead</li>
+            <li><strong>Обновляй</strong> шаблоны Apollo победившим вариантом</li>
+        </ul>
+
+        <div class="try-it">
+            <div class="title">Попробуй сейчас: спроектируй A/B-тест (5 мин)</div>
+            <p>Для своего beauty salon first-touch email создай 2 варианта темы:</p>
+            <p><strong>Вариант A (вопрос):</strong> <code>{{company}} bookings?</code><br>
+            <strong>Вариант B (число):</strong> <code>40% more bookings</code></p>
+            <p>1. Как ты ДУМАЕШЬ, какой победит? Почему?<br>
+            &nbsp;&nbsp;&gt; Мой прогноз: ___________ потому что ___________</p>
+            <p>2. Сколько email на вариант нужно для валидного теста?<br>
+            &nbsp;&nbsp;&gt; Ответ: 100-200 на вариант</p>
+            <p>3. Если Вариант A -- 22% open rate, Вариант B -- 35% open rate (по 200 отправок) -- какой вывод?<br>
+            &nbsp;&nbsp;&gt; Ответ: Вариант B побеждает. Используй его дальше. Теперь тестируй СЛЕДУЮЩУЮ переменную (CTA).</p>
+            <p>4. Сохрани оба варианта как шаблоны в Apollo</p>
+        </div>
+    </div>
+
+    <!-- Section 4: Vertical-Specific Messaging -->
+    <div class="section" id="section4">
+        <h2><span class="num">4</span> Вертикаль-специфичные email-углы</h2>
+
+        <h3>Почему одно сообщение не подходит всем:</h3>
+        <p>"Одно релевантное предложение, привязанное к конкретному сигналу, бьёт пять дженерик-строк." Проблемы владельца фитнес-студии отличаются от проблем владельца салона красоты. Email, который резонирует с создателем курсов, провалится для ресторатора. <strong>Сегментация по вертикали -- это самое высокоэффективное действие для reply rate.</strong></p>
+
+        <h3>4-T Framework (Josh Braun) -- используй для КАЖДОГО email:</h3>
+        <table>
+            <tr>
+                <th>T</th>
+                <th>Что это</th>
+                <th>Пример (Beauty Salon)</th>
+            </tr>
+            <tr>
+                <td><strong>Trigger</strong></td>
+                <td>Конкретное наблюдение о их бизнесе</td>
+                <td>"Noticed {{company}} has 200+ 5-star Google reviews"</td>
+            </tr>
+            <tr>
+                <td><strong>Think</strong></td>
+                <td>Что обычно испытывают похожие компании</td>
+                <td>"Most salons rely on walk-ins, missing 40% of potential bookings"</td>
+            </tr>
+            <tr>
+                <td><strong>Third-Party</strong></td>
+                <td>Социальное доказательство от похожего клиента</td>
+                <td>"We helped a Dubai salon increase bookings by 40% in 8 weeks"</td>
+            </tr>
+            <tr>
+                <td><strong>Talk</strong></td>
+                <td>Низко-барьерный CTA</td>
+                <td>"Curious how this could look for {{company}}?"</td>
+            </tr>
+        </table>
+
+        <h3>Гайд по вертикалям:</h3>
+        <table>
+            <tr>
+                <th>Вертикаль</th>
+                <th>Ключевая боль</th>
+                <th>Ракурс email</th>
+                <th>Trigger-сигнал</th>
+            </tr>
+            <tr>
+                <td><strong>Фитнес/Зал</strong></td>
+                <td>Низкие продления, сезонные спады</td>
+                <td>"Похожие залы заполнили занятия через Meta-кампании"</td>
+                <td>Открытие нового зала, найм тренеров</td>
+            </tr>
+            <tr>
+                <td><strong>Красота/Салон</strong></td>
+                <td>Нестабильные записи, зависимость от walk-in</td>
+                <td>"Салоны увеличили записи на X% через социальную рекламу"</td>
+                <td>Новая локация, найм стилистов</td>
+            </tr>
+            <tr>
+                <td><strong>F&B/Ресторан</strong></td>
+                <td>Комиссии delivery-приложений, трафик только на выходных</td>
+                <td>"Рестораны сокращают зависимость от delivery, увеличивают прямые заказы"</td>
+                <td>Новое меню, расширение, новый филиал</td>
+            </tr>
+            <tr>
+                <td><strong>E-commerce</strong></td>
+                <td>Растущий CAC, падающий ROAS</td>
+                <td>"Кейсы с конкретным улучшением ROAS"</td>
+                <td>Запуск новых продуктов, найм</td>
+            </tr>
+            <tr>
+                <td><strong>Образование/Курсы</strong></td>
+                <td>Нестабильные наборы, неудачный опыт с рекламой</td>
+                <td>"Заполнили 200 мест на мастер-класс за $12/регистрация"</td>
+                <td>Новые программы, расширение</td>
+            </tr>
+            <tr>
+                <td><strong>Недвижимость</strong></td>
+                <td>Качество лидов, высокая конкуренция</td>
+                <td>"Снижение стоимости квалифицированного лида"</td>
+                <td>Запуск новых проектов</td>
+            </tr>
+            <tr>
+                <td><strong>Коучи/Консультанты</strong></td>
+                <td>Пустые слоты в календаре, неправильные клиенты</td>
+                <td>"Заполненный календарь квалифицированными высокочековыми клиентами"</td>
+                <td>Новые сертификации, расширение услуг</td>
+            </tr>
+        </table>
+
+        <div class="tip">
+            <div class="title">Подсказка</div>
+            <p>Всегда пиши шаблоны в ТОНЕ вертикали. Владельцы фитнес-студий реагируют на энергию и результаты. Владельцы салонов красоты -- на элегантность и Instagram-успех. Рестораторы -- на сокращение расходов и увеличение гостей. Подстраивайся под их мир.</p>
+        </div>
+
+        <div class="try-it">
+            <div class="title">Попробуй сейчас: напиши 3-email последовательность для одной вертикали (10 мин)</div>
+            <p><strong>Выбери вертикаль:</strong> ___________</p>
+            <p>Напиши все 3 email, используя 4-T Framework и лучшие практики:</p>
+            <p><strong>Email 1 (День 1): Value-first вступление</strong><br>
+            -- Тема: ___________<br>
+            -- Тело (менее 80 слов, interest-based CTA):<br>
+            &gt; ___________</p>
+            <p><strong>Email 2 (День 4): Follow-up с кейсом</strong><br>
+            -- Тема: ___________<br>
+            -- Тело (ссылка на конкретные результаты, тот же тред):<br>
+            &gt; ___________</p>
+            <p><strong>Email 3 (День 10): Breakup / мягкое закрытие</strong><br>
+            -- Тема: ___________<br>
+            -- Тело (менее 60 слов, "ничего страшного, если нет"):<br>
+            &gt; ___________</p>
+            <p>Это становится твоим планом кампании Smartlead для этой вертикали.</p>
+        </div>
+    </div>
+
+    <!-- Section 5: Sequence Rulesets -->
+    <div class="section" id="section5">
+        <h2><span class="num">5</span> Правила последовательностей (Rulesets)</h2>
+
+        <h3>Правила, которые тебя защищают (концептуально -- для конфигурации Smartlead):</h3>
+        <table>
+            <tr>
+                <th>Правило</th>
+                <th>Что делает</th>
+                <th>Почему важно</th>
+            </tr>
+            <tr>
+                <td><strong>Reply &rarr; Finish</strong></td>
+                <td>Останавливает отправку при ответе</td>
+                <td>Не отправляй email тому, кто уже ответил</td>
+            </tr>
+            <tr>
+                <td><strong>OOO &rarr; Pause</strong></td>
+                <td>Ставит на паузу при Out-of-Office</td>
+                <td>Автоматически возобновляется по возвращении</td>
+            </tr>
+            <tr>
+                <td><strong>Bounce &rarr; Remove</strong></td>
+                <td>Помечает bounced email</td>
+                <td>Защищает репутацию отправителя</td>
+            </tr>
+            <tr>
+                <td><strong>X Opens &rarr; Call Task</strong></td>
+                <td>Создаёт задачу на звонок после множества открытий</td>
+                <td>Hot lead сигнал -- читает, но не отвечает</td>
+            </tr>
+            <tr>
+                <td><strong>Same Account &rarr; Coordinate</strong></td>
+                <td>Обрабатывает, когда ДРУГОЙ человек из компании отвечает</td>
+                <td>Не раздражай всю компанию рассылкой</td>
+            </tr>
+        </table>
+
+        <h3>Как это связано со Smartlead:</h3>
+        <p>Большинство этих правил существуют и в Smartlead. Понимание логики в Apollo помогает правильно настроить Smartlead. Правила одинаковы, независимо от того, какой инструмент отправляет письма.</p>
+
+        <div class="try-it">
+            <div class="title">Попробуй сейчас: определи свои правила (2 мин)</div>
+            <p>Для своей 3-email последовательности из Раздела 4 запиши правила:</p>
+            <p>-- Что происходит при <strong>ответе?</strong> &rarr; ___________<br>
+            -- Что происходит при <strong>OOO?</strong> &rarr; ___________<br>
+            -- Что происходит при <strong>bounce?</strong> &rarr; ___________</p>
+            <p><strong>Ожидаемые ответы:</strong> Reply &rarr; завершить последовательность + создать задачу на ответ. OOO &rarr; пауза + автовозобновление по возвращении. Bounce &rarr; пометить как bad data + удалить из будущих кампаний.</p>
+        </div>
+    </div>
+
+    <!-- Practice Exercise -->
+    <div class="section" id="practice" style="border-left: 4px solid #e94560;">
+        <h2>Практическое задание: расширение библиотеки шаблонов (5 мин)</h2>
+
+        <p>Создай email-шаблоны в Apollo для ещё ОДНОЙ вертикали (помимо beauty/fitness):</p>
+        <p>Выбери: F&B, E-commerce, Education/Courses, Real Estate или Coaches</p>
+
+        <p>Создай:</p>
+        <ol class="steps">
+            <li><strong>First-touch шаблон</strong> (менее 80 слов, interest-based CTA)</li>
+            <li><strong>Follow-up шаблон</strong> (ракурс с кейсом)</li>
+        </ol>
+
+        <p>Сохрани оба в Apollo. Теперь у тебя есть шаблоны минимум для 3 вертикалей.</p>
+    </div>
+
+    <!-- Quiz -->
+    <div class="section">
+        <h2>Квиз Дня 7</h2>
+
+        <div class="quiz">
+            <div class="title">Вопрос 1</div>
+            <p>Какая идеальная длина для first-touch cold email?</p>
+            <ol>
+                <li>a) Менее 80 слов</li>
+                <li>b) 150-200 слов</li>
+                <li>c) 300+ слов -- чем больше деталей, тем лучше</li>
+                <li>d) Не важно, главное персонализация</li>
+            </ol>
+            <details>
+                <summary>Показать ответ</summary>
+                <p><strong>a)</strong> Менее 80 слов. Данные постоянно показывают, что короткие first-touch email получают больше ответов. Сохрани подробности для follow-up.</p>
+            </details>
+        </div>
+
+        <div class="quiz">
+            <div class="title">Вопрос 2</div>
+            <p>Ты A/B-тестируешь темы. Вариант A: 15% open rate. Вариант B: 32% open rate. Каждый протестирован на 250 получателях. Что делать?</p>
+            <ol>
+                <li>a) Продолжать тестировать -- 250 недостаточно данных</li>
+                <li>b) Вариант B побеждает -- используй дальше и тестируй следующую переменную (CTA)</li>
+                <li>c) Оба плохие -- пробуй совершенно новые темы</li>
+            </ol>
+            <details>
+                <summary>Показать ответ</summary>
+                <p><strong>b)</strong> Вариант B побеждает при 250 на вариант (проходит порог 200+ для статистической валидности). Отметь, что Вариант A (15%) также ниже порога "исправь немедленно" в 20%, поэтому 32% Варианта B -- значительное улучшение. Теперь тестируй другое (CTA, тело).</p>
+            </details>
+        </div>
+
+        <div class="quiz">
+            <div class="title">Вопрос 3</div>
+            <p>Твой первый email начинается с: "Hi, my name is Ahmed from Digital Marketing Agency. We specialize in Meta Ads for businesses in the UAE." Что не так? (Назови 3 проблемы)</p>
+            <details>
+                <summary>Показать ответ</summary>
+                <p>(1) Начинается с "my name is" -- паттерн мгновенного удаления. (2) Ведёт с регалий ОТПРАВИТЕЛЯ, а не с проблемы ПОЛУЧАТЕЛЯ. (3) Слишком общий -- нет наблюдения о конкретном лиде или его бизнесе. Исправление: начни с наблюдения о их бизнесе, затем свяжи с релевантным кейсом.</p>
+            </details>
+        </div>
+
+        <div class="quiz">
+            <div class="title">Вопрос 4</div>
+            <p>Используя 4-T Framework, напиши по одному предложению для каждого T для фитнес-студии:</p>
+            <p>-- <strong>Trigger:</strong> ___________<br>
+            -- <strong>Think:</strong> ___________<br>
+            -- <strong>Third-Party:</strong> ___________<br>
+            -- <strong>Talk:</strong> ___________</p>
+            <details>
+                <summary>Показать пример ответа</summary>
+                <p><strong>Trigger:</strong> "Noticed {{company}} just launched a new HIIT class schedule."<br>
+                <strong>Think:</strong> "Most studios struggle to fill new classes without paid promotion."<br>
+                <strong>Third-Party:</strong> "We helped a Dubai gym fill 50 new slots per week at $8/acquisition."<br>
+                <strong>Talk:</strong> "Curious if you're exploring ads for the new classes?"</p>
+            </details>
+        </div>
+    </div>
+
+    <!-- Day Summary -->
+    <div class="day-summary">
+        <h3>Итоги Дня 7</h3>
+        <p><strong>Главные выводы:</strong></p>
+        <ol style="padding-left: 20px; color: #444;">
+            <li>Последовательности ПЛАНИРУЮТСЯ в Apollo, ВЫПОЛНЯЮТСЯ в Smartlead. Apollo -- архитектор, Smartlead -- строитель.</li>
+            <li>Менее 80 слов, тема 2-4 слова, один CTA, начни с ИХ проблемы -- это non-negotiable правила.</li>
+            <li>A/B-тестируй ОДНУ переменную за раз, минимум 100-200 отправок на вариант.</li>
+            <li>Сначала чини темы (если open rate &lt;20%), потом тело/CTA (если reply rate &lt;4%).</li>
+            <li>Вертикаль-специфичный месседжинг превосходит общий в 5 раз. Одна кампания на вертикаль.</li>
+        </ol>
+    </div>
+
+    <!-- Checklist -->
+    <div class="section">
+        <h3>Чек-лист -- Я теперь умею:</h3>
+        <ul class="checklist">
+            <li><span class="check"></span> Объяснить, как последовательности Apollo маппятся на кампании Smartlead</li>
+            <li><span class="check"></span> Создавать email-шаблоны с динамическими переменными (минимум 3 шаблона)</li>
+            <li><span class="check"></span> Применять лучшие практики cold email (длина, тема, CTA, без форматирования)</li>
+            <li><span class="check"></span> Проектировать 3-email структуру последовательности с правильным таймингом</li>
+            <li><span class="check"></span> Настраивать A/B-тестирование и знать пороги для принятия решений</li>
+            <li><span class="check"></span> Писать вертикаль-специфичные сообщения минимум для 3 ICP-вертикалей</li>
+        </ul>
+    </div>
+
+    <!-- Next day preview -->
+    <div class="section" style="border-left: 4px solid #0f3460;">
+        <h3>Завтра: День 8 -- Workflows и автоматизация</h3>
+        <p>Ты построишь автоматические workflows, которые направляют высокоценные сигналы (смена работы, buying intent) в списки действий и задачи. Apollo начнёт работать НА ТЕБЯ, даже когда ты не залогинен.</p>
+    </div>
+
+</div>
+
+<div class="footer">Apollo.io Обучение - День 7 из 10 | Создано для SF Agency</div>
+
+</body>
+</html>

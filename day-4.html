@@ -3,24 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apollo.io - День 4: CRM Pipeline и управление сделками</title>
+    <title>Apollo.io - День 4: Качество данных</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8f9fb; color: #1a1a2e; line-height: 1.7; }
-        .header { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); color: white; padding: 48px 0; text-align: center; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fb;
+            color: #1a1a2e;
+            line-height: 1.7;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            padding: 48px 0;
+            text-align: center;
+        }
+
         .header h1 { font-size: 2.4rem; margin-bottom: 8px; font-weight: 700; }
-        .header .subtitle { font-size: 1.1rem; opacity: 0.8; }
+        .header .subtitle { font-size: 1.1rem; opacity: 0.8; font-weight: 400; }
         .header .badge { display: inline-block; background: #e94560; color: white; padding: 4px 16px; border-radius: 20px; font-size: 0.85rem; margin-top: 12px; font-weight: 600; }
+
         .container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
+
         .progress-bar { background: white; border-radius: 12px; padding: 24px 32px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 20px; }
         .progress-bar .label { font-weight: 600; white-space: nowrap; color: #555; }
         .progress-track { flex: 1; height: 10px; background: #e8ecf1; border-radius: 5px; overflow: hidden; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, #e94560, #0f3460); border-radius: 5px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #e94560, #0f3460); border-radius: 5px; transition: width 0.5s; }
         .progress-bar .day-label { font-weight: 700; color: #0f3460; white-space: nowrap; }
-        .nav-links { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
-        .nav-links a { padding: 8px 16px; background: white; border-radius: 8px; text-decoration: none; color: #0f3460; font-weight: 600; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-        .nav-links a:hover { background: #0f3460; color: white; }
-        .nav-links a.current { background: #0f3460; color: white; }
+
         .toc { background: white; border-radius: 12px; padding: 28px 32px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .toc h3 { font-size: 1.1rem; margin-bottom: 16px; color: #0f3460; }
         .toc ol { padding-left: 20px; }
@@ -28,88 +40,44 @@
         .toc a { color: #0f3460; text-decoration: none; font-weight: 500; }
         .toc a:hover { text-decoration: underline; }
         .toc .time { color: #999; font-size: 0.85rem; margin-left: 8px; }
-        .section { background: white; border-radius: 12px; padding: 36px; margin-bottom: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+
+        .section { background: white; border-radius: 12px; padding: 36px 36px; margin-bottom: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .section h2 { font-size: 1.5rem; margin-bottom: 20px; color: #1a1a2e; padding-bottom: 12px; border-bottom: 2px solid #e8ecf1; }
         .section h2 .num { display: inline-block; background: #0f3460; color: white; width: 36px; height: 36px; border-radius: 50%; text-align: center; line-height: 36px; font-size: 1rem; margin-right: 12px; vertical-align: middle; }
         .section h3 { font-size: 1.15rem; margin: 24px 0 12px; color: #0f3460; }
         .section p { margin-bottom: 16px; color: #444; }
+
         .steps { counter-reset: step; list-style: none; padding: 0; }
         .steps li { counter-increment: step; padding: 12px 16px 12px 52px; position: relative; margin-bottom: 8px; background: #f8f9fb; border-radius: 8px; border-left: 3px solid #0f3460; }
         .steps li::before { content: counter(step); position: absolute; left: 14px; top: 12px; background: #0f3460; color: white; width: 26px; height: 26px; border-radius: 50%; text-align: center; line-height: 26px; font-size: 0.8rem; font-weight: 700; }
+
         .warning { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
         .warning .title { font-weight: 700; color: #856404; margin-bottom: 4px; }
         .warning p { color: #856404; margin: 0; font-size: 0.95rem; }
+
         .tip { background: #d4edda; border: 1px solid #28a745; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
         .tip .title { font-weight: 700; color: #155724; margin-bottom: 4px; }
         .tip p { color: #155724; margin: 0; font-size: 0.95rem; }
+
         .info { background: #d1ecf1; border: 1px solid #17a2b8; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
         .info .title { font-weight: 700; color: #0c5460; margin-bottom: 4px; }
         .info p { color: #0c5460; margin: 0; font-size: 0.95rem; }
+
         table { width: 100%; border-collapse: collapse; margin: 16px 0; }
         table th { background: #0f3460; color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 0.9rem; }
         table td { padding: 10px 16px; border-bottom: 1px solid #e8ecf1; font-size: 0.95rem; }
         table tr:nth-child(even) { background: #f8f9fb; }
 
-        .dhc-card {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 16px;
-            margin: 20px 0;
-        }
-        .dhc-item {
-            background: #f8f9fb;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            border: 2px solid #e8ecf1;
-        }
-        .dhc-item .dhc-icon { font-size: 2rem; margin-bottom: 8px; }
-        .dhc-item .dhc-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; color: #0f3460; }
-        .dhc-item .dhc-desc { font-size: 0.8rem; color: #666; }
-
-        .flow-diagram {
-            background: #f8f9fb;
-            border-radius: 12px;
-            padding: 24px;
-            margin: 20px 0;
-        }
-        .flow-step {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 12px 0;
-        }
-        .flow-step:not(:last-child) { border-bottom: 1px dashed #ccc; }
-        .flow-num {
-            background: #0f3460;
-            color: white;
-            width: 32px; height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            font-size: 0.9rem;
-            flex-shrink: 0;
-        }
-        .flow-content { flex: 1; }
-        .flow-content strong { color: #0f3460; }
-        .flow-arrow {
-            color: #0f3460;
-            font-size: 1.2rem;
-            flex-shrink: 0;
-        }
-
-        .practice-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            padding: 24px;
-            margin: 20px 0;
-            color: white;
-        }
-        .practice-box .practice-title { font-weight: 700; font-size: 1.1rem; margin-bottom: 12px; }
-        .practice-box ol { padding-left: 20px; }
-        .practice-box li { margin-bottom: 8px; }
+        .credit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+        .credit-card { background: #f8f9fb; border-radius: 10px; padding: 20px; text-align: center; border: 2px solid transparent; }
+        .credit-card.free { border-color: #28a745; }
+        .credit-card.paid { border-color: #e94560; }
+        .credit-card .credit-icon { font-size: 2rem; margin-bottom: 8px; }
+        .credit-card .credit-title { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+        .credit-card .credit-desc { font-size: 0.85rem; color: #666; }
+        .credit-card .credit-cost { font-size: 1.2rem; font-weight: 700; margin-top: 8px; }
+        .credit-card.free .credit-cost { color: #28a745; }
+        .credit-card.paid .credit-cost { color: #e94560; }
 
         .checklist { list-style: none; padding: 0; }
         .checklist li { padding: 10px 16px; margin-bottom: 6px; background: #f8f9fb; border-radius: 8px; font-size: 0.95rem; display: flex; align-items: center; gap: 12px; }
@@ -120,12 +88,38 @@
         .quiz ol { padding-left: 20px; }
         .quiz li { margin-bottom: 8px; color: #5b21b6; }
 
+        .link-btn { display: inline-block; background: #0f3460; color: white; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin: 8px 4px 8px 0; font-size: 0.9rem; }
+        .link-btn:hover { background: #1a4a8a; }
+        .link-btn.secondary { background: white; color: #0f3460; border: 2px solid #0f3460; }
+
+        .nav-links { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+        .nav-links a { padding: 8px 16px; background: white; border-radius: 8px; text-decoration: none; color: #0f3460; font-weight: 600; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .nav-links a:hover { background: #0f3460; color: white; }
+        .nav-links a.current { background: #0f3460; color: white; }
+
         .footer { text-align: center; padding: 40px 24px; color: #999; font-size: 0.85rem; }
 
+        .try-it { background: #e8f5e9; border: 2px dashed #28a745; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+        .try-it .title { font-weight: 700; color: #2e7d32; margin-bottom: 4px; }
+        .try-it p { color: #2e7d32; margin: 0; font-size: 0.95rem; }
+
+        details { margin: 12px 0; }
+        details summary { cursor: pointer; font-weight: 600; color: #0f3460; padding: 8px 0; }
+        details summary:hover { text-decoration: underline; }
+
+        .day-summary { background: linear-gradient(135deg, #f0e6ff, #e8ecf1); border-radius: 12px; padding: 24px; margin: 20px 0; }
+        .day-summary h3 { color: #5b21b6; margin-bottom: 12px; }
+
+        .rita-shortcut { background: #fff8e1; border: 1px solid #ff8f00; border-radius: 8px; padding: 12px 16px; margin: 16px 0; font-size: 0.9rem; }
+        .rita-shortcut .title { font-weight: 700; color: #e65100; margin-bottom: 4px; }
+
+        .workflow-box { background: #1a1a2e; color: white; border-radius: 12px; padding: 24px; margin: 20px 0; font-family: monospace; font-size: 0.9rem; line-height: 2; text-align: center; }
+        .workflow-box .arrow { color: #e94560; font-weight: bold; }
+        .workflow-box .node { background: #0f3460; padding: 4px 12px; border-radius: 6px; display: inline-block; margin: 4px; }
+
         @media (max-width: 600px) {
-            .dhc-card { grid-template-columns: 1fr; }
+            .credit-grid { grid-template-columns: 1fr; }
             .section { padding: 24px 20px; }
-            .nav-links { gap: 8px; }
         }
     </style>
 </head>
@@ -133,12 +127,13 @@
 
 <div class="header">
     <h1>Apollo.io - Обучение</h1>
-    <div class="subtitle">Неделя 1 / День 4: CRM Pipeline и управление сделками</div>
+    <div class="subtitle">Неделя 1 / День 4: Качество данных</div>
     <div class="badge">~ 60 минут</div>
 </div>
 
 <div class="container">
 
+    <!-- Navigation -->
     <div class="nav-links">
         <a href="index.html">День 1</a>
         <a href="day-2.html">День 2</a>
@@ -152,390 +147,597 @@
         <a href="day-10.html">День 10</a>
     </div>
 
+    <!-- Progress -->
     <div class="progress-bar">
-        <span class="label">Прогресс:</span>
+        <span class="label">Прогресс обучения:</span>
         <div class="progress-track">
             <div class="progress-fill" style="width: 40%"></div>
         </div>
         <span class="day-label">День 4 из 10</span>
     </div>
 
+    <!-- TOC -->
     <div class="toc">
         <h3>Содержание дня</h3>
         <ol>
-            <li><a href="#section1">Что такое CRM Pipeline</a> <span class="time">10 мин</span></li>
-            <li><a href="#section2">Работа со стадиями</a> <span class="time">15 мин</span></li>
-            <li><a href="#section3">Создание сделок (Deals)</a> <span class="time">10 мин</span></li>
-            <li><a href="#section4">Записи и активности</a> <span class="time">15 мин</span></li>
-            <li><a href="#section5">Практика</a> <span class="time">10 мин</span></li>
+            <li><a href="#review">Повторение: День 3</a> <span class="time">5 мин</span></li>
+            <li><a href="#section1">Инструменты обогащения данных (Enrichment)</a> <span class="time">15 мин</span></li>
+            <li><a href="#section2">Data Health Center — панель здоровья данных</a> <span class="time">10 мин</span></li>
+            <li><a href="#section3">Job Change Alerts — оповещения о смене работы</a> <span class="time">15 мин</span></li>
+            <li><a href="#section4">Buying Intent — сигналы покупательского намерения</a> <span class="time">10 мин</span></li>
+            <li><a href="#section5">Гигиена списков перед экспортом</a> <span class="time">5 мин</span></li>
+            <li><a href="#quiz">Проверь себя</a> <span class="time">5 мин</span></li>
         </ol>
     </div>
 
-    <!-- Section 1: What is CRM Pipeline -->
+    <!-- Quick Review -->
+    <div class="section" id="review" style="border-left: 4px solid #7c3aed;">
+        <h2>🔄 Повторение: День 3</h2>
+        <p>Ответь на вопросы, прежде чем открывать ответы:</p>
+
+        <p><strong>Вопрос 1:</strong> Что такое workflow RAW → READY? Опиши в одном предложении.</p>
+        <details>
+            <summary>Показать ответ</summary>
+            <p>Результаты поиска сохраняются в RAW-список (черновик), проходят ручную проверку, и только квалифицированные контакты переносятся в READY-список для экспорта в Smartlead.</p>
+        </details>
+
+        <p><strong>Вопрос 2:</strong> Ты добавил 50 новых контактов в RAW-список, проверил их, перенёс 30 в READY и экспортировал READY. Сколько кредитов потрачено?</p>
+        <details>
+            <summary>Показать ответ</summary>
+            <p>50 email-кредитов (добавление в RAW) + 30 export-кредитов (экспорт READY) = <strong>80 кредитов</strong>. Перенос из RAW в READY бесплатный — контакты уже сохранены.</p>
+        </details>
+
+        <p><strong>Вопрос 3:</strong> Назови один тип фильтра, который надёжнее отраслевых тегов Apollo для поиска нишевых бизнесов.</p>
+        <details>
+            <summary>Показать ответ</summary>
+            <p>Фильтр <strong>Technologies</strong> (технологии) — например, Kajabi для создателей курсов, Shopify для e-commerce. Этот фильтр напрямую определяет, какой софт использует компания.</p>
+        </details>
+    </div>
+
+    <!-- Section 1: Enrichment -->
     <div class="section" id="section1">
-        <h2><span class="num">1</span> Что такое CRM Pipeline</h2>
+        <h2><span class="num">1</span> Инструменты обогащения данных (Enrichment)</h2>
 
-        <p>Pipeline (пайплайн) — это визуальная воронка, которая показывает, на каком этапе находится каждый контакт: от первого касания до закрытия сделки. Представь конвейер, где каждый человек двигается по стадиям слева направо.</p>
+        <h3>Что такое обогащение</h3>
+        <p>Представь, что у тебя есть телефонная книга, где у некоторых записей есть только имя, но нет телефона и адреса. Обогащение (Enrichment) — это как нанять детектива, который найдёт недостающие данные. Ты даёшь Apollo то, что знаешь (имя + компания), а система находит остальное: email, телефон, должность, данные о компании.</p>
 
-        <p>Pipeline помогает видеть общую картину: сколько людей на каждом этапе, где затор, и кто требует внимания прямо сейчас.</p>
-
-        <h3>Наши 9 стадий pipeline:</h3>
-        <table>
-            <tr>
-                <th>#</th>
-                <th>Стадия</th>
-                <th>Что это значит</th>
-            </tr>
-            <tr>
-                <td><strong>1</strong></td>
-                <td><strong>New Lead</strong></td>
-                <td>Только что найден, ещё не контактировали</td>
-            </tr>
-            <tr>
-                <td><strong>2</strong></td>
-                <td><strong>Researching</strong></td>
-                <td>Изучаем компанию и человека перед контактом</td>
-            </tr>
-            <tr>
-                <td><strong>3</strong></td>
-                <td><strong>Contacted</strong></td>
-                <td>Отправили первое сообщение (email, LinkedIn invite)</td>
-            </tr>
-            <tr>
-                <td><strong>4</strong></td>
-                <td><strong>Connected</strong></td>
-                <td>Получили ответ или человек принял invite</td>
-            </tr>
-            <tr>
-                <td><strong>5</strong></td>
-                <td><strong>Engaged</strong></td>
-                <td>Ведём активный диалог</td>
-            </tr>
-            <tr>
-                <td><strong>6</strong></td>
-                <td><strong>Meeting Booked</strong></td>
-                <td>Назначена встреча / звонок</td>
-            </tr>
-            <tr>
-                <td><strong>7</strong></td>
-                <td><strong>Proposal Sent</strong></td>
-                <td>Отправлено коммерческое предложение</td>
-            </tr>
-            <tr>
-                <td><strong>8</strong></td>
-                <td><strong>Won</strong></td>
-                <td>Клиент подписался, сделка закрыта</td>
-            </tr>
-            <tr>
-                <td><strong>9</strong></td>
-                <td><strong>Lost</strong></td>
-                <td>Отказался или перестал отвечать</td>
-            </tr>
-        </table>
-
-        <h3>Как попасть в Pipeline:</h3>
-        <ol class="steps">
-            <li>В левой навигации нажми <strong>Deals</strong></li>
-            <li>Вверху выбери вкладку <strong>Pipeline</strong> (вид воронки)</li>
-            <li>Ты увидишь колонки — каждая колонка = стадия. Контакты/сделки отображаются карточками внутри колонок</li>
-        </ol>
-
-        <div class="tip">
-            <div class="title">Зачем нужен Pipeline</div>
-            <p>Pipeline нужен для того, чтобы ни один контакт не потерялся. Каждый человек должен быть в определённой стадии. Если контакт "завис" без стадии — ты не знаешь, что с ним делать, и он забывается.</p>
-        </div>
-    </div>
-
-    <!-- Section 2: Working with Stages -->
-    <div class="section" id="section2">
-        <h2><span class="num">2</span> Работа со стадиями</h2>
-
-        <p>Главная задача — вовремя двигать контакты между стадиями. Это можно делать двумя способами:</p>
-
-        <h3>Способ 1: Drag-and-drop в Pipeline view</h3>
-        <p>Просто перетащи карточку сделки из одной колонки в другую. Это самый быстрый способ.</p>
-
-        <h3>Способ 2: Через карточку контакта</h3>
-        <ol class="steps">
-            <li>Открой контакт (кликни на его имя)</li>
-            <li>Найди выпадающее меню <strong>Stage</strong> (стадия)</li>
-            <li>Выбери новую стадию из списка</li>
-            <li>Изменение сохранится автоматически</li>
-        </ol>
-
-        <h3>Когда перемещать контакт:</h3>
-        <table>
-            <tr>
-                <th>Действие</th>
-                <th>Из стадии</th>
-                <th>В стадию</th>
-            </tr>
-            <tr>
-                <td>Отправили LinkedIn invite</td>
-                <td>New Lead</td>
-                <td><strong>Contacted</strong></td>
-            </tr>
-            <tr>
-                <td>Человек принял invite</td>
-                <td>Contacted</td>
-                <td><strong>Connected</strong></td>
-            </tr>
-            <tr>
-                <td>Ответил на сообщение</td>
-                <td>Connected</td>
-                <td><strong>Engaged</strong></td>
-            </tr>
-            <tr>
-                <td>Согласился на звонок</td>
-                <td>Engaged</td>
-                <td><strong>Meeting Booked</strong></td>
-            </tr>
-            <tr>
-                <td>Отправили предложение</td>
-                <td>Meeting Booked</td>
-                <td><strong>Proposal Sent</strong></td>
-            </tr>
-            <tr>
-                <td>Подписал договор</td>
-                <td>Proposal Sent</td>
-                <td><strong>Won</strong></td>
-            </tr>
-            <tr>
-                <td>Отказался / пропал</td>
-                <td>Любая</td>
-                <td><strong>Lost</strong></td>
-            </tr>
-        </table>
-
-        <div class="warning">
-            <div class="title">Не оставляй контакты в "New Lead" больше 3 дней</div>
-            <p>Если ты не планируешь отправить им сообщение — удали из pipeline. Застрявшие контакты загрязняют воронку, и ты перестаёшь видеть реальную картину.</p>
-        </div>
-    </div>
-
-    <!-- Section 3: Creating Deals -->
-    <div class="section" id="section3">
-        <h2><span class="num">3</span> Создание сделок (Deals)</h2>
-
-        <p>Deal (сделка) — это потенциальный доход от конкретного контакта. Сделка привязывается к контакту и имеет сумму, стадию и ожидаемую дату закрытия.</p>
-
-        <h3>Как создать сделку:</h3>
-        <ol class="steps">
-            <li>Открой контакт, для которого хочешь создать сделку</li>
-            <li>Справа найди секцию <strong>Deals</strong></li>
-            <li>Нажми <strong>+ Create Deal</strong></li>
-            <li>Заполни поля: <strong>название</strong> (компания + услуга), <strong>сумма</strong>, <strong>стадию</strong>, <strong>дату закрытия</strong></li>
-            <li>Нажми <strong>Save</strong></li>
-        </ol>
-
-        <div class="info">
-            <div class="title">Когда создавать Deal</div>
-            <p>Создавай сделку когда контакт в стадии "Meeting Booked" или выше. Не раньше — это загрязнит pipeline ненужными сделками и исказит прогнозы по выручке.</p>
-        </div>
-
-        <h3>Формат именования сделок:</h3>
-        <table>
-            <tr>
-                <th>Формат</th>
-                <th>Пример</th>
-            </tr>
-            <tr>
-                <td><strong>[Компания] - Meta Ads [Месяц]</strong></td>
-                <td>Sohum Wellness - Meta Ads Апр 2026</td>
-            </tr>
-            <tr>
-                <td><strong>[Компания] - Meta Ads [Месяц]</strong></td>
-                <td>Al Rawi Group - Meta Ads Мар 2026</td>
-            </tr>
-            <tr>
-                <td><strong>[Компания] - Meta Ads [Месяц]</strong></td>
-                <td>FitZone Dubai - Meta Ads Май 2026</td>
-            </tr>
-        </table>
-
-        <div class="tip">
-            <div class="title">Единый формат = порядок</div>
-            <p>Всегда используй один и тот же формат имени. Так проще искать сделки, фильтровать по компании, и видеть, в каком месяце ожидается закрытие.</p>
-        </div>
-    </div>
-
-    <!-- Section 4: Notes and Activities -->
-    <div class="section" id="section4">
-        <h2><span class="num">4</span> Записи и активности</h2>
-
-        <p>Каждое взаимодействие с контактом нужно фиксировать. Apollo поддерживает 4 типа активностей:</p>
-
+        <h3>5 типов обогащения в Apollo</h3>
         <table>
             <tr>
                 <th>Тип</th>
-                <th>Для чего</th>
+                <th>Что делает</th>
+                <th>Когда использовать</th>
             </tr>
             <tr>
-                <td><strong>Notes</strong> (Заметки)</td>
-                <td>Свободный текст: что обсуждали, что узнали, что решили</td>
+                <td><strong>In-app enrichment</strong></td>
+                <td>Клик <strong>"Access email"</strong> или <strong>"Access mobile"</strong> на любом контакте</td>
+                <td>Разовые проверки при просмотре</td>
             </tr>
             <tr>
-                <td><strong>Tasks</strong> (Задачи)</td>
-                <td>Напоминания о следующем шаге с дедлайном</td>
+                <td><strong>CSV enrichment</strong></td>
+                <td>Загружаешь CSV-файл, Apollo заполняет пропущенные поля</td>
+                <td>Когда есть список из другого источника (Google Maps, мероприятия)</td>
             </tr>
             <tr>
-                <td><strong>Calls</strong> (Звонки)</td>
-                <td>Запись о звонке: длительность, результат</td>
+                <td><strong>Saved records enrichment</strong></td>
+                <td>Массовое обогащение контактов, уже сохранённых в Apollo</td>
+                <td>Ежемесячное обновление существующей базы</td>
             </tr>
             <tr>
-                <td><strong>Emails</strong> (Письма)</td>
-                <td>Автоматически логируются при отправке через Apollo</td>
+                <td><strong>Waterfall enrichment</strong></td>
+                <td>Каскадный поиск через 18 провайдеров данных (по данным на начало 2026 года)</td>
+                <td>Максимальное покрытие, когда Apollo один не находит данные</td>
+            </tr>
+            <tr>
+                <td><strong>CRM enrichment</strong></td>
+                <td>Автообогащение записей Salesforce/HubSpot</td>
+                <td>Если/когда интегрируешь CRM</td>
             </tr>
         </table>
 
-        <h3>Как добавить заметку:</h3>
-        <ol class="steps">
-            <li>Открой контакт (кликни на имя)</li>
-            <li>Внизу карточки найди секцию <strong>Activity</strong></li>
-            <li>Нажми <strong>Note</strong></li>
-            <li>Напиши заметку</li>
-            <li>Нажми <strong>Save</strong></li>
-        </ol>
+        <h3>Правило кредитов, которое экономит деньги</h3>
+        <div class="info">
+            <div class="title">ℹ️ Ключевое правило</div>
+            <p>Кредиты списываются <strong>только когда обогащение УСПЕШНО находит данные</strong>. Если Apollo пытается найти email и не находит — ты не платишь ничего. Обогащение по сути безрисковое: платишь только за результат.</p>
+        </div>
 
-        <h3>Когда и что записывать:</h3>
-        <table>
-            <tr>
-                <th>Когда</th>
-                <th>Что записать</th>
-            </tr>
-            <tr>
-                <td>После отправки сообщения</td>
-                <td>"Отправил invite + сообщение [дата]"</td>
-            </tr>
-            <tr>
-                <td>После ответа</td>
-                <td>"Ответил: [суть ответа]"</td>
-            </tr>
-            <tr>
-                <td>После звонка</td>
-                <td>"Звонок [дата]: обсудили X, следующий шаг Y"</td>
-            </tr>
-            <tr>
-                <td>После отказа</td>
-                <td>"Отказ: причина — [причина]"</td>
-            </tr>
-        </table>
-
-        <h3>Как создать задачу (Task):</h3>
-        <ol class="steps">
-            <li>Открой контакт</li>
-            <li>В секции Activity нажми <strong>Task</strong></li>
-            <li>Напиши, что нужно сделать (например, "Отправить follow-up")</li>
-            <li>Установи <strong>Due date</strong> (дедлайн)</li>
-            <li>Выбери <strong>Priority</strong> (приоритет): High, Medium, Low</li>
-            <li>Нажми <strong>Save</strong></li>
-        </ol>
-
-        <p>Задачи с дедлайном появятся в разделе <strong>Tasks</strong> в левом меню. Apollo напомнит о просроченных задачах.</p>
+        <div class="info">
+            <div class="title">ℹ️ Нюанс для Waterfall</div>
+            <p>Apollo не списывает кредит, если данные не найдены. Но если ты используешь API-провайдеров waterfall со своими ключами — эти провайдеры могут брать плату на своей стороне независимо от результата.</p>
+        </div>
 
         <div class="tip">
-            <div class="title">Записывай ВСЁ</div>
-            <p>Через месяц ты не вспомнишь, что обсуждали. Заметка в 2 строки экономит 20 минут вспоминания. Привычка записывать — один из главных навыков в продажах.</p>
-        </div>
-    </div>
-
-    <!-- Section 5: Practice -->
-    <div class="section" id="section5">
-        <h2><span class="num">5</span> Практика</h2>
-
-        <div class="practice-box">
-            <div class="practice-title">Задание 1: Создай тестовую сделку</div>
-            <ol>
-                <li>Открой любой контакт из тестового списка</li>
-                <li>Справа найди секцию <strong>Deals</strong></li>
-                <li>Нажми <strong>+ Create Deal</strong></li>
-                <li>Название: <strong>"Test Company - Meta Ads Мар 2026"</strong></li>
-                <li>Сумма: <strong>5000</strong></li>
-                <li>Стадия: <strong>Meeting Booked</strong></li>
-                <li>Дата закрытия: <strong>через 2 недели от сегодня</strong></li>
-                <li>Сохрани и проверь, что сделка появилась в Pipeline view</li>
-            </ol>
+            <div class="title">💡 Гарантия от bounce'ов (Bounce Guarantee)</div>
+            <p>Если email, который Apollo подтвердил как доставляемый, вернётся (bounce) в течение 30 дней после раскрытия, Apollo вернёт кредит в следующем биллинговом цикле. Это дополнительная защита для тебя.</p>
         </div>
 
-        <div class="practice-box" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
-            <div class="practice-title">Задание 2: Двигай контакты по стадиям</div>
-            <ol>
-                <li>Возьми <strong>5 контактов</strong> из тестового списка</li>
-                <li>Контакт 1: перемести из New Lead в <strong>Contacted</strong></li>
-                <li>Контакт 2: перемести из New Lead в <strong>Connected</strong></li>
-                <li>Контакт 3: перемести в <strong>Engaged</strong></li>
-                <li>Контакт 4: перемести в <strong>Meeting Booked</strong></li>
-                <li>Контакт 5: перемести в <strong>Lost</strong></li>
-                <li>Открой <strong>Pipeline view</strong> и убедись, что контакты в правильных колонках</li>
-            </ol>
-        </div>
+        <h3>Waterfall enrichment — мощная функция</h3>
+        <p>Вместо проверки только базы данных Apollo, каскадный поиск проходит через <strong>до 18 дополнительных провайдеров данных</strong> (по данным на начало 2026). Это как спросить 18 разных детективов вместо одного.</p>
 
-        <div class="practice-box" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-            <div class="practice-title">Задание 3: Добавь заметки</div>
-            <ol>
-                <li>Открой <strong>3 контакта</strong> из тестового списка</li>
-                <li>Контакт 1: добавь заметку <strong>"Отправил invite + сообщение 09.03.2026"</strong></li>
-                <li>Контакт 2: добавь заметку <strong>"Ответил: интересуется Meta Ads, спросил о цене"</strong></li>
-                <li>Контакт 3: добавь заметку <strong>"Звонок 09.03: обсудили бюджет, следующий шаг — КП"</strong></li>
-                <li>Для Контакта 3 создай <strong>задачу</strong>: "Отправить КП" с дедлайном <strong>завтра</strong></li>
-            </ol>
+        <p><strong>Путь:</strong> <strong>Settings</strong> (⚙️) → <strong>Enrichment</strong> → <strong>Waterfall settings</strong></p>
+
+        <p>Три режима конфигурации:</p>
+        <table>
+            <tr>
+                <th>Режим</th>
+                <th>Описание</th>
+                <th>Когда использовать</th>
+            </tr>
+            <tr>
+                <td><strong>Maximize accuracy</strong></td>
+                <td>Валидация данных через несколько провайдеров</td>
+                <td>Лучшее качество, больше кредитов</td>
+            </tr>
+            <tr>
+                <td><strong>Maximize coverage</strong></td>
+                <td>Больше провайдеров, меньше перекрёстной валидации</td>
+                <td>Больше найденных данных, умеренные кредиты</td>
+            </tr>
+            <tr>
+                <td><strong>Cost-efficient</strong></td>
+                <td>Только база Apollo</td>
+                <td>Самый дешёвый вариант, может пропустить контакты</td>
+            </tr>
+        </table>
+
+        <div class="tip">
+            <div class="title">💡 Для агентства</div>
+            <p>Для нашей работы с UAE SMB-компаниями рекомендуется режим <strong>Maximize coverage</strong> — маленькие международные компании сложнее найти только в базе Apollo.</p>
         </div>
 
         <div class="warning">
-            <div class="title">Только тестовые контакты!</div>
-            <p>Все практические задания делай на ТЕСТОВЫХ контактах. Не трогай рабочие списки.</p>
+            <div class="title">⚠️ Реальная точность email НИЖЕ рекламируемой</div>
+            <p>Apollo заявляет 91-98% точности. По независимым отзывам пользователей — <strong>65-75% на практике</strong>, особенно для небольших международных компаний. Это напрямую касается UAE SMB. Именно поэтому мы: (1) всегда фильтруем по статусу <strong>"Verified"</strong>, (2) используем процесс RAW → READY, (3) при необходимости проверяем через внешние сервисы (NeverBounce, ZeroBounce).</p>
         </div>
+
+        <div class="warning">
+            <div class="title">⚠️ Данные устаревают на ~2-3% в месяц</div>
+            <p>"Verified" список полугодовой давности может содержать 20% невалидных email. Люди меняют работу, компании закрываются, домены истекают. <strong>Правило:</strong> перепроверяй любой список старше 3 месяцев перед использованием в Smartlead.</p>
+        </div>
+
+        <div class="try-it">
+            <div class="title">🎯 Попробуй сейчас: проверь настройки Waterfall (7 мин)</div>
+            <p>1. Перейди в <strong>Settings</strong> → <strong>Enrichment</strong> → <strong>Waterfall settings</strong></p>
+            <p>2. Запиши:</p>
+            <p>&nbsp;&nbsp;&nbsp;• Waterfall включён? ___________</p>
+            <p>&nbsp;&nbsp;&nbsp;• Количество активных провайдеров: ___________</p>
+            <p>&nbsp;&nbsp;&nbsp;• Текущий режим: ___________</p>
+            <p>3. Сделай скриншот страницы настроек</p>
+            <p>4. <em>Опционально:</em> Открой свой READY-список из Дня 3. Найди контакт с пропущенным email. Нажми <strong>"Access email"</strong> или <strong>"Enrich"</strong> — посмотри, что произойдёт.</p>
+        </div>
+    </div>
+
+    <!-- Section 2: Data Health Center -->
+    <div class="section" id="section2">
+        <h2><span class="num">2</span> Data Health Center — панель здоровья данных</h2>
+
+        <h3>Что это такое</h3>
+        <p>Как ты проходишь ежегодный медосмотр, чтобы вовремя заметить проблемы — так и <strong>Data Health Center</strong> показывает "здоровье" твоей базы данных. Что в порядке (точные данные), что требует внимания (пропущенные email, устаревшие записи), что изменилось (смена работы). Проверяй его раз в неделю — 5 минут могут уберечь от рассылки по плохим данным.</p>
+
+        <h3>5 виджетов Data Health Center</h3>
+        <table>
+            <tr>
+                <th>Виджет</th>
+                <th>Что показывает</th>
+                <th>Что делать</th>
+            </tr>
+            <tr>
+                <td><strong>Job Changes</strong></td>
+                <td>Контакты, сменившие компанию/должность</td>
+                <td>Возможность для повторного контакта (раздел 3)</td>
+            </tr>
+            <tr>
+                <td><strong>Missing Emails</strong></td>
+                <td>Контакты без email-адресов</td>
+                <td>Запусти обогащение для заполнения пропусков</td>
+            </tr>
+            <tr>
+                <td><strong>Data Accuracy</strong></td>
+                <td>% контактов с точными vs. неточными данными</td>
+                <td>Следи за трендом; разбирайся, если % падает</td>
+            </tr>
+            <tr>
+                <td><strong>Credit Usage</strong></td>
+                <td>Сколько кредитов потратила команда</td>
+                <td>Предотвращает сюрпризы в конце месяца</td>
+            </tr>
+            <tr>
+                <td><strong>Enrichment Activities</strong></td>
+                <td>Прогресс текущих процессов обогащения</td>
+                <td>Отслеживай запущенные задачи</td>
+            </tr>
+        </table>
+
+        <h3>Как найти Data Health Center</h3>
+        <ol class="steps">
+            <li>Нажми <strong>Enrich</strong> в левом меню боковой панели</li>
+            <li>Выбери <strong>Data Health Center</strong> (вкладка или раздел внутри <strong>Enrich</strong>)</li>
+            <li>Просмотри каждый виджет — сегодня просто знакомимся с интерфейсом</li>
+        </ol>
+
+        <div class="try-it">
+            <div class="title">🎯 Попробуй сейчас: первый медосмотр базы (5 мин)</div>
+            <p>Открой <strong>Data Health Center</strong> и запиши текущие значения:</p>
+            <p>1. Обнаружено смен работы: ___________</p>
+            <p>2. Контактов без email: ___________</p>
+            <p>3. Общая точность данных, %: ___________</p>
+            <p>4. Кредитов использовано в этом месяце: ___________</p>
+            <p>5. Активные задачи обогащения? ___________</p>
+        </div>
+
+        <div class="info">
+            <div class="title">ℹ️ Для папы</div>
+            <p>Некоторые виджеты могут показывать маленькие числа или нули — это нормально, потому что мы ещё не набрали большую базу. По мере добавления контактов в ближайшие недели эти виджеты станут всё полезнее.</p>
+        </div>
+    </div>
+
+    <!-- Section 3: Job Change Alerts -->
+    <div class="section" id="section3">
+        <h2><span class="num">3</span> Job Change Alerts — оповещения о смене работы</h2>
+
+        <h3>Почему смена работы — это золото</h3>
+        <p>Представь ситуацию. Полгода назад ты написал маркетинг-менеджеру сети салонов красоты. Она была заинтересована, но сказала: "не сейчас — может быть, в следующем квартале." Потом она сменила работу. Теперь она — Head of Marketing в более крупной компании в другой нише. Эта компания тоже подходит под наш ICP. Она уже знает тебя и твою работу. Это <strong>самый тёплый лид</strong> — и Apollo сообщил тебе об этом автоматически.</p>
+
+        <h3>3 причины, почему смена работы — золото для агентства</h3>
+        <table>
+            <tr>
+                <th>#</th>
+                <th>Причина</th>
+                <th>Почему это работает</th>
+            </tr>
+            <tr>
+                <td><strong>1</strong></td>
+                <td>Новые сотрудники имеют бюджет и хотят показать результат</td>
+                <td>Маркетинг-менеджер на новой позиции активно ищет решения — ему нужно быстро доказать свою ценность</td>
+            </tr>
+            <tr>
+                <td><strong>2</strong></td>
+                <td>Прошлые контакты в новых компаниях = тёплые лиды</td>
+                <td>Они уже знают тебя. Барьер доверия ниже</td>
+            </tr>
+            <tr>
+                <td><strong>3</strong></td>
+                <td>Паттерны найма сигнализируют о приоритетах компании</td>
+                <td>Компания, нанимающая "Digital Marketing Manager" — говорит "нам нужна помощь с маркетингом". Они могут быть готовы к агентству</td>
+            </tr>
+        </table>
+
+        <div class="rita-shortcut">
+            <div class="title">⚡ Rita Shortcut</div>
+            <p>Скорость решает. Топовые команды реагируют на сигналы о смене работы <strong>в течение 30 минут</strong>. Чем быстрее напишешь после смены работы — тем выше отклик. Настрой email-уведомления для этих алертов.</p>
+        </div>
+
+        <h3>Как работают Job Change Alerts</h3>
+        <ul style="margin-bottom: 16px; padding-left: 20px;">
+            <li>Apollo мониторит все твои сохранённые контакты</li>
+            <li>Когда кто-то меняет работу (новая компания, новая должность, новый email), Apollo помечает это</li>
+            <li>Ты выбираешь действие: экспортировать, создать новую запись контакта или обновить существующую</li>
+            <li>Стоимость: <strong>1-5 кредитов за контакт</strong> для обновления данных о смене работы (зависит от количества waterfall-провайдеров)</li>
+        </ul>
+
+        <h3>Workflow реагирования на смену работы</h3>
+        <div class="workflow-box">
+            <span class="node">Алерт: смена работы</span>
+            <span class="arrow"> → </span>
+            <span class="node">Проверка: новая компания подходит под ICP?</span>
+            <span class="arrow"> → </span>
+            <span class="node">Да → экспорт в Smartlead</span>
+            <span class="arrow"> → </span>
+            <span class="node">Отправка поздравления + предложение</span>
+        </div>
+
+        <h3>Как настроить Job Change Alerts</h3>
+        <ol class="steps">
+            <li>Перейди в <strong>Enrich</strong> → <strong>Job Change Alerts</strong></li>
+            <li>На странице отображаются контакты, чья работа изменилась</li>
+            <li>Доступные действия:<br>
+                • <strong>Export</strong> — скачать данные о сменах работы в CSV<br>
+                • <strong>Create new contact</strong> — создать новую запись с обновлённой компанией/должностью (сохраняет старую запись)<br>
+                • <strong>Update existing</strong> — перезаписать старые данные новой информацией</li>
+        </ol>
+
+        <h3>Шаблон email для реагирования на смену работы</h3>
+        <div style="background: #f8f9fb; border-radius: 8px; padding: 16px 20px; margin: 16px 0; font-family: monospace; font-size: 0.9rem; line-height: 1.6;">
+            <strong>Subject:</strong> congrats on the move<br><br>
+            Hi {{first_name}},<br><br>
+            Saw you joined {{company}} — congrats on the new role!<br><br>
+            We work with [отрасль] businesses helping them<br>
+            [конкретный результат] through Meta Ads.<br><br>
+            Since you're getting settled at {{company}},<br>
+            thought this might be relevant.<br><br>
+            No rush — just wanted to say congrats and reconnect.
+        </div>
+
+        <div class="try-it">
+            <div class="title">🎯 Попробуй сейчас: создай Watch List (7 мин)</div>
+            <p>1. Перейди в <strong>Lists</strong> → создай новый список: <strong>"Job Change Watch List"</strong></p>
+            <p>2. Открой свой READY-список из Дня 3</p>
+            <p>3. Добавь 10 контактов из READY-списка в "Job Change Watch List" (БЕСПЛАТНО — контакты уже сохранены)</p>
+            <p>4. Apollo теперь автоматически мониторит этих 10 контактов на предмет смены работы</p>
+            <p>5. Перейди в <strong>Enrich</strong> → <strong>Job Change Alerts</strong> — проверь, есть ли уже алерты (для новых контактов скорее всего ещё нет, но теперь ты знаешь, где смотреть)</p>
+            <p>6. Напиши свой 2-предложенный email для человека, сменившего работу. Используй шаблон выше как отправную точку:</p>
+            <p style="border-left: 3px solid #2e7d32; padding-left: 12px; margin-top: 8px;">
+                Твой черновик: ___________________________________________________________
+            </p>
+        </div>
+    </div>
+
+    <!-- Section 4: Buying Intent -->
+    <div class="section" id="section4">
+        <h2><span class="num">4</span> Buying Intent — сигналы покупательского намерения</h2>
+
+        <h3>Что такое intent data</h3>
+        <p>Представь, что ты можешь видеть, какие компании прямо сейчас гуглят "digital marketing agency Dubai". Именно это делает intent data. Apollo партнёрствует с провайдерами данных (<strong>Bombora</strong> — 14 000+ тем и <strong>LeadSift</strong> — 1 600+ тем), которые отслеживают, какие компании активно изучают определённые темы в интернете. Если сеть салонов красоты исследует "Instagram advertising" — она поднимает руку, даже если ещё не связалась с тобой.</p>
+
+        <h3>Как работает scoring намерений (Bombora)</h3>
+        <table>
+            <tr>
+                <th>Диапазон баллов</th>
+                <th>Уровень</th>
+                <th>Что это значит</th>
+            </tr>
+            <tr>
+                <td><strong>75-100</strong></td>
+                <td style="color: #dc3545; font-weight: bold;">Высокий</td>
+                <td>Активно исследуют. Действуй СЕЙЧАС.</td>
+            </tr>
+            <tr>
+                <td><strong>62-75</strong></td>
+                <td style="color: #ffc107; font-weight: bold;">Средний</td>
+                <td>Есть интерес. Стоит написать.</td>
+            </tr>
+            <tr>
+                <td><strong>0-61</strong></td>
+                <td style="color: #6c757d; font-weight: bold;">Низкий</td>
+                <td>Минимальные сигналы. Низкий приоритет.</td>
+            </tr>
+        </table>
+
+        <h3>Релевантные темы intent для нашего агентства</h3>
+        <ul style="margin-bottom: 16px; padding-left: 20px;">
+            <li>"Digital marketing"</li>
+            <li>"Social media advertising"</li>
+            <li>"Meta ads" / "Facebook advertising" / "Instagram advertising"</li>
+            <li>"Lead generation"</li>
+            <li>"Customer acquisition"</li>
+            <li>"E-learning" / "Online courses" (для ICP курсов)</li>
+        </ul>
+
+        <h3>Реальный эффект intent data</h3>
+        <div class="credit-grid">
+            <div class="credit-card paid">
+                <div class="credit-icon">📧</div>
+                <div class="credit-title">Обычный cold email</div>
+                <div class="credit-desc">Без сигналов, общий подход</div>
+                <div class="credit-cost">3-5% reply rate</div>
+            </div>
+            <div class="credit-card free">
+                <div class="credit-icon">🎯</div>
+                <div class="credit-title">Signal-based outreach</div>
+                <div class="credit-desc">С персонализацией по intent</div>
+                <div class="credit-cost">18% reply rate</div>
+            </div>
+        </div>
+        <p style="text-align: center; font-size: 0.85rem; color: #888;">Emails с персонализацией по сигналам дают ~5x отклик. Multi-signal (intent + job change + ICP match): 25-40% reply rate.</p>
+
+        <p><strong>Только 30% маркетологов используют intent data</strong> — это конкурентное преимущество для тебя.</p>
+
+        <h3>Как настроить intent topics</h3>
+        <ol class="steps">
+            <li>Перейди в <strong>Settings</strong> (⚙️) → найди <strong>Ideal Customer Profile</strong> или <strong>Buying Intent</strong></li>
+            <li>Нажми, чтобы настроить темы намерений</li>
+            <li>Найди и выбери релевантные темы: "Digital marketing", "Social media advertising", "Instagram advertising", "Lead generation", "Online courses"</li>
+            <li>Сохрани настройки</li>
+        </ol>
+
+        <h3>Использование intent в поиске</h3>
+        <ol class="steps">
+            <li>Перейди в <strong>Search</strong> → <strong>Companies</strong></li>
+            <li>В фильтрах найди <strong>Buying Intent</strong></li>
+            <li>Выбери: <strong>High</strong> intent score</li>
+            <li>Добавь другие фильтры: Location = UAE, # Employees = 1-50</li>
+            <li>Результаты покажут компании, активно исследующие твои темы</li>
+        </ol>
+
+        <div class="warning">
+            <div class="title">⚠️ Intent-сигналы быстро теряют актуальность</div>
+            <p>Данные о намерениях обновляются <strong>еженедельно</strong>. "Высокий" сигнал на этой неделе может стать "низким" на следующей. Если видишь компанию с высоким intent — действуй в тот же день. Также помни: intent говорит о КОМПАНИИ, а не о конкретном человеке — тебе всё равно нужно найти правильного ЛПР (лицо, принимающее решения).</p>
+        </div>
+
+        <div class="try-it">
+            <div class="title">🎯 Попробуй сейчас: настрой Intent Topics (4 мин)</div>
+            <p>1. Перейди в <strong>Settings</strong> → <strong>Buying Intent</strong> (или <strong>Ideal Customer Profile</strong>)</p>
+            <p>2. Выбери 5 релевантных тем для агентства (из списка выше)</p>
+            <p>3. Сохрани настройки</p>
+            <p>4. Перейди в <strong>Search</strong> → <strong>Companies</strong></p>
+            <p>5. Фильтр: Buying Intent = High, Location = UAE, # Employees = 1-50</p>
+            <p>6. Сколько UAE-компаний с высоким intent по твоим темам? ___________</p>
+            <p>7. Сделай скриншот результатов</p>
+        </div>
+
+        <div class="tip">
+            <div class="title">💡 Подсказка</div>
+            <p>Даже если результатов мало — intent data обновляется еженедельно. Проверяй каждый понедельник как часть еженедельной рутины.</p>
+        </div>
+    </div>
+
+    <!-- Section 5: List Hygiene -->
+    <div class="section" id="section5">
+        <h2><span class="num">5</span> Гигиена списков перед экспортом</h2>
+
+        <h3>Аналогия чистого топлива</h3>
+        <p>Отправка плохих данных в Smartlead — как заправка машины грязным топливом. Это не просто не работает — это ломает двигатель. Плохие email приводят к bounce'ам. Bounce'ы портят репутацию отправителя. Испорченная репутация означает, что даже ХОРОШИЕ письма ХОРОШИМ контактам попадают в спам. <strong>Один грязный список может навредить всем кампаниям на всех доменах.</strong></p>
+
+        <h3>Чек-лист перед экспортом</h3>
+        <ul class="checklist">
+            <li><span class="check"></span> Только контакты со статусом <strong>"Verified"</strong> или <strong>"Likely to Engage"</strong></li>
+            <li><span class="check"></span> НИКАКИХ контактов со статусом "Update Required" или "Unverified"</li>
+            <li><span class="check"></span> Все контакты прошли ручную проверку (процесс RAW → READY завершён)</li>
+            <li><span class="check"></span> Списку менее 3 месяцев (или перепроверен)</li>
+            <li><span class="check"></span> Для важных кампаний: внешняя верификация (NeverBounce, ZeroBounce — $0.003-0.01 за email)</li>
+        </ul>
+
+        <h3>Правила поддержания чистоты</h3>
+        <table>
+            <tr>
+                <th>Метрика</th>
+                <th>Целевое значение</th>
+                <th>Действие</th>
+            </tr>
+            <tr>
+                <td>Hard bounces</td>
+                <td>Удалять немедленно</td>
+                <td>Smartlead сообщает о них — убирай сразу</td>
+            </tr>
+            <tr>
+                <td>Bounce rate</td>
+                <td><strong>&lt;2%</strong> на кампанию</td>
+                <td>Выше 2% — проверь качество списка</td>
+            </tr>
+            <tr>
+                <td>Ревалидация списков</td>
+                <td>Каждый месяц</td>
+                <td>Для длительных кампаний перепроверяй monthly</td>
+            </tr>
+            <tr>
+                <td>Complaint rate</td>
+                <td><strong>&lt;0.1%</strong></td>
+                <td>Жёсткий порог Google с 2024 года</td>
+            </tr>
+        </table>
+
+        <div class="warning">
+            <div class="title">⚠️ Bounce rate 15-35% возможен для некоторых сегментов Apollo</div>
+            <p>Реальные данные показывают, что для некоторых сегментов (маленькие международные компании) bounce rate может быть 15-35%. Это НЕПРИЕМЛЕМО для Smartlead. Фильтр по статусу <strong>"Verified"</strong> — твоя главная защита. Если пропустишь этот шаг — рискуешь повредить отправляющие домены.</p>
+        </div>
+
+        <div class="try-it">
+            <div class="title">🎯 Попробуй сейчас: аудит твоего экспорта (2 мин)</div>
+            <p>Открой CSV, который ты экспортировал в День 3:</p>
+            <p>1. Есть ли колонка "Email Status"? Какие значения ты видишь?</p>
+            <p>2. Какой % имеет статус "Verified"? ___________%</p>
+            <p>3. Есть ли "Unverified" или "Update Required"? Пометь их — эти контакты НЕ должны попасть в Smartlead.</p>
+        </div>
+    </div>
+
+    <!-- Practice Exercise -->
+    <div class="section" style="border-left: 4px solid #e94560;">
+        <h2>🎯 Практическое задание: Аудит качества данных</h2>
+
+        <p>Выполни полную проверку качества данных, используя всё, что узнал сегодня:</p>
+
+        <ol class="steps">
+            <li>Открой <strong>Data Health Center</strong> (<strong>Enrich</strong> → <strong>Data Health Center</strong>) — запиши любые проблемы</li>
+            <li>Проверь <strong>Job Change Alerts</strong> (<strong>Enrich</strong> → <strong>Job Change Alerts</strong>) — есть ли новые изменения?</li>
+            <li>Запусти поиск компаний с фильтром <strong>High buying intent</strong> по твоим темам</li>
+            <li>Открой свой <strong>READY-список</strong> — убедись, что все контакты имеют статус "Verified"</li>
+            <li>Запиши: сколько контактов в READY-списке полностью квалифицированы И имеют verified email?</li>
+        </ol>
+
+        <p style="font-weight: 700; color: #e94560;">Это твоё "launch-ready" число — контакты, которые можно уверенно отправить в Smartlead.</p>
+
+        <p><strong>Моё launch-ready число:</strong> ___________</p>
+    </div>
+
+    <!-- Day Summary -->
+    <div class="day-summary">
+        <h3>📋 Итоги Дня 4</h3>
+        <p><strong>Ключевые выводы:</strong></p>
+        <ul style="padding-left: 20px; margin-bottom: 16px;">
+            <li>Обогащение заполняет пропуски в данных — и ты платишь <strong>только когда данные НАЙДЕНЫ</strong> (безрисково)</li>
+            <li>Реальная точность email — 65-75%, не рекламируемые 91-98%. Всегда фильтруй по "Verified"</li>
+            <li>Apollo возвращает кредит, если подтверждённый email bounce'ится в течение 30 дней</li>
+            <li>Смена работы — самые тёплые сигналы. Прошлые контакты в новых компаниях уже знают тебя</li>
+            <li>Buying Intent выявляет компании, ПРЯМО СЕЙЧАС исследующие твои услуги</li>
+            <li>Гигиена данных защищает репутацию Smartlead. Один грязный список может навредить всем кампаниям</li>
+        </ul>
     </div>
 
     <!-- Checklist -->
     <div class="section">
-        <h2>Чек-лист Дня 4</h2>
-
+        <h3>✅ Чек-лист — Теперь я умею:</h3>
         <ul class="checklist">
-            <li><span class="check"></span> Я знаю 9 стадий нашего pipeline</li>
-            <li><span class="check"></span> Я знаю, как переместить контакт между стадиями</li>
-            <li><span class="check"></span> Я знаю, когда создавать сделку</li>
-            <li><span class="check"></span> Я знаю формат именования сделок</li>
-            <li><span class="check"></span> Я умею добавлять заметки к контактам</li>
-            <li><span class="check"></span> Я умею создавать задачи с дедлайном</li>
-            <li><span class="check"></span> Я создал тестовую сделку и добавил заметки</li>
+            <li><span class="check"></span> Находить инструменты обогащения и знаю 5 типов Enrichment</li>
+            <li><span class="check"></span> Проверять и интерпретировать Data Health Center</li>
+            <li><span class="check"></span> Настраивать Job Change Watch List и объяснять ценность сигналов о смене работы</li>
+            <li><span class="check"></span> Настраивать Buying Intent topics и фильтровать поиск по intent score</li>
+            <li><span class="check"></span> Применять чек-лист гигиены списков перед экспортом в Smartlead</li>
         </ul>
 
+        <div class="info">
+            <div class="title">🔗 Завтра: День 5</div>
+            <p><strong>Обзор Недели 1 + Практический тест.</strong> Ты докажешь, что освоил всё из Дней 1-4, собрав полный список проспектов с нуля под давлением времени. Если справишься — ты готов к Неделе 2 с продвинутыми workflows.</p>
+        </div>
+    </div>
+
+    <!-- Quiz -->
+    <div class="section" id="quiz">
+        <h2><span class="num">6</span> Проверь себя</h2>
+
         <div class="quiz">
-            <div class="title">Самопроверка:</div>
+            <div class="title">🧪 Вопрос 1</div>
+            <p>Реальная точность email-адресов Apollo приблизительно:</p>
             <ol>
-                <li>В какую стадию перемещаем контакт после того, как он принял LinkedIn invite?</li>
-                <li>Когда нужно создавать Deal (сделку)?</li>
-                <li>Что нужно записать после каждого звонка?</li>
-                <li>Почему не стоит оставлять контакт в "New Lead" больше 3 дней?</li>
-                <li>Как правильно назвать сделку по нашему формату?</li>
+                <li>91-98% (как заявлено)</li>
+                <li>65-75% (по реальным отзывам пользователей)</li>
+                <li>99%</li>
+                <li>50%</li>
             </ol>
+            <details>
+                <summary>Показать ответ</summary>
+                <p><strong>Ответ: б)</strong> 65-75%. Разрыв между рекламируемой и реальной точностью — важное знание. Именно поэтому мы всегда фильтруем по статусу "Verified" и используем процесс RAW → READY.</p>
+            </details>
         </div>
 
-        <details>
-            <summary style="cursor:pointer; color:#0f3460; font-weight:600; padding: 8px 0;">Нажми, чтобы увидеть ответы</summary>
-            <ol style="padding: 16px 20px; background:#f8f9fb; border-radius:8px; margin-top:8px;">
-                <li><strong>Connected</strong> — принятый invite означает, что контакт подключился</li>
-                <li>Когда контакт в стадии <strong>Meeting Booked</strong> или выше — раньше создавать сделку не нужно, это загрязнит pipeline</li>
-                <li><strong>Дату, что обсуждали, и следующий шаг</strong> — формат: "Звонок [дата]: обсудили X, следующий шаг Y"</li>
-                <li>Это <strong>загрязняет pipeline</strong> — если не планируем контактировать, лучше удалить. Застрявшие контакты мешают видеть реальную картину</li>
-                <li><strong>"[Компания] - Meta Ads [Месяц]"</strong> — например, "Sohum Wellness - Meta Ads Апр 2026"</li>
+        <div class="quiz">
+            <div class="title">🧪 Вопрос 2</div>
+            <p>Ты видишь компанию в Apollo с "High" buying intent по теме "Social media advertising". Что это означает?</p>
+            <ol>
+                <li>Они уже наняли агентство</li>
+                <li>Они активно изучают тему рекламы в социальных сетях</li>
+                <li>Они кликнули на твой сайт</li>
+                <li>Они ответили на холодное письмо</li>
             </ol>
-        </details>
+            <details>
+                <summary>Показать ответ</summary>
+                <p><strong>Ответ: б)</strong> Высокий buying intent означает, что компания активно потребляет контент, связанный с рекламой в соцсетях. Они не связывались с тобой (это не ответ на письмо) и не обязательно кого-то наняли. Они в режиме исследования — идеальный момент для контакта.</p>
+            </details>
+        </div>
+
+        <div class="quiz">
+            <div class="title">🧪 Вопрос 3</div>
+            <p>Назови 2 причины, почему сигналы о смене работы ценны для performance marketing агентства, продающего UAE SMB.</p>
+            <details>
+                <summary>Показать ответ</summary>
+                <p><strong>Ответ:</strong> (1) Новые сотрудники имеют бюджетные полномочия и хотят быстро показать результат — они активно ищут решения. (2) Маркетинг-менеджер, перешедший в новую компанию — тёплый лид в новой компании, потому что уже знает тебя и твоё ценностное предложение.</p>
+            </details>
+        </div>
+
+        <div class="quiz">
+            <div class="title">🧪 Вопрос 4</div>
+            <p>В твоём READY-списке 25 контактов. У 5 из них статус email "Unverified". Что делать ПЕРЕД экспортом?</p>
+            <ol>
+                <li>Экспортировать все 25 — Smartlead разберётся с bounce'ами</li>
+                <li>Убрать 5 unverified и экспортировать только 20 verified</li>
+                <li>Попробовать обогащение для 5 unverified — может, найдутся verified email</li>
+                <li>И б) и в) допустимы, но в) — лучшая практика</li>
+            </ol>
+            <details>
+                <summary>Показать ответ</summary>
+                <p><strong>Ответ: г)</strong> Лучшая практика — сначала попробовать обогащение (в) — возможно, удастся восстановить некоторые контакты. Если обогащение не помогает — убрать их из экспорта (б). Никогда не экспортируй unverified контакты в Smartlead (а) — это неприемлемо.</p>
+            </details>
+        </div>
     </div>
 
-    <!-- Next day -->
-    <div class="section" style="border-left: 4px solid #0f3460;">
-        <h3>Завтра: День 5 - Обзор и практический тест</h3>
-        <p>Повторим всё, что изучили за первую неделю (Дни 1-4), и пройдём практический тест на знание Apollo.io: поиск, фильтры, списки, обогащение, pipeline и сделки.</p>
+    <!-- Navigation -->
+    <div style="text-align: center; margin: 32px 0;">
+        <a href="day-3.html" class="link-btn secondary">← День 3: Поиск компаний</a>
+        <a href="day-5.html" class="link-btn">День 5: Обзор Недели 1 →</a>
     </div>
 
 </div>
 
-<div class="footer">
-    <p>SF Agency - Внутреннее обучение Apollo.io</p>
-    <p>Создано: Март 2026</p>
-</div>
+<div class="footer">Apollo.io Обучение - День 4 из 10 | Создано для SF Agency</div>
 
 </body>
 </html>

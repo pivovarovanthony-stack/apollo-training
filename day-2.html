@@ -3,75 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Apollo.io - День 2: Поиск контактов</title>
+    <title>Apollo.io - День 2: Поиск людей</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #f8f9fb;
             color: #1a1a2e;
             line-height: 1.7;
         }
+
         .header {
             background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
             color: white;
             padding: 48px 0;
             text-align: center;
         }
+
         .header h1 { font-size: 2.4rem; margin-bottom: 8px; font-weight: 700; }
-        .header .subtitle { font-size: 1.1rem; opacity: 0.8; }
-        .header .badge {
-            display: inline-block;
-            background: #e94560;
-            color: white;
-            padding: 4px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            margin-top: 12px;
-            font-weight: 600;
-        }
+        .header .subtitle { font-size: 1.1rem; opacity: 0.8; font-weight: 400; }
+        .header .badge { display: inline-block; background: #e94560; color: white; padding: 4px 16px; border-radius: 20px; font-size: 0.85rem; margin-top: 12px; font-weight: 600; }
+
         .container { max-width: 900px; margin: 0 auto; padding: 40px 24px; }
 
-        .progress-bar {
-            background: white;
-            border-radius: 12px;
-            padding: 24px 32px;
-            margin-bottom: 32px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
+        .progress-bar { background: white; border-radius: 12px; padding: 24px 32px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); display: flex; align-items: center; gap: 20px; }
         .progress-bar .label { font-weight: 600; white-space: nowrap; color: #555; }
         .progress-track { flex: 1; height: 10px; background: #e8ecf1; border-radius: 5px; overflow: hidden; }
-        .progress-fill { width: 20%; height: 100%; background: linear-gradient(90deg, #e94560, #0f3460); border-radius: 5px; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, #e94560, #0f3460); border-radius: 5px; transition: width 0.5s; }
         .progress-bar .day-label { font-weight: 700; color: #0f3460; white-space: nowrap; }
 
-        .nav-links {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 32px;
-        }
-        .nav-links a {
-            padding: 8px 16px;
-            background: white;
-            border-radius: 8px;
-            text-decoration: none;
-            color: #0f3460;
-            font-weight: 600;
-            font-size: 0.9rem;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-        .nav-links a:hover { background: #0f3460; color: white; }
-        .nav-links a.current { background: #0f3460; color: white; }
-
-        .toc {
-            background: white;
-            border-radius: 12px;
-            padding: 28px 32px;
-            margin-bottom: 32px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
+        .toc { background: white; border-radius: 12px; padding: 28px 32px; margin-bottom: 32px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
         .toc h3 { font-size: 1.1rem; margin-bottom: 16px; color: #0f3460; }
         .toc ol { padding-left: 20px; }
         .toc li { margin-bottom: 8px; }
@@ -79,236 +41,81 @@
         .toc a:hover { text-decoration: underline; }
         .toc .time { color: #999; font-size: 0.85rem; margin-left: 8px; }
 
-        .section {
-            background: white;
-            border-radius: 12px;
-            padding: 36px;
-            margin-bottom: 28px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
-        }
-        .section h2 {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            color: #1a1a2e;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #e8ecf1;
-        }
-        .section h2 .num {
-            display: inline-block;
-            background: #0f3460;
-            color: white;
-            width: 36px; height: 36px;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 36px;
-            font-size: 1rem;
-            margin-right: 12px;
-            vertical-align: middle;
-        }
+        .section { background: white; border-radius: 12px; padding: 36px 36px; margin-bottom: 28px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .section h2 { font-size: 1.5rem; margin-bottom: 20px; color: #1a1a2e; padding-bottom: 12px; border-bottom: 2px solid #e8ecf1; }
+        .section h2 .num { display: inline-block; background: #0f3460; color: white; width: 36px; height: 36px; border-radius: 50%; text-align: center; line-height: 36px; font-size: 1rem; margin-right: 12px; vertical-align: middle; }
         .section h3 { font-size: 1.15rem; margin: 24px 0 12px; color: #0f3460; }
         .section p { margin-bottom: 16px; color: #444; }
 
-        .screenshot {
-            width: 100%;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            margin: 16px 0;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-        }
-        .screenshot-caption {
-            text-align: center;
-            font-size: 0.85rem;
-            color: #888;
-            margin-top: -8px;
-            margin-bottom: 20px;
-            font-style: italic;
-        }
-
         .steps { counter-reset: step; list-style: none; padding: 0; }
-        .steps li {
-            counter-increment: step;
-            padding: 12px 16px 12px 52px;
-            position: relative;
-            margin-bottom: 8px;
-            background: #f8f9fb;
-            border-radius: 8px;
-            border-left: 3px solid #0f3460;
-        }
-        .steps li::before {
-            content: counter(step);
-            position: absolute;
-            left: 14px; top: 12px;
-            background: #0f3460;
-            color: white;
-            width: 26px; height: 26px;
-            border-radius: 50%;
-            text-align: center;
-            line-height: 26px;
-            font-size: 0.8rem;
-            font-weight: 700;
-        }
+        .steps li { counter-increment: step; padding: 12px 16px 12px 52px; position: relative; margin-bottom: 8px; background: #f8f9fb; border-radius: 8px; border-left: 3px solid #0f3460; }
+        .steps li::before { content: counter(step); position: absolute; left: 14px; top: 12px; background: #0f3460; color: white; width: 26px; height: 26px; border-radius: 50%; text-align: center; line-height: 26px; font-size: 0.8rem; font-weight: 700; }
 
-        .warning {
-            background: #fff3cd;
-            border: 1px solid #ffc107;
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin: 20px 0;
-        }
+        .warning { background: #fff3cd; border: 1px solid #ffc107; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
         .warning .title { font-weight: 700; color: #856404; margin-bottom: 4px; }
         .warning p { color: #856404; margin: 0; font-size: 0.95rem; }
 
-        .tip {
-            background: #d4edda;
-            border: 1px solid #28a745;
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin: 20px 0;
-        }
+        .tip { background: #d4edda; border: 1px solid #28a745; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
         .tip .title { font-weight: 700; color: #155724; margin-bottom: 4px; }
         .tip p { color: #155724; margin: 0; font-size: 0.95rem; }
 
-        .info {
-            background: #d1ecf1;
-            border: 1px solid #17a2b8;
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin: 20px 0;
-        }
+        .info { background: #d1ecf1; border: 1px solid #17a2b8; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
         .info .title { font-weight: 700; color: #0c5460; margin-bottom: 4px; }
         .info p { color: #0c5460; margin: 0; font-size: 0.95rem; }
 
         table { width: 100%; border-collapse: collapse; margin: 16px 0; }
-        table th {
-            background: #0f3460;
-            color: white;
-            padding: 12px 16px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
+        table th { background: #0f3460; color: white; padding: 12px 16px; text-align: left; font-weight: 600; font-size: 0.9rem; }
         table td { padding: 10px 16px; border-bottom: 1px solid #e8ecf1; font-size: 0.95rem; }
         table tr:nth-child(even) { background: #f8f9fb; }
 
-        .filter-card {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin: 16px 0;
-        }
-        .filter-item {
-            background: #f8f9fb;
-            border-radius: 8px;
-            padding: 14px 16px;
-            border-left: 3px solid #0f3460;
-        }
-        .filter-item .filter-name {
-            font-weight: 700;
-            font-size: 0.95rem;
-            margin-bottom: 4px;
-            color: #0f3460;
-        }
-        .filter-item .filter-desc {
-            font-size: 0.85rem;
-            color: #666;
-        }
-
-        .persona-card {
-            border: 2px solid #0f3460;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 16px 0;
-            background: linear-gradient(135deg, #f8f9fb 0%, #e8ecf1 100%);
-        }
-        .persona-card .persona-name {
-            font-size: 1.1rem;
-            font-weight: 700;
-            color: #0f3460;
-            margin-bottom: 12px;
-        }
-        .persona-card .persona-filters {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-        .persona-card .persona-tag {
-            background: #0f3460;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 16px;
-            font-size: 0.8rem;
-            font-weight: 500;
-        }
-
-        .practice-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            padding: 24px;
-            margin: 20px 0;
-            color: white;
-        }
-        .practice-box .practice-title {
-            font-weight: 700;
-            font-size: 1.1rem;
-            margin-bottom: 12px;
-        }
-        .practice-box ol {
-            padding-left: 20px;
-        }
-        .practice-box li {
-            margin-bottom: 8px;
-        }
+        .credit-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 20px 0; }
+        .credit-card { background: #f8f9fb; border-radius: 10px; padding: 20px; text-align: center; border: 2px solid transparent; }
+        .credit-card.free { border-color: #28a745; }
+        .credit-card.paid { border-color: #e94560; }
+        .credit-card .credit-icon { font-size: 2rem; margin-bottom: 8px; }
+        .credit-card .credit-title { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+        .credit-card .credit-desc { font-size: 0.85rem; color: #666; }
+        .credit-card .credit-cost { font-size: 1.2rem; font-weight: 700; margin-top: 8px; }
+        .credit-card.free .credit-cost { color: #28a745; }
+        .credit-card.paid .credit-cost { color: #e94560; }
 
         .checklist { list-style: none; padding: 0; }
-        .checklist li {
-            padding: 10px 16px;
-            margin-bottom: 6px;
-            background: #f8f9fb;
-            border-radius: 8px;
-            font-size: 0.95rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .checklist li .check {
-            width: 22px; height: 22px;
-            border: 2px solid #ccc;
-            border-radius: 4px;
-            flex-shrink: 0;
-        }
+        .checklist li { padding: 10px 16px; margin-bottom: 6px; background: #f8f9fb; border-radius: 8px; font-size: 0.95rem; display: flex; align-items: center; gap: 12px; }
+        .checklist li .check { width: 22px; height: 22px; border: 2px solid #ccc; border-radius: 4px; flex-shrink: 0; }
 
-        .quiz {
-            background: #f0e6ff;
-            border: 1px solid #7c3aed;
-            border-radius: 8px;
-            padding: 20px;
-            margin: 20px 0;
-        }
+        .quiz { background: #f0e6ff; border: 1px solid #7c3aed; border-radius: 8px; padding: 20px; margin: 20px 0; }
         .quiz .title { font-weight: 700; color: #5b21b6; margin-bottom: 12px; font-size: 1.05rem; }
         .quiz ol { padding-left: 20px; }
         .quiz li { margin-bottom: 8px; color: #5b21b6; }
 
-        .link-btn {
-            display: inline-block;
-            background: #0f3460;
-            color: white;
-            padding: 10px 24px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: 600;
-            margin: 8px 4px 8px 0;
-            font-size: 0.9rem;
-        }
+        .link-btn { display: inline-block; background: #0f3460; color: white; padding: 10px 24px; border-radius: 8px; text-decoration: none; font-weight: 600; margin: 8px 4px 8px 0; font-size: 0.9rem; }
         .link-btn:hover { background: #1a4a8a; }
         .link-btn.secondary { background: white; color: #0f3460; border: 2px solid #0f3460; }
 
+        .nav-links { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+        .nav-links a { padding: 8px 16px; background: white; border-radius: 8px; text-decoration: none; color: #0f3460; font-weight: 600; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .nav-links a:hover { background: #0f3460; color: white; }
+        .nav-links a.current { background: #0f3460; color: white; }
+
         .footer { text-align: center; padding: 40px 24px; color: #999; font-size: 0.85rem; }
 
+        .try-it { background: #e8f5e9; border: 2px dashed #28a745; border-radius: 8px; padding: 16px 20px; margin: 20px 0; }
+        .try-it .title { font-weight: 700; color: #2e7d32; margin-bottom: 4px; }
+        .try-it p { color: #2e7d32; margin: 0; font-size: 0.95rem; }
+
+        details { margin: 12px 0; }
+        details summary { cursor: pointer; font-weight: 600; color: #0f3460; padding: 8px 0; }
+        details summary:hover { text-decoration: underline; }
+
+        .day-summary { background: linear-gradient(135deg, #f0e6ff, #e8ecf1); border-radius: 12px; padding: 24px; margin: 20px 0; }
+        .day-summary h3 { color: #5b21b6; margin-bottom: 12px; }
+
+        .rita-shortcut { background: #fff8e1; border: 1px solid #ff8f00; border-radius: 8px; padding: 12px 16px; margin: 16px 0; font-size: 0.9rem; }
+        .rita-shortcut .title { font-weight: 700; color: #e65100; margin-bottom: 4px; }
+
         @media (max-width: 600px) {
-            .filter-card { grid-template-columns: 1fr; }
+            .credit-grid { grid-template-columns: 1fr; }
             .section { padding: 24px 20px; }
-            .nav-links { flex-wrap: wrap; }
-            .persona-card .persona-filters { gap: 6px; }
         }
     </style>
 </head>
@@ -316,7 +123,7 @@
 
 <div class="header">
     <h1>Apollo.io - Обучение</h1>
-    <div class="subtitle">Неделя 1 / День 2: Поиск контактов (Prospecting)</div>
+    <div class="subtitle">Неделя 1 / День 2: Поиск людей</div>
     <div class="badge">~ 90 минут</div>
 </div>
 
@@ -338,7 +145,7 @@
 
     <!-- Progress -->
     <div class="progress-bar">
-        <span class="label">Прогресс:</span>
+        <span class="label">Прогресс обучения:</span>
         <div class="progress-track">
             <div class="progress-fill" style="width: 20%"></div>
         </div>
@@ -349,413 +156,498 @@
     <div class="toc">
         <h3>Содержание дня</h3>
         <ol>
-            <li><a href="#section1">Как работает поиск людей (People Search)</a> <span class="time">15 мин</span></li>
-            <li><a href="#section2">Основные фильтры и что они означают</a> <span class="time">20 мин</span></li>
-            <li><a href="#section3">Наши 3 персоны: как использовать</a> <span class="time">15 мин</span></li>
-            <li><a href="#section4">Списки: создание и управление</a> <span class="time">15 мин</span></li>
-            <li><a href="#section5">Практика: найти и сохранить 20 контактов</a> <span class="time">20 мин</span></li>
-            <li><a href="#section6">Чек-лист и самопроверка</a> <span class="time">5 мин</span></li>
+            <li><a href="#review">Повторение: День 1</a> <span class="time">5 мин</span></li>
+            <li><a href="#section1">Основы поиска людей: фильтры и подход</a> <span class="time">20 мин</span></li>
+            <li><a href="#section2">Boolean-поиск по должностям</a> <span class="time">15 мин</span></li>
+            <li><a href="#section3">Персоны — шаблоны твоего ICP</a> <span class="time">20 мин</span></li>
+            <li><a href="#section4">Сохранённые поиски и оповещения</a> <span class="time">15 мин</span></li>
+            <li><a href="#section5">Система приоритизации лидов (Tiering)</a> <span class="time">15 мин</span></li>
+            <li><a href="#section6">Практическое задание и самопроверка</a> <span class="time">10 мин</span></li>
         </ol>
     </div>
 
-    <!-- Section 1: How Search Works -->
+    <!-- Quick Review -->
+    <div class="section" id="review" style="border-left: 4px solid #7c3aed;">
+        <h2>🔄 Повторение: День 1</h2>
+        <p>Ответь на вопросы до того, как заглянешь в ответы:</p>
+
+        <p><strong>Вопрос 1:</strong> Назови 4 типа кредитов Apollo.</p>
+        <details><summary>Ответ</summary><p>Email-кредиты, Mobile-кредиты, Export-кредиты, Data-кредиты.</p></details>
+
+        <p><strong>Вопрос 2:</strong> Ты добавил 30 новых контактов в список, а потом экспортировал список в CSV. Сколько всего кредитов потрачено?</p>
+        <details><summary>Ответ</summary><p>60 кредитов: 30 email-кредитов (добавление новых контактов) + 30 export-кредитов (экспорт в CSV).</p></details>
+
+        <p><strong>Вопрос 3:</strong> Назови основные разделы сайдбара Apollo. Минимум 5.</p>
+        <details><summary>Ответ</summary><p>Home, Search, Engage (содержит Sequences, Tasks, Analytics и др.), Workflows, Enrich, Deals. Плюс: Lists, Settings.</p></details>
+    </div>
+
+    <!-- Section 1 -->
     <div class="section" id="section1">
-        <h2><span class="num">1</span> Как работает поиск людей</h2>
+        <h2><span class="num">1</span> Основы поиска людей: фильтры и подход</h2>
 
-        <p>Поиск людей - это главный инструмент Apollo. Здесь ты находишь потенциальных клиентов по набору фильтров.</p>
+        <p>Вчера ты нашёл владельца фитнес-студии с помощью базового поиска. Сегодня научимся искать с ТОЧНОСТЬЮ — комбинируя фильтры для поиска именно тех людей, которые нам нужны. Это как апгрейд с обычного поиска Google до расширенного поиска со всеми возможными параметрами.</p>
 
-        <h3>Как попасть в поиск:</h3>
-        <ol class="steps">
-            <li>В левой навигации нажми <strong>People</strong> (раздел "Prospect and enrich")</li>
-            <li>Слева появится панель фильтров. Если не видно - нажми <strong>Show Filters</strong></li>
-            <li>Справа - результаты поиска: список людей с именами, должностями, компаниями</li>
-        </ol>
+        <h3>Интерфейс поиска:</h3>
+        <ul style="margin: 12px 0 16px 20px; color: #444;">
+            <li>Путь: <strong>Search &rarr; People</strong> (вкладка "People" вверху)</li>
+            <li>Левая панель — все доступные фильтры</li>
+            <li>Основная область — результаты</li>
+            <li>Если фильтры не видны, нажми <strong>"Show Filters"</strong> слева</li>
+        </ul>
 
-        <img src="https://www.apollo.io/_next/image?url=%2F_next%2Fstatic%2Fmedia%2Fcontact-account-search.ca09a7e6.png&w=3840&q=75" alt="Панель фильтров Apollo" class="screenshot">
-        <div class="screenshot-caption">Панель фильтров: Job Titles, Persona, Company, Location и другие</div>
-
-        <h3>Что ты видишь в результатах:</h3>
+        <h3>Категории фильтров:</h3>
         <table>
             <tr>
-                <th>Колонка</th>
-                <th>Что показывает</th>
+                <th>Категория</th>
+                <th>Ключевые фильтры</th>
+                <th>Когда использовать</th>
             </tr>
             <tr>
-                <td><strong>Name</strong></td>
-                <td>Имя и фамилия контакта</td>
+                <td><strong>Person Info</strong></td>
+                <td>Job Title (Boolean), Department, Seniority, Time in Role</td>
+                <td>Поиск нужного ЧЕЛОВЕКА</td>
             </tr>
             <tr>
-                <td><strong>Title</strong></td>
-                <td>Должность (CEO, Marketing Manager и т.д.)</td>
+                <td><strong>Company Info</strong></td>
+                <td>Industry, # Employees, Revenue, Location, Technologies</td>
+                <td>Поиск нужной КОМПАНИИ</td>
             </tr>
             <tr>
-                <td><strong>Company</strong></td>
-                <td>Название компании</td>
+                <td><strong>Advanced</strong></td>
+                <td>Buying Intent, Funding, Job Postings, NAICS codes</td>
+                <td>Таргетинг на основе сигналов</td>
             </tr>
             <tr>
-                <td><strong>Email</strong></td>
-                <td>Рабочий email (может быть скрыт - нужен кредит для раскрытия)</td>
-            </tr>
-            <tr>
-                <td><strong>Phone</strong></td>
-                <td>Телефон (скрыт, 5 кредитов для раскрытия)</td>
-            </tr>
-            <tr>
-                <td><strong>Employees</strong></td>
-                <td>Размер компании</td>
-            </tr>
-            <tr>
-                <td><strong>Industry</strong></td>
-                <td>Отрасль компании</td>
+                <td><strong>Contact Data</strong></td>
+                <td>Email Status, Phone Available, Lists (include/exclude)</td>
+                <td>Фильтрация по качеству данных</td>
             </tr>
         </table>
 
+        <h3>Подход «от широкого к узкому»:</h3>
+        <ol class="steps">
+            <li>Начни с 2-3 самых важных фильтров (локация + должность + размер компании)</li>
+            <li>Проверь количество результатов</li>
+            <li>Если слишком много (&gt;1,000): добавь ещё фильтров для сужения</li>
+            <li>Если слишком мало (&lt;50): убери фильтр или расширь критерии</li>
+        </ol>
+
         <div class="warning">
-            <div class="title">Напоминание о кредитах</div>
-            <p>Просмотр результатов поиска - <strong>бесплатно</strong>. Кредиты тратятся только когда ты нажимаешь кнопку раскрытия email или телефона. Можешь спокойно просматривать и фильтровать результаты.</p>
+            <div class="title">⚠️ Отраслевые теги Apollo ненадёжны для нишевых вертикалей</div>
+            <p>Из опыта нашего агентства: отраслевые категории Apollo могут давать до 70% «мусора» для специфических ниш. Поиск по «beauty salons» может вернуть оптовиков косметики, импортёров и франшизы бьюти-школ. ВСЕГДА проверяй результаты вручную. Никогда не доверяй тегам слепо.</p>
+        </div>
+
+        <h3>Построение первого фильтрованного поиска, шаг за шагом:</h3>
+        <ol class="steps">
+            <li>Нажми <strong>Search</strong> в левом сайдбаре</li>
+            <li>Убедись, что ты на вкладке <strong>People</strong> (не Companies)</li>
+            <li>Нажми <strong>"Show Filters"</strong> слева, если фильтры не видны</li>
+            <li><strong>Фильтр 1 — Location:</strong> найди "Location" в панели фильтров, нажми &rarr; введи "United Arab Emirates" &rarr; выбери</li>
+            <li><strong>Фильтр 2 — Job Title:</strong> найди "Job Title" в секции Person Info &rarr; введи: <code>Owner</code> &rarr; Enter. Запиши количество результатов (вверху справа)</li>
+            <li><strong>Фильтр 3 — # Employees:</strong> в секции Company Info выбери: 1-10 и 11-50 (отметь оба)</li>
+            <li>Проверь результаты: количество должно заметно уменьшиться. Пролистай — похожи ли на реальных владельцев бизнеса в ОАЭ?</li>
+        </ol>
+
+        <div class="try-it">
+            <div class="title">🎯 Попробуй прямо сейчас (7 мин)</div>
+            <p>Запусти свой первый реальный поиск с фильтрами:<br>
+            - <strong>Location:</strong> United Arab Emirates<br>
+            - <strong>Job Title:</strong> "Founder" OR "Owner" OR "CEO"<br>
+            - <strong># Employees:</strong> 1-50<br><br>
+            Запиши:<br>
+            1. Сколько результатов: ___________<br>
+            2. Из первых 10 — сколько реально бизнес-владельцы? _____ из 10<br>
+            3. <strong>НЕ сохраняй контакты</strong> — просто наблюдай</p>
         </div>
     </div>
 
-    <!-- Section 2: Filters -->
+    <!-- Section 2 -->
     <div class="section" id="section2">
-        <h2><span class="num">2</span> Основные фильтры и что они означают</h2>
+        <h2><span class="num">2</span> Boolean-поиск по должностям</h2>
 
-        <p>Фильтры - это то, что делает Apollo мощным. Вместо того чтобы вручную искать каждого человека, ты задаешь критерии и получаешь список подходящих людей.</p>
+        <p>Boolean-поиск (Булев поиск) — это способ комбинировать поисковые термины с помощью специальных слов: <strong>OR</strong>, <strong>AND</strong>, <strong>NOT</strong>. Ты говоришь Apollo: «Покажи людей, чья должность содержит ЭТО или ТО, но НЕ вот то». Это мощный инструмент, потому что должности в ОАЭ не стандартизированы — один и тот же человек может быть "Owner", "Founder", "Managing Director" или "General Manager".</p>
 
-        <h3>Основные фильтры (используем каждый день):</h3>
-        <div class="filter-card">
-            <div class="filter-item">
-                <div class="filter-name">Job Titles</div>
-                <div class="filter-desc">Должность. Можно ввести несколько: CEO, Owner, Founder, Managing Director</div>
-            </div>
-            <div class="filter-item">
-                <div class="filter-name">Persona</div>
-                <div class="filter-desc">Наши сохраненные профили (подробнее - раздел 3)</div>
-            </div>
-            <div class="filter-item">
-                <div class="filter-name">Location</div>
-                <div class="filter-desc">Страна, город, регион. Например: United Arab Emirates, Dubai</div>
-            </div>
-            <div class="filter-item">
-                <div class="filter-name">Company</div>
-                <div class="filter-desc">Конкретная компания или список компаний</div>
-            </div>
-            <div class="filter-item">
-                <div class="filter-name"># Employees</div>
-                <div class="filter-desc">Размер компании: 1-10, 11-50, 51-200 и т.д.</div>
-            </div>
-            <div class="filter-item">
-                <div class="filter-name">Industry &amp; Keywords</div>
-                <div class="filter-desc">Отрасль: Fitness, Beauty, F&amp;B, Real Estate и т.д.</div>
-            </div>
-        </div>
-
-        <h3>Продвинутые фильтры (нажми "More Filters"):</h3>
-        <div class="filter-card">
-            <div class="filter-item">
-                <div class="filter-name">Buying Intent</div>
-                <div class="filter-desc">Компании, активно ищущие наши услуги (High/Medium/Low). Самый ценный фильтр!</div>
-            </div>
-            <div class="filter-item">
-                <div class="filter-name">Technologies</div>
-                <div class="filter-desc">Какие технологии использует компания (Shopify, WordPress, Meta Pixel)</div>
-            </div>
-            <div class="filter-item">
-                <div class="filter-name">Revenue</div>
-                <div class="filter-desc">Годовой доход компании. Помогает отсеять слишком маленькие</div>
-            </div>
-            <div class="filter-item">
-                <div class="filter-name">Job Postings</div>
-                <div class="filter-desc">Компании, которые нанимают. Растущие компании = больше бюджета</div>
-            </div>
-            <div class="filter-item">
-                <div class="filter-name">Funding</div>
-                <div class="filter-desc">Компании, получившие инвестиции. Есть деньги на маркетинг</div>
-            </div>
-            <div class="filter-item">
-                <div class="filter-name">Lists</div>
-                <div class="filter-desc">Включить/исключить людей из определенных списков (избегаем повторов)</div>
-            </div>
-        </div>
-
-        <div class="tip">
-            <div class="title">Совет: комбинируй фильтры</div>
-            <p>Не используй только один фильтр. Комбинация 3-4 фильтров дает самые точные результаты. Например: <strong>Location: UAE + Title: Owner + Industry: Fitness + Employees: 1-50</strong> - это наш идеальный клиент.</p>
-        </div>
-
-        <h3>Как фильтры работают вместе:</h3>
+        <h3>Три Boolean-оператора:</h3>
         <table>
             <tr>
-                <th>Комбинация</th>
-                <th>Результат</th>
-                <th>Качество</th>
-            </tr>
-            <tr>
-                <td>Только Title: CEO</td>
-                <td>Миллионы результатов, большинство нерелевантны</td>
-                <td style="color: #e94560; font-weight: 700;">Плохо</td>
-            </tr>
-            <tr>
-                <td>Title: CEO + Location: UAE</td>
-                <td>Тысячи результатов, ближе к цели</td>
-                <td style="color: #ffc107; font-weight: 700;">Средне</td>
-            </tr>
-            <tr>
-                <td>Title: CEO + Location: UAE + Industry: Fitness</td>
-                <td>Сотни результатов, большинство релевантны</td>
-                <td style="color: #28a745; font-weight: 700;">Хорошо</td>
-            </tr>
-            <tr>
-                <td>Persona: UAE Owner + Buying Intent: High</td>
-                <td>Десятки результатов, горячие лиды</td>
-                <td style="color: #28a745; font-weight: 700;">Отлично</td>
-            </tr>
-        </table>
-    </div>
-
-    <!-- Section 3: Personas -->
-    <div class="section" id="section3">
-        <h2><span class="num">3</span> Наши 3 персоны: как использовать</h2>
-
-        <p>Персоны - это сохраненные наборы фильтров. Вместо того чтобы каждый раз вручную настраивать 5 фильтров, ты выбираешь одну персону и получаешь нужные результаты в один клик.</p>
-
-        <h3>Как применить персону:</h3>
-        <ol class="steps">
-            <li>Перейди в <strong>People</strong> (поиск людей)</li>
-            <li>В панели фильтров нажми на <strong>Persona</strong></li>
-            <li>Выбери одну из наших персон из списка</li>
-            <li>Фильтры автоматически применятся, и ты увидишь результаты</li>
-        </ol>
-
-        <h3>Наши сохраненные персоны:</h3>
-
-        <div class="persona-card">
-            <div class="persona-name">1. UAE Business Owner</div>
-            <p style="margin-bottom: 12px; color: #444;">Владельцы бизнеса в ОАЭ - наша основная целевая аудитория. Малый и средний бизнес, которому нужен перфоманс-маркетинг.</p>
-            <div class="persona-filters">
-                <span class="persona-tag">Owner / Founder / CEO</span>
-                <span class="persona-tag">UAE</span>
-                <span class="persona-tag">1-50 сотрудников</span>
-                <span class="persona-tag">Fitness / Beauty / F&B</span>
-            </div>
-        </div>
-
-        <div class="persona-card">
-            <div class="persona-name">2. GCC MD</div>
-            <p style="margin-bottom: 12px; color: #444;">Управляющие директора в странах Персидского залива. Более крупные компании, которые могут платить за комплексные услуги.</p>
-            <div class="persona-filters">
-                <span class="persona-tag">Managing Director / GM / Country Manager</span>
-                <span class="persona-tag">UAE / Saudi / Qatar / Bahrain / Kuwait / Oman</span>
-                <span class="persona-tag">11-200 сотрудников</span>
-            </div>
-        </div>
-
-        <div class="persona-card">
-            <div class="persona-name">3. Marketing Managers GCC</div>
-            <p style="margin-bottom: 12px; color: #444;">Менеджеры по маркетингу в компаниях Персидского залива. Они принимают решения о найме агентств и распределении рекламных бюджетов.</p>
-            <div class="persona-filters">
-                <span class="persona-tag">Marketing Manager / Digital Marketing Manager / Brand Manager</span>
-                <span class="persona-tag">UAE / Saudi / Qatar / Bahrain / Kuwait / Oman</span>
-                <span class="persona-tag">11-500 сотрудников</span>
-            </div>
-        </div>
-
-        <div class="info">
-            <div class="title">Когда какую персону использовать?</div>
-            <p><strong>UAE Business Owner</strong> - для быстрых продаж, короткий цикл, наш основной рынок.<br>
-            <strong>GCC MD</strong> - для более крупных контрактов в регионе.<br>
-            <strong>Marketing Managers GCC</strong> - для выхода на ЛПР, которые непосредственно управляют рекламными бюджетами.</p>
-        </div>
-
-        <div class="warning">
-            <div class="title">Правило</div>
-            <p>Всегда начинай поиск с персоны. Не настраивай фильтры вручную - персоны уже оптимизированы. Ты можешь добавить дополнительные фильтры поверх персоны (например, Buying Intent).</p>
-        </div>
-    </div>
-
-    <!-- Section 4: Lists -->
-    <div class="section" id="section4">
-        <h2><span class="num">4</span> Списки: создание и управление</h2>
-
-        <p>Списки (Lists) - это способ организовать найденные контакты. Думай о них как о папках: ты находишь людей через поиск и сохраняешь их в нужный список.</p>
-
-        <h3>Как создать список и добавить контакты:</h3>
-        <ol class="steps">
-            <li>Найди нужных людей через поиск (People + фильтры/персона)</li>
-            <li>Выбери контакты чекбоксами слева (можно выбрать несколько или все)</li>
-            <li>Нажми <strong>"Add to list"</strong> в панели действий сверху</li>
-            <li>Выбери существующий список или нажми <strong>"Create new list"</strong></li>
-            <li>Введи название списка (например, "UAE Fitness Owners - Март 2026")</li>
-            <li>Нажми <strong>"Update"</strong></li>
-        </ol>
-
-        <div class="warning">
-            <div class="title">Внимание: кредиты при сохранении!</div>
-            <p>Когда ты добавляешь <strong>нового</strong> контакта в список, Apollo автоматически раскрывает его email. Это стоит <strong>1 кредит</strong>. Если ты добавляешь 20 человек - это 20 кредитов. Добавление уже сохраненных контактов в другой список - бесплатно.</p>
-        </div>
-
-        <h3>Правила именования списков:</h3>
-        <table>
-            <tr>
-                <th>Формат</th>
+                <th>Оператор</th>
+                <th>Что делает</th>
                 <th>Пример</th>
             </tr>
             <tr>
-                <td>[Регион] [Отрасль] [Роль] - [Дата]</td>
-                <td>UAE Fitness Owners - Mar 2026</td>
+                <td><strong>OR</strong></td>
+                <td>Показывает результаты с ЛЮБЫМ из терминов</td>
+                <td>"Owner" OR "Founder" OR "CEO"</td>
             </tr>
             <tr>
-                <td>[Регион] [Отрасль] [Роль] - [Дата]</td>
-                <td>GCC Beauty MDs - Mar 2026</td>
+                <td><strong>AND</strong></td>
+                <td>Показывает результаты со ВСЕМИ терминами</td>
+                <td>"VP" AND "Marketing"</td>
             </tr>
             <tr>
-                <td>[Регион] [Отрасль] [Роль] - [Дата]</td>
-                <td>US Ecom VP Marketing - Mar 2026</td>
+                <td><strong>NOT</strong></td>
+                <td>Исключает результаты с этим термином</td>
+                <td>NOT "Assistant" NOT "Intern"</td>
             </tr>
         </table>
 
-        <h3>Как работать со списками:</h3>
-        <table>
-            <tr>
-                <th>Действие</th>
-                <th>Где найти</th>
-            </tr>
-            <tr>
-                <td>Просмотреть все списки</td>
-                <td>Левая навигация &rarr; <strong>Lists</strong></td>
-            </tr>
-            <tr>
-                <td>Отфильтровать поиск по списку</td>
-                <td>В фильтрах поиска &rarr; <strong>Lists</strong> (включить или исключить)</td>
-            </tr>
-            <tr>
-                <td>Экспортировать список</td>
-                <td>Открыть список &rarr; выбрать контакты &rarr; <strong>Export</strong> (тратит кредиты!)</td>
-            </tr>
-            <tr>
-                <td>Удалить контакт из списка</td>
-                <td>Открыть список &rarr; выбрать контакт &rarr; <strong>Remove from list</strong></td>
-            </tr>
-        </table>
+        <h3>Комбинирование (используй скобки):</h3>
+        <p style="background: #f8f9fb; padding: 12px 16px; border-radius: 8px; font-family: monospace; font-size: 0.9rem;">
+            ("Owner" OR "Founder" OR "CEO" OR "Managing Director") NOT ("Assistant" OR "Former" OR "Ex-")
+        </p>
 
-        <div class="tip">
-            <div class="title">Совет: исключай уже обработанные списки</div>
-            <p>Когда ищешь новых людей, добавь фильтр <strong>Lists &rarr; Exclude</strong> и выбери списки, с которыми уже работаешь. Так ты не увидишь дубликатов и не потратишь время на уже обработанных контактов.</p>
-        </div>
-    </div>
-
-    <!-- Section 5: Practice -->
-    <div class="section" id="section5">
-        <h2><span class="num">5</span> Практика: найти и сохранить 20 контактов</h2>
-
-        <p>Теперь применим все, что узнали. Твоя задача - найти 20 подходящих контактов и сохранить их в список.</p>
-
-        <div class="practice-box">
-            <div class="practice-title">Задание: Поиск 20 контактов</div>
-            <ol>
-                <li>Перейди в <strong>People</strong></li>
-                <li>Выбери персону <strong>"UAE Business Owner"</strong></li>
-                <li>Добавь дополнительный фильтр: <strong>Industry</strong> &rarr; выбери одну отрасль (например, Fitness)</li>
-                <li>Просмотри результаты. Обрати внимание на должности, компании, размер</li>
-                <li>Выбери <strong>20 наиболее подходящих</strong> контактов (чекбоксы слева)</li>
-                <li>Нажми <strong>"Add to list"</strong> &rarr; создай новый список <strong>"Training Test - [Твое имя]"</strong></li>
-                <li>Перейди в <strong>Lists</strong> и проверь, что список создан и содержит 20 контактов</li>
-            </ol>
-        </div>
-
-        <h3>На что обращать внимание при выборе контактов:</h3>
-        <table>
-            <tr>
-                <th>Критерий</th>
-                <th>Хороший знак</th>
-                <th>Плохой знак</th>
-            </tr>
-            <tr>
-                <td><strong>Должность</strong></td>
-                <td>Owner, CEO, Founder, Managing Director</td>
-                <td>Intern, Assistant, Junior</td>
-            </tr>
-            <tr>
-                <td><strong>Компания</strong></td>
-                <td>Реальный бизнес с сайтом, активная компания</td>
-                <td>Неизвестное название, нет сайта, закрыта</td>
-            </tr>
-            <tr>
-                <td><strong>Размер</strong></td>
-                <td>1-200 сотрудников</td>
-                <td>1 сотрудник (фрилансер) или 10,000+ (корпорация)</td>
-            </tr>
-            <tr>
-                <td><strong>Локация</strong></td>
-                <td>Совпадает с нашим целевым регионом</td>
-                <td>Другая страна/регион</td>
-            </tr>
-        </table>
+        <h3>Почему Boolean важен для НАШЕГО агентства:</h3>
+        <ul style="margin: 12px 0 16px 20px; color: #444;">
+            <li>Малый бизнес ОАЭ не использует стандартизированные должности</li>
+            <li>Владелец спортзала может быть "Founder", "Owner", "CEO" или "Managing Director"</li>
+            <li>Без Boolean ты пропустишь половину потенциальных клиентов</li>
+            <li>Оператор NOT убирает мусор: "Former CEO" и "Assistant to CEO" — не наши цели</li>
+        </ul>
 
         <div class="warning">
-            <div class="title">Напоминание</div>
-            <p>Добавление 20 контактов в список потратит ~20 email кредитов. Это нормально для обучения, но в реальной работе всегда проверяй компанию перед добавлением.</p>
+            <div class="title">⚠️ Синтаксис Boolean должен быть точным</div>
+            <p>- Используй <strong>ЗАГЛАВНЫЕ</strong> буквы для OR, AND, NOT<br>
+            - Используй <strong>кавычки</strong> вокруг многословных должностей: "Managing Director" (не просто Managing Director)<br>
+            - Скобки группируют термины: ("Sales" OR "Marketing") AND "Director"<br>
+            - Опечатка в Boolean может молча дать неправильные результаты — всегда проверяй количество результатов</p>
         </div>
 
-        <h3>После выполнения задания:</h3>
+        <h3>Построение Boolean-запроса в Apollo:</h3>
         <ol class="steps">
-            <li>Открой свой тестовый список в <strong>Lists</strong></li>
-            <li>Проверь: все 20 контактов на месте?</li>
-            <li>Посмотри, у скольких раскрылся email (зеленая иконка = email есть)</li>
-            <li>Кликни на 2-3 контакта и посмотри их карточки - изучи, какая информация доступна</li>
+            <li>Перейди в <strong>Search &rarr; People</strong></li>
+            <li>Нажми на фильтр <strong>Job Title</strong></li>
+            <li>В текстовом поле введи Boolean-запрос: <code>"Owner" OR "Founder" OR "CEO" OR "Managing Director" OR "General Manager"</code></li>
+            <li>Нажми Enter — Apollo обработает Boolean и покажет объединённые результаты</li>
+            <li>Добавь исключение NOT: <code>NOT "Assistant" NOT "Intern" NOT "Former"</code></li>
+            <li>Количество результатов должно немного уменьшиться (мусор убран)</li>
         </ol>
+
+        <div class="try-it">
+            <div class="title">🎯 Попробуй прямо сейчас: Boolean-практика (7 мин)</div>
+            <p>Построй Boolean-запросы для каждого ICP агентства. Сначала напиши на бумаге, потом проверь в Apollo:</p>
+            <p><strong>ICP 1 — Создатели курсов / Педагоги:</strong><br>
+            <code>("Course Creator" OR "Trainer" OR "Educator" OR "Coach" OR "Founder") NOT ("Assistant" OR "Intern")</code><br>
+            Добавь: Location = UAE, # Employees = 1-50<br>
+            Результатов: ___________</p>
+            <p><strong>ICP 2 — Владельцы сервисного бизнеса:</strong><br>
+            <code>("Owner" OR "Founder" OR "Managing Director" OR "General Manager" OR "CEO") NOT ("Former" OR "Ex-")</code><br>
+            Добавь: Location = UAE, # Employees = 1-50<br>
+            Результатов: ___________</p>
+            <p><strong>Сравни:</strong> какой ICP даёт больше результатов? Совпадает с ожиданиями?</p>
+        </div>
     </div>
 
-    <!-- Section 6: Checklist -->
+    <!-- Section 3 -->
+    <div class="section" id="section3">
+        <h2><span class="num">3</span> Персоны — шаблоны твоего ICP</h2>
+
+        <p>Персона (Persona) — это сохранённый шаблон фильтров, определяющий КОГО ты ищешь. Вместо того чтобы каждый раз вводить одни и те же фильтры, ты сохраняешь их как Персону и применяешь одним кликом. Это как кнопка быстрого набора на телефоне — нажал одну кнопку, все нужные параметры установлены.</p>
+
+        <h3>Персона vs. Сохранённый поиск (Saved Search):</h3>
+        <table>
+            <tr>
+                <th></th>
+                <th>Персона (Persona)</th>
+                <th>Сохранённый поиск (Saved Search)</th>
+            </tr>
+            <tr>
+                <td><strong>Что сохраняет</strong></td>
+                <td>КОГО ты ищешь (должности, отрасли, размер компании)</td>
+                <td>ВЕСЬ поиск (все фильтры, каждая деталь)</td>
+            </tr>
+            <tr>
+                <td><strong>Аналогия</strong></td>
+                <td>Шаблон рецепта («блюдо из курицы»)</td>
+                <td>Полный рецепт с точными пропорциями</td>
+            </tr>
+            <tr>
+                <td><strong>Повторное использование</strong></td>
+                <td>Отправная точка — потом добавляешь ещё фильтры</td>
+                <td>Воспроизводит точно тот же поиск</td>
+            </tr>
+            <tr>
+                <td><strong>Когда использовать</strong></td>
+                <td>Когда регулярно ищешь один ТИП людей</td>
+                <td>Когда повторяешь один и тот же точный поиск</td>
+            </tr>
+        </table>
+
+        <h3>3 Персоны, которые мы создадим:</h3>
+
+        <p><strong>Персона 1: "UAE Business Owners" (Основная)</strong></p>
+        <ul style="margin: 8px 0 16px 20px; color: #444;">
+            <li>Titles: Owner, Founder, CEO, Managing Director, General Manager</li>
+            <li>Location: UAE</li>
+            <li>Employees: 1-50</li>
+            <li>Industries: Education, Coaching, Beauty, Fitness, F&B, Real Estate, E-commerce</li>
+        </ul>
+
+        <p><strong>Персона 2: "GCC Managing Directors"</strong></p>
+        <ul style="margin: 8px 0 16px 20px; color: #444;">
+            <li>Titles: Managing Director, CEO, Founder, Owner, General Manager</li>
+            <li>Location: ОАЭ, Саудовская Аравия, Бахрейн, Кувейт, Катар, Оман</li>
+            <li>Employees: 5-200</li>
+            <li>Industries: более широкий набор</li>
+        </ul>
+
+        <p><strong>Персона 3: "Marketing Managers GCC"</strong></p>
+        <ul style="margin: 8px 0 16px 20px; color: #444;">
+            <li>Titles: Marketing Manager, Head of Marketing, Marketing Director, Digital Marketing Manager, CMO</li>
+            <li>Location: ОАЭ + GCC</li>
+            <li>Employees: 10-200</li>
+            <li>Department: Marketing</li>
+        </ul>
+
+        <h3>Создание Персоны — шаг за шагом:</h3>
+        <ol class="steps">
+            <li>Перейди в <strong>Search &rarr; People</strong></li>
+            <li>Нажми <strong>Show Filters</strong> (левая панель)</li>
+            <li>Найди секцию <strong>Persona</strong> (ближе к верху фильтров)</li>
+            <li>Нажми <strong>"+ Persona"</strong> (или "Create Persona")</li>
+            <li>Назови её: <strong>"UAE Business Owners"</strong></li>
+            <li>Установи фильтры: Job Title (Boolean-запрос с OR), Location: UAE, # Employees: 1-50, Industry (выбери нужные)</li>
+            <li>Нажми <strong>Save</strong> — персона появится в выпадающем меню Persona</li>
+        </ol>
+
+        <div class="warning">
+            <div class="title">⚠️ Персоны — это отправные точки, не завершённые поиски</div>
+            <p>Персона определяет только КОГО ты ищешь. Тебе всё ещё нужно добавлять другие фильтры (статус email, конкретный город, отрасль) для каждого конкретного поиска. Частая ошибка — думать «я применил Персону, значит поиск готов». Нет — Персона даёт широкий пул, ты сужаешь его дальше.</p>
+        </div>
+
+        <div class="tip">
+            <div class="title">💡 Подсказка</div>
+            <p>Держи Персоны сфокусированными — добавляй только те фильтры, которые критически важны для определения идеального клиента. Чем точнее Персона, тем меньше результатов она покажет. Лучше начать шире и сужать по ситуации.</p>
+        </div>
+
+        <div class="try-it">
+            <div class="title">🎯 Попробуй прямо сейчас: Создай все 3 Персоны (10 мин)</div>
+            <p>Создай каждую Персону в Apollo по спецификациям выше:</p>
+            <p>1. <strong>UAE Business Owners</strong> — по инструкции выше<br>
+            2. <strong>GCC Managing Directors</strong> — шире по локации (все страны GCC), 5-200 сотрудников<br>
+            3. <strong>Marketing Managers GCC</strong> — другие должности (Marketing Manager, Head of Marketing и т.д.), добавь Department: Marketing</p>
+            <p>После создания всех трёх:<br>
+            - Примени "UAE Business Owners" — результатов: ___________<br>
+            - Примени "GCC Managing Directors" — результатов: ___________<br>
+            - Примени "Marketing Managers GCC" — результатов: ___________<br>
+            - Сделай скриншот списка Персон</p>
+        </div>
+    </div>
+
+    <!-- Section 4 -->
+    <div class="section" id="section4">
+        <h2><span class="num">4</span> Сохранённые поиски и оповещения</h2>
+
+        <p>Ты создал Персоны, которые определяют КОГО (должности, локация, размер). Теперь представь, что хочешь запускать очень конкретный поиск каждую неделю: «Владельцы салонов красоты в Дубае с верифицированным email и 5-20 сотрудников». Это Сохранённый поиск (Saved Search) — все фильтры сохранены, один клик для повторения.</p>
+
+        <h3>Возможности Saved Search:</h3>
+        <ul style="margin: 12px 0 16px 20px; color: #444;">
+            <li>Сохрани ЛЮБУЮ комбинацию фильтров с именем</li>
+            <li>Применяй одним кликом</li>
+            <li>Делись с коллегами</li>
+            <li><strong>Настрой оповещения:</strong> Apollo присылает email, когда появляются НОВЫЕ контакты, подходящие под твой поиск (ежедневно, еженедельно или ежемесячно)</li>
+        </ul>
+
+        <h3>Создание Saved Search — шаг за шагом:</h3>
+        <ol class="steps">
+            <li>Перейди в <strong>Search &rarr; People</strong></li>
+            <li>Примени свою Персону <strong>"UAE Business Owners"</strong> (один клик)</li>
+            <li>Добавь дополнительные фильтры: <strong>Industry:</strong> Beauty, Personal Care | <strong>Location (уточнение):</strong> Dubai | <strong>Email Status:</strong> Verified</li>
+            <li>Проверь результаты — должен быть сфокусированный список</li>
+            <li>Нажми <strong>"Save as new search"</strong> (иконка сохранения/закладки вверху)</li>
+            <li>Назови: <strong>"Dubai Beauty Salon Owners - Verified"</strong></li>
+            <li>Нажми Save</li>
+            <li><strong>Настрой оповещение:</strong> найди иконку колокольчика или "Set alert" рядом с сохранённым поиском. Выбери: <strong>Weekly</strong> (другие варианты: daily или monthly). Apollo будет присылать email каждую неделю с новыми контактами</li>
+        </ol>
+
+        <div class="try-it">
+            <div class="title">🎯 Попробуй прямо сейчас: Создай 2 Saved Search с оповещениями (8 мин)</div>
+            <p><strong>Saved Search 1:</strong><br>
+            - Начни с Персоны "UAE Business Owners"<br>
+            - Добавь: Industry = Fitness/Gym, Location = Dubai, Email Status = Verified<br>
+            - Сохрани как: <strong>"Dubai Fitness Owners - Verified"</strong><br>
+            - Оповещение: <strong>Weekly</strong></p>
+            <p><strong>Saved Search 2:</strong><br>
+            - Начни с Персоны "UAE Business Owners"<br>
+            - Добавь: Industry = Beauty, Location = UAE, Email Status = Verified<br>
+            - Сохрани как: <strong>"UAE Beauty Salon Owners - Verified"</strong><br>
+            - Оповещение: <strong>Weekly</strong></p>
+            <p>Проверь, что оба появились в списке Saved Searches. Сделай скриншот.</p>
+        </div>
+    </div>
+
+    <!-- Section 5 -->
+    <div class="section" id="section5">
+        <h2><span class="num">5</span> Система приоритизации лидов (Tiering)</h2>
+
+        <p>Вы — команда из 2 человек. Вы не можете написать уникальное, глубоко исследованное письмо каждому потенциальному клиенту. Система приоритизации (Tiering) говорит, КУДА вкладывать ограниченное время для максимальной отдачи.</p>
+
+        <h3>3-уровневая система:</h3>
+        <table>
+            <tr>
+                <th>Уровень</th>
+                <th>% лидов</th>
+                <th>Усилие на персонализацию</th>
+                <th>Подход</th>
+                <th>Пример для агентства</th>
+            </tr>
+            <tr>
+                <td><strong>Tier 1</strong> (Топ 3%)</td>
+                <td>~3%</td>
+                <td>70% усилий</td>
+                <td>Ручной, гиперперсонализированный. Исследуй LinkedIn, сайт, Instagram.</td>
+                <td>Создатель курсов с 50K+ подписчиков, e-com бренд с выручкой 2M+ AED, сеть салонов</td>
+            </tr>
+            <tr>
+                <td><strong>Tier 2</strong> (~27%)</td>
+                <td>~27%</td>
+                <td>20% усилий</td>
+                <td>Шаблоны с персональными штрихами. Вертикально-специфичные шаблоны + минимальная ручная доработка.</td>
+                <td>Хороший бизнес в целевой вертикали с явным онлайн-присутствием</td>
+            </tr>
+            <tr>
+                <td><strong>Tier 3</strong> (~70%)</td>
+                <td>~70%</td>
+                <td>10% усилий</td>
+                <td>Полная автоматизация. Сегментированные списки, отличные шаблоны, только динамические переменные.</td>
+                <td>Широкое совпадение с ICP, без специфических квалифицирующих сигналов</td>
+            </tr>
+        </table>
+
+        <h3>Исследование Tier 1 — метод «Покажи, что ты меня знаешь»:</h3>
+        <ol style="margin: 12px 0 16px 20px; color: #444;">
+            <li><strong>Исследуй человека:</strong> активность в LinkedIn, посты, личные интересы</li>
+            <li><strong>Пойми компанию:</strong> сайт, продукты, услуги, Instagram</li>
+            <li><strong>Изучи нишу:</strong> терминология отрасли, конкурентный ландшафт</li>
+        </ol>
+
+        <h3>Как определить уровень:</h3>
+        <ul style="margin: 12px 0 16px 20px; color: #444;">
+            <li><strong>Сигналы Tier 1:</strong> большое количество подписчиков (50K+), несколько локаций, видимый рост, упоминания в прессе</li>
+            <li><strong>Сигналы Tier 2:</strong> активные соцсети, приличный сайт, целевая вертикаль, верифицированный email, 10+ сотрудников</li>
+            <li><strong>Tier 3:</strong> совпадение с ICP по фильтрам, но без специфических квалифицирующих сигналов</li>
+        </ul>
+
+        <div class="warning">
+            <div class="title">⚠️ Не персонализируй всех подряд</div>
+            <p>Ошибка №1 для маленьких команд: попытка написать кастомное письмо каждому лиду. Это приводит к выгоранию и низкому объёму. Использование только {{first_name}} — это НЕ персонализация (это базовый минимум). Но тратить 30 минут на исследование Tier 3 — впустую. Правильно сегментируй, потом действуй.</p>
+        </div>
+
+        <div class="rita-shortcut">
+            <div class="title">⚡ Совет для продвинутых</div>
+            Используй company-first подход (День 3) для Tier 1 лидов — сначала изучи компанию, потом найди нужного человека. People-first подход подойдёт для Tier 3 — находи людей быстро, фильтруй позже.
+        </div>
+
+        <div class="try-it">
+            <div class="title">🎯 Попробуй прямо сейчас: Классифицируй лидов (8 мин)</div>
+            <p>1. Примени Saved Search "Dubai Fitness Owners - Verified"<br>
+            2. Просмотри результаты БЕЗ сохранения<br>
+            3. Определи и запиши:</p>
+            <p><strong>2 Tier 1 лида</strong> — объясни ПОЧЕМУ:<br>
+            - Имя: ___________ Причина: ___________<br>
+            - Имя: ___________ Причина: ___________</p>
+            <p><strong>5 Tier 2 лидов</strong> — что их квалифицирует?<br>
+            - Имена: ___________</p>
+            <p><strong>Все остальные</strong> = Tier 3</p>
+            <p>4. Для 2 Tier 1 лидов запиши одну конкретную деталь для персонализированного письма (например: «Только открыли вторую локацию» или «30K подписчиков в Instagram»)</p>
+        </div>
+    </div>
+
+    <!-- Section 6: Practice + Quiz -->
     <div class="section" id="section6">
-        <h2><span class="num">6</span> Чек-лист и самопроверка</h2>
+        <h2><span class="num">6</span> Практическое задание и самопроверка</h2>
+
+        <div style="border-left: 4px solid #e94560; padding-left: 20px; margin-bottom: 24px;">
+            <h3>🎯 Финальное задание: Поиск ICP с нуля</h3>
+            <p>Выбери вертикаль, которую агентство ещё не искало: <strong>F&B / Рестораны в Абу-Даби</strong></p>
+            <p>Без пошаговых подсказок выполни:</p>
+            <ol style="margin: 12px 0 16px 20px; color: #444;">
+                <li>Примени подходящую Персону</li>
+                <li>Добавь фильтры: Industry (Food & Beverage), Location (Abu Dhabi), Email Status (Verified)</li>
+                <li>Запиши количество результатов</li>
+                <li>Построй Boolean-запрос по должностям, если нужно</li>
+                <li>Пролистай 10 результатов — оцени качество (какой % реально рестораторы?)</li>
+                <li>Определи 1 Tier 1 и 3 Tier 2 лида</li>
+                <li>Сохрани как: <strong>"Abu Dhabi F&B Owners - Verified"</strong></li>
+            </ol>
+            <p><strong>Самоконтроль:</strong> Удалось выполнить все шаги без возврата к инструкциям? Если да — навыки Дня 2 усвоены.</p>
+        </div>
 
         <h3>Чек-лист Дня 2:</h3>
         <ul class="checklist">
-            <li><span class="check"></span> Я умею переходить в поиск людей (People)</li>
-            <li><span class="check"></span> Я знаю основные фильтры: Job Title, Location, Industry, # Employees</li>
-            <li><span class="check"></span> Я знаю продвинутые фильтры: Buying Intent, Technologies, Revenue</li>
-            <li><span class="check"></span> Я умею применять персону в один клик</li>
-            <li><span class="check"></span> Я знаю наши 3 персоны и когда использовать каждую</li>
-            <li><span class="check"></span> Я создал тестовый список с 20 контактами</li>
-            <li><span class="check"></span> Я знаю, что добавление нового контакта в список тратит 1 кредит</li>
-            <li><span class="check"></span> Я умею исключать списки из поиска для избежания дубликатов</li>
+            <li><span class="check"></span> Умею искать людей с несколькими фильтрами (должность, локация, размер, отрасль)</li>
+            <li><span class="check"></span> Могу строить Boolean-запросы с OR, AND, NOT</li>
+            <li><span class="check"></span> Создал(а) и применяю 3 Персоны</li>
+            <li><span class="check"></span> Сохранил(а) поиски и включил(а) еженедельные оповещения (2+ сохранённых поиска)</li>
+            <li><span class="check"></span> Могу классифицировать лидов в Tier 1 / Tier 2 / Tier 3 и объяснить логику</li>
         </ul>
 
         <div class="quiz">
-            <div class="title">Самопроверка:</div>
+            <div class="title">🧪 Проверь себя</div>
+
+            <p><strong>Вопрос 1:</strong> В чём разница между Персоной и Сохранённым поиском в Apollo?</p>
             <ol>
-                <li>Какой фильтр показывает компании, которые сейчас ищут наши услуги?</li>
-                <li>Сколько кредитов стоит добавление нового контакта в список?</li>
-                <li>Какую персону использовать для поиска владельцев бизнеса в Дубае?</li>
-                <li>Зачем исключать списки при новом поиске?</li>
-                <li>Что лучше: использовать 1 фильтр или комбинацию 3-4 фильтров?</li>
+                <li>Это одно и то же</li>
+                <li>Персона = повторяемый шаблон КОГО (компонент фильтров). Saved Search = полный слепок поиска (все фильтры)</li>
+                <li>Персона для людей, Saved Search для компаний</li>
+                <li>Персона стоит кредитов, Saved Search бесплатный</li>
             </ol>
+            <details><summary>Показать ответ</summary><p><strong>b)</strong> Персона определяет КОГО ты ищешь (должности, отрасли, фирмографические атрибуты) как повторяемый компонент. Saved Search сохраняет ВЕСЬ поиск со всеми фильтрами.</p></details>
+
+            <p><strong>Вопрос 2:</strong> Ты строишь Boolean-запрос для владельцев сервисного бизнеса в ОАЭ. Какой запрос правильный?</p>
+            <ol>
+                <li>"Owner" AND "Founder" AND "CEO"</li>
+                <li>"Owner" OR "Founder" OR "CEO" NOT "Assistant"</li>
+                <li>"Owner" + "Founder" + "CEO" - "Assistant"</li>
+            </ol>
+            <details><summary>Показать ответ</summary><p><strong>b)</strong> OR находит людей с ЛЮБОЙ из этих должностей. AND потребовал бы ВСЕ должности одновременно (невозможно). Синтаксис + и - не работает в Apollo Boolean.</p></details>
+
+            <p><strong>Вопрос 3:</strong> В 3-уровневой системе, какой процент усилий на персонализацию идёт на Tier 1 (топ 3%) лидов?</p>
+            <ol>
+                <li>10%</li>
+                <li>30%</li>
+                <li>50%</li>
+                <li>70%</li>
+            </ol>
+            <details><summary>Показать ответ</summary><p><strong>d) 70%</strong> — кажется нелогичным (3% лидов получают 70% усилий), но это самые ценные цели. Одна конверсия Tier 1 может стоить 20 конверсий Tier 3.</p></details>
+
+            <p><strong>Вопрос 4:</strong> Ты настроил(а) еженедельное оповещение на Saved Search "Dubai Fitness Owners". Что произойдёт?</p>
+            <ol>
+                <li>Apollo автоматически добавит новых людей в список</li>
+                <li>Apollo пришлёт email со списком новых контактов, подходящих под поиск</li>
+                <li>Apollo отправит письма этим контактам от твоего имени</li>
+                <li>Ничего, пока не проверишь вручную</li>
+            </ol>
+            <details><summary>Показать ответ</summary><p><strong>b)</strong> Apollo присылает уведомление со списком новых контактов, подходящих под критерии поиска. Ты сам(а) решаешь, добавлять ли их в списки.</p></details>
         </div>
 
-        <details>
-            <summary style="cursor:pointer; color:#0f3460; font-weight:600; padding: 8px 0;">Нажми, чтобы увидеть ответы</summary>
-            <ol style="padding: 16px 20px; background:#f8f9fb; border-radius:8px; margin-top:8px;">
-                <li><strong>Buying Intent</strong> - показывает уровень интереса (High/Medium/Low)</li>
-                <li><strong>1 email кредит</strong> - Apollo раскрывает email при сохранении</li>
-                <li><strong>UAE Business Owner</strong> - наша основная персона для ОАЭ</li>
-                <li>Чтобы <strong>не видеть дубликатов</strong> и не тратить время на уже обработанных людей</li>
-                <li><strong>3-4 фильтра</strong> - один фильтр дает слишком много нерелевантных результатов</li>
+        <div class="day-summary">
+            <h3>Итоги Дня 2</h3>
+            <ol style="color: #444;">
+                <li><strong>«От широкого к узкому»</strong> — начни с 2-3 фильтров, проверь результаты, сужай дальше</li>
+                <li><strong>Boolean (OR, AND, NOT)</strong> ловит вариации должностей, которые используют предприниматели ОАЭ</li>
+                <li><strong>Персоны = шаблоны КОГО.</strong> Saved Searches = полные слепки поиска.</li>
+                <li><strong>Еженедельные оповещения</strong> на Saved Searches — Apollo сам уведомит о новых совпадениях</li>
+                <li><strong>Tiering:</strong> 70% усилий по персонализации на топ 3% (Tier 1) лидов</li>
             </ol>
-        </details>
+        </div>
     </div>
 
     <!-- Next day preview -->
     <div class="section" style="border-left: 4px solid #0f3460;">
-        <h3>Завтра: День 3 - Списки и обогащение данных</h3>
-        <p>Научимся работать со списками контактов, использовать Data Health Center, фильтровать по смене работы и недостающим email-адресам.</p>
+        <h3>Завтра: День 3 — Поиск компаний и списки</h3>
+        <p>Научимся искать компании (не только людей), создадим рабочий процесс RAW &rarr; READY для управления списками и экспортируем первый CSV для Smartlead.</p>
+    </div>
+
+    <!-- Bottom nav -->
+    <div style="text-align: center; margin: 32px 0;">
+        <a href="index.html" class="link-btn secondary">&larr; Предыдущий день</a>
+        <a href="day-3.html" class="link-btn">Следующий день &rarr;</a>
     </div>
 
 </div>
 
 <div class="footer">
-    <p>SF Agency - Внутреннее обучение Apollo.io</p>
-    <p>Создано: Март 2026</p>
+    Apollo.io Обучение — День 2 из 10 | Создано для SF Agency
 </div>
 
 </body>

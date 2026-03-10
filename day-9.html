@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Apollo.io - День 9: Аналитика, отчётность и интеграция со Smartlead</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f8f9fb;
+            color: #1a1a2e;
+            line-height: 1.7;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            color: white;
+            padding: 48px 0;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.4rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.8;
+            font-weight: 400;
+        }
+
+        .header .badge {
+            display: inline-block;
+            background: #e94560;
+            color: white;
+            padding: 4px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            font-weight: 600;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 24px;
+        }
+
+        .progress-bar {
+            background: white;
+            border-radius: 12px;
+            padding: 24px 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .progress-bar .label {
+            font-weight: 600;
+            white-space: nowrap;
+            color: #555;
+        }
+
+        .progress-track {
+            flex: 1;
+            height: 10px;
+            background: #e8ecf1;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            width: 90%;
+            height: 100%;
+            background: linear-gradient(90deg, #e94560, #0f3460);
+            border-radius: 5px;
+            transition: width 0.5s;
+        }
+
+        .progress-bar .day-label {
+            font-weight: 700;
+            color: #0f3460;
+            white-space: nowrap;
+        }
+
+        .toc {
+            background: white;
+            border-radius: 12px;
+            padding: 28px 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .toc h3 {
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            color: #0f3460;
+        }
+
+        .toc ol {
+            padding-left: 20px;
+        }
+
+        .toc li {
+            margin-bottom: 8px;
+        }
+
+        .toc a {
+            color: #0f3460;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .toc .time {
+            color: #999;
+            font-size: 0.85rem;
+            margin-left: 8px;
+        }
+
+        .section {
+            background: white;
+            border-radius: 12px;
+            padding: 36px 36px;
+            margin-bottom: 28px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        .section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+            color: #1a1a2e;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #e8ecf1;
+        }
+
+        .section h2 .num {
+            display: inline-block;
+            background: #0f3460;
+            color: white;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 36px;
+            font-size: 1rem;
+            margin-right: 12px;
+            vertical-align: middle;
+        }
+
+        .section h3 {
+            font-size: 1.15rem;
+            margin: 24px 0 12px;
+            color: #0f3460;
+        }
+
+        .section p {
+            margin-bottom: 16px;
+            color: #444;
+        }
+
+        .steps {
+            counter-reset: step;
+            list-style: none;
+            padding: 0;
+        }
+
+        .steps li {
+            counter-increment: step;
+            padding: 12px 16px 12px 52px;
+            position: relative;
+            margin-bottom: 8px;
+            background: #f8f9fb;
+            border-radius: 8px;
+            border-left: 3px solid #0f3460;
+        }
+
+        .steps li::before {
+            content: counter(step);
+            position: absolute;
+            left: 14px;
+            top: 12px;
+            background: #0f3460;
+            color: white;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 26px;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .warning .title {
+            font-weight: 700;
+            color: #856404;
+            margin-bottom: 4px;
+        }
+
+        .warning p {
+            color: #856404;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .tip {
+            background: #d4edda;
+            border: 1px solid #28a745;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .tip .title {
+            font-weight: 700;
+            color: #155724;
+            margin-bottom: 4px;
+        }
+
+        .tip p {
+            color: #155724;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #17a2b8;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+
+        .info .title {
+            font-weight: 700;
+            color: #0c5460;
+            margin-bottom: 4px;
+        }
+
+        .info p {
+            color: #0c5460;
+            margin: 0;
+            font-size: 0.95rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+        }
+
+        table th {
+            background: #0f3460;
+            color: white;
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        table td {
+            padding: 10px 16px;
+            border-bottom: 1px solid #e8ecf1;
+            font-size: 0.95rem;
+        }
+
+        table tr:nth-child(even) {
+            background: #f8f9fb;
+        }
+
+        .nav-diagram {
+            display: grid;
+            grid-template-columns: 200px 1fr;
+            gap: 0;
+            border: 2px solid #0f3460;
+            border-radius: 12px;
+            overflow: hidden;
+            margin: 20px 0;
+        }
+
+        .nav-sidebar {
+            background: #1a1a2e;
+            color: white;
+            padding: 20px 0;
+        }
+
+        .nav-sidebar .nav-item {
+            padding: 10px 20px;
+            font-size: 0.9rem;
+            cursor: default;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-sidebar .nav-item.active {
+            background: #0f3460;
+        }
+
+        .nav-sidebar .nav-item .icon {
+            opacity: 0.7;
+            font-size: 0.85rem;
+        }
+
+        .nav-sidebar .nav-section {
+            padding: 8px 20px 4px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            opacity: 0.5;
+            letter-spacing: 1px;
+            margin-top: 8px;
+        }
+
+        .nav-main {
+            background: #f8f9fb;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #888;
+            font-style: italic;
+        }
+
+        .credit-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin: 20px 0;
+        }
+
+        .credit-card {
+            background: #f8f9fb;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid transparent;
+        }
+
+        .credit-card.free { border-color: #28a745; }
+        .credit-card.paid { border-color: #e94560; }
+        .credit-card .credit-icon { font-size: 2rem; margin-bottom: 8px; }
+        .credit-card .credit-title { font-weight: 700; font-size: 1rem; margin-bottom: 4px; }
+        .credit-card .credit-desc { font-size: 0.85rem; color: #666; }
+        .credit-card .credit-cost { font-size: 1.2rem; font-weight: 700; margin-top: 8px; }
+        .credit-card.free .credit-cost { color: #28a745; }
+        .credit-card.paid .credit-cost { color: #e94560; }
+
+        .checklist {
+            list-style: none;
+            padding: 0;
+        }
+
+        .checklist li {
+            padding: 10px 16px;
+            margin-bottom: 6px;
+            background: #f8f9fb;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .checklist li .check {
+            width: 22px;
+            height: 22px;
+            border: 2px solid #ccc;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .quiz {
+            background: #f0e6ff;
+            border: 1px solid #7c3aed;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .quiz .title {
+            font-weight: 700;
+            color: #5b21b6;
+            margin-bottom: 12px;
+            font-size: 1.05rem;
+        }
+
+        .quiz ol { padding-left: 20px; }
+        .quiz li { margin-bottom: 8px; color: #5b21b6; }
+
+        .link-btn {
+            display: inline-block;
+            background: #0f3460;
+            color: white;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            margin: 8px 4px 8px 0;
+            font-size: 0.9rem;
+        }
+
+        .link-btn:hover { background: #1a4a8a; }
+
+        .link-btn.secondary {
+            background: white;
+            color: #0f3460;
+            border: 2px solid #0f3460;
+        }
+
+        .nav-links { display: flex; gap: 12px; margin-bottom: 32px; flex-wrap: wrap; }
+        .nav-links a { padding: 8px 16px; background: white; border-radius: 8px; text-decoration: none; color: #0f3460; font-weight: 600; font-size: 0.9rem; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+        .nav-links a:hover { background: #0f3460; color: white; }
+        .nav-links a.current { background: #0f3460; color: white; }
+
+        .footer {
+            text-align: center;
+            padding: 40px 24px;
+            color: #999;
+            font-size: 0.85rem;
+        }
+
+        /* Try It Now micro-exercise */
+        .try-it {
+            background: #e8f5e9;
+            border: 2px dashed #28a745;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 20px 0;
+        }
+        .try-it .title { font-weight: 700; color: #2e7d32; margin-bottom: 4px; }
+        .try-it p { color: #2e7d32; margin: 0; font-size: 0.95rem; }
+
+        /* Expandable details */
+        details { margin: 12px 0; }
+        details summary { cursor: pointer; font-weight: 600; color: #0f3460; padding: 8px 0; }
+        details summary:hover { text-decoration: underline; }
+
+        /* Day summary box */
+        .day-summary {
+            background: linear-gradient(135deg, #f0e6ff, #e8ecf1);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+        .day-summary h3 { color: #5b21b6; margin-bottom: 12px; }
+
+        /* Rita shortcut */
+        .rita-shortcut {
+            background: #fff8e1;
+            border: 1px solid #ff8f00;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin: 16px 0;
+            font-size: 0.9rem;
+        }
+        .rita-shortcut .title { font-weight: 700; color: #e65100; margin-bottom: 4px; }
+
+        /* Workflow diagram */
+        .workflow-diagram {
+            background: #1a1a2e;
+            color: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 0.9rem;
+            line-height: 1.8;
+            text-align: center;
+        }
+        .workflow-diagram .arrow { color: #e94560; font-weight: bold; }
+        .workflow-diagram .node { background: #0f3460; padding: 4px 12px; border-radius: 6px; display: inline-block; margin: 4px; }
+
+        @media (max-width: 600px) {
+            .credit-grid { grid-template-columns: 1fr; }
+            .nav-diagram { grid-template-columns: 1fr; }
+            .section { padding: 24px 20px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h1>Apollo.io - Обучение</h1>
+    <div class="subtitle">Неделя 2 / День 9: Аналитика, отчётность и интеграция со Smartlead</div>
+    <div class="badge">~ 60 минут</div>
+</div>
+
+<div class="container">
+
+    <!-- Navigation -->
+    <div class="nav-links">
+        <a href="index.html">День 1</a>
+        <a href="day-2.html">День 2</a>
+        <a href="day-3.html">День 3</a>
+        <a href="day-4.html">День 4</a>
+        <a href="day-5.html">День 5</a>
+        <a href="day-6.html">День 6</a>
+        <a href="day-7.html">День 7</a>
+        <a href="day-8.html">День 8</a>
+        <a href="day-9.html" class="current">День 9</a>
+        <a href="day-10.html">День 10</a>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-bar">
+        <span class="label">Прогресс обучения:</span>
+        <div class="progress-track">
+            <div class="progress-fill"></div>
+        </div>
+        <span class="day-label">День 9 из 10</span>
+    </div>
+
+    <!-- TOC -->
+    <div class="toc">
+        <h3>Содержание дня</h3>
+        <ol>
+            <li><a href="#review">Повторение Дня 8</a> <span class="time">5 мин</span></li>
+            <li><a href="#section1">Тур по аналитическим дашбордам Apollo</a> <span class="time">15 мин</span></li>
+            <li><a href="#section2">Ключевые бенчмарки и пороги принятия решений</a> <span class="time">10 мин</span></li>
+            <li><a href="#section3">Feedback loop: Smartlead <-> Apollo</a> <span class="time">20 мин</span></li>
+            <li><a href="#section4">Фреймворк обработки ответов</a> <span class="time">5 мин</span></li>
+        </ol>
+    </div>
+
+    <!-- Quick Review -->
+    <div class="section" id="review">
+        <h2><span class="num">0</span> Повторение: День 8</h2>
+
+        <p>Быстрая проверка. Попробуй ответить сам, потом раскрой ответ.</p>
+
+        <details>
+            <summary>Q1: Назови 2 workflow, которые ты построил, и их триггеры.</summary>
+            <p style="padding: 12px; background:#f8f9fb; border-radius:8px; margin-top:8px; color:#444;">
+                (1) <strong>Job Change Re-Engagement</strong> -- триггер: смена работы (event-based).
+                (2) <strong>High Intent Weekly Routing</strong> -- триггер: расписание (понедельник 9:00).
+            </p>
+        </details>
+
+        <details>
+            <summary>Q2: Назови 5 фаз Signal Operating Model.</summary>
+            <p style="padding: 12px; background:#f8f9fb; border-radius:8px; margin-top:8px; color:#444;">
+                (1) Signal Discovery (настройка). (2) Signal Scoring (еженедельно, автоматически). (3) Signal Routing (через workflow). (4) Signal Execution (в тот же день). (5) Signal Optimization (ежемесячно).
+            </p>
+        </details>
+
+        <details>
+            <summary>Q3: У workflow нет фильтров входа. Почему это опасно?</summary>
+            <p style="padding: 12px; background:#f8f9fb; border-radius:8px; margin-top:8px; color:#444;">
+                Workflow применяется ко ВСЕМ записям в твоей базе Apollo, не только к целевым контактам. Это может засорить списки нерелевантными контактами, потратить кредиты и создать шум, который трудно чистить.
+            </p>
+        </details>
+    </div>
+
+    <!-- Section 1: Analytics Dashboard Tour -->
+    <div class="section" id="section1">
+        <h2><span class="num">1</span> Тур по аналитическим дашбордам Apollo</h2>
+
+        <p>На дашборде аналитики много графиков и цифр. Тебе НЕ нужно понимать все. Фокусируйся на этих 5 метриках -- они скажут, работает твой outbound или сломан.</p>
+
+        <h3>5 метрик, которые важнее всего:</h3>
+
+        <table>
+            <tr>
+                <th>Метрика</th>
+                <th>Что говорит</th>
+                <th>Где искать</th>
+                <th>Здоровый диапазон</th>
+            </tr>
+            <tr>
+                <td><strong>Open Rate</strong></td>
+                <td>Видят ли проспекты твои email?</td>
+                <td>Email Analytics (в <strong>Engage</strong>)</td>
+                <td>40-60%</td>
+            </tr>
+            <tr>
+                <td><strong>Reply Rate</strong></td>
+                <td>Вовлекаются ли проспекты?</td>
+                <td>Sequence Reports (в <strong>Engage</strong>)</td>
+                <td>5-10%</td>
+            </tr>
+            <tr>
+                <td><strong>Bounce Rate</strong></td>
+                <td>Качество данных в порядке?</td>
+                <td>Email Analytics</td>
+                <td>&lt;2%</td>
+            </tr>
+            <tr>
+                <td><strong>Pipeline Value</strong></td>
+                <td>Сколько дохода в воронке?</td>
+                <td>Deal Reports</td>
+                <td>Растет из месяца в месяц</td>
+            </tr>
+            <tr>
+                <td><strong>Credit Usage</strong></td>
+                <td>Уложишься ли ты в лимит за месяц?</td>
+                <td><strong>Settings</strong> > <strong>Billing</strong></td>
+                <td>&lt;80% к середине месяца</td>
+            </tr>
+        </table>
+
+        <h3>Диагностическая блок-схема (когда что-то не так):</h3>
+
+        <div class="workflow-diagram" style="text-align: left; padding: 20px 24px;">
+            <span style="color: #e94560;">Low open rate (&lt;20%)</span><br>
+            &nbsp;&nbsp;--> Исправь тему письма (subject line)<br><br>
+            <span style="color: #e94560;">Open rate OK, но low reply rate (&lt;4%)</span><br>
+            &nbsp;&nbsp;--> Исправь тело письма или CTA<br><br>
+            <span style="color: #e94560;">Reply rate OK, но нет встреч</span><br>
+            &nbsp;&nbsp;--> Исправь follow-up или квалификацию<br><br>
+            <span style="color: #e94560;">High bounce rate (&gt;5%)</span><br>
+            &nbsp;&nbsp;--> СРОЧНО исправь качество списков (аудит данных)<br><br>
+            <span style="color: #e94560;">Кредиты тают быстро</span><br>
+            &nbsp;&nbsp;--> Проверь фильтры workflows, сократи ненужное обогащение
+        </div>
+
+        <h3>Доступные дашборды в Apollo:</h3>
+
+        <table>
+            <tr>
+                <th>Дашборд</th>
+                <th>Что показывает</th>
+                <th>Когда проверять</th>
+            </tr>
+            <tr>
+                <td><strong>Email Analytics</strong></td>
+                <td>Open rate, click rate, reply rate, bounce rate</td>
+                <td>Еженедельно</td>
+            </tr>
+            <tr>
+                <td><strong>Sequence Reports</strong></td>
+                <td>Воронка: delivered > opened > replied > interested</td>
+                <td>После каждого цикла кампании</td>
+            </tr>
+            <tr>
+                <td><strong>Deal Reports</strong></td>
+                <td>Pipeline по стадиям, прогресс сделок, win/loss</td>
+                <td>Еженедельно</td>
+            </tr>
+            <tr>
+                <td><strong>Goals</strong></td>
+                <td>Результат vs. цели</td>
+                <td>Ежемесячно</td>
+            </tr>
+        </table>
+
+        <div class="info">
+            <div class="title">Навигация к Analytics</div>
+            <p><strong>Analytics</strong> находится в разделе <strong>Engage</strong> (не как отдельный пункт в левом меню). Открой <strong>Engage</strong>, потом ищи <strong>Analytics</strong> внутри. Там же находятся Sequence Reports и Email Analytics.</p>
+        </div>
+
+        <h3>Тур по дашбордам -- пошагово:</h3>
+
+        <ol class="steps">
+            <li>Открой раздел <strong>Engage</strong> в левом меню, найди <strong>Analytics</strong></li>
+            <li>Посмотри <strong>Email Analytics</strong> -- ищи: open rate, reply rate, bounce rate</li>
+            <li>Посмотри <strong>Sequence Reports</strong> (в <strong>Engage</strong> > <strong>Sequences</strong> > Analytics) -- ищи воронку: delivered > opened > replied > interested</li>
+            <li>Открой <strong>Deals</strong> > посмотри отчеты/аналитику -- ищи: pipeline value, сделки по стадиям, прогресс</li>
+            <li>Проверь <strong>Settings</strong> > <strong>Billing</strong> -- использование кредитов</li>
+        </ol>
+
+        <div class="tip">
+            <div class="title">AI-отчеты</div>
+            <p>В Apollo есть функция <strong>AI reporting</strong>, которая позволяет задавать вопросы на обычном языке, типа "What's my average reply rate this month?" Ищи иконку AI-ассистента в разделе Analytics.</p>
+        </div>
+
+        <p>Если дашборды выглядят пустыми -- это потому что ты еще не запускал реальные кампании. После первой недели Smartlead-кампании здесь начнут появляться данные. Пока просто запомни, ГДЕ что смотреть.</p>
+
+        <div class="try-it">
+            <div class="title">Попробуй сейчас: Знакомство с дашбордами (5 мин)</div>
+            <p>
+                Пройди по каждой области аналитики. Для каждой запиши 1 метрику, которую будешь отслеживать после запуска кампаний:
+            </p>
+        </div>
+
+        <table>
+            <tr>
+                <th>Дашборд</th>
+                <th>Какую метрику буду отслеживать</th>
+                <th>Почему важна</th>
+            </tr>
+            <tr>
+                <td>Email Analytics</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Sequence Reports</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Deal Reports</td>
+                <td></td>
+                <td></td>
+            </tr>
+            <tr>
+                <td>Credit Usage (Billing)</td>
+                <td></td>
+                <td></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- Section 2: Key Benchmarks -->
+    <div class="section" id="section2">
+        <h2><span class="num">2</span> Ключевые бенчмарки и пороги решений</h2>
+
+        <h3>Бенчмарки холодного email (данные 2025-2026):</h3>
+
+        <table>
+            <tr>
+                <th>Метрика</th>
+                <th>Средний</th>
+                <th>Хороший</th>
+                <th>Топ</th>
+                <th>ТВОЯ цель</th>
+            </tr>
+            <tr>
+                <td><strong>Open Rate</strong></td>
+                <td>25-44% (зависит от метода измерения)</td>
+                <td>40%+</td>
+                <td>50%+</td>
+                <td><strong>40%+</strong></td>
+            </tr>
+            <tr>
+                <td><strong>Reply Rate</strong></td>
+                <td>3-5%</td>
+                <td>5-10%</td>
+                <td>10%+</td>
+                <td><strong>5%+</strong></td>
+            </tr>
+            <tr>
+                <td><strong>Click Rate</strong></td>
+                <td>2%</td>
+                <td>2%+</td>
+                <td>4%+</td>
+                <td><strong>2%+</strong></td>
+            </tr>
+            <tr>
+                <td><strong>Bounce Rate</strong></td>
+                <td>&lt;5%</td>
+                <td>&lt;2%</td>
+                <td>&lt;1%</td>
+                <td><strong>&lt;2%</strong></td>
+            </tr>
+            <tr>
+                <td><strong>Meeting Booking</strong></td>
+                <td>~1%</td>
+                <td>1-3%</td>
+                <td>3%+</td>
+                <td><strong>1%+</strong></td>
+            </tr>
+        </table>
+
+        <div class="warning">
+            <div class="title">Про Open Rate</div>
+            <p>Open rate все менее надежен из-за <strong>Apple Mail Privacy Protection</strong>, которая искусственно завышает показатели. Ориентируйся на <strong>reply rate как главную метрику</strong> вовлеченности. Если reply rate хороший (5%+), не переживай из-за open rate.</p>
+        </div>
+
+        <div class="info">
+            <div class="title">Бенчмарки reply rate подробнее</div>
+            <p>Средний: <strong>3-5%</strong>. Хороший: <strong>5-10%</strong>. Топ: <strong>10%+</strong>. Элитные кампании с signal-based targeting: <strong>15-25%</strong>.</p>
+        </div>
+
+        <h3>Пороги решений -- что чинить и когда:</h3>
+
+        <table>
+            <tr>
+                <th>Проблема</th>
+                <th>Порог</th>
+                <th>Что исправить</th>
+                <th>Приоритет</th>
+            </tr>
+            <tr>
+                <td>Low open rate</td>
+                <td>&lt;20%</td>
+                <td>Смени тему письма</td>
+                <td><strong>СРОЧНО</strong> -- email не видят</td>
+            </tr>
+            <tr>
+                <td>Low reply rate</td>
+                <td>&lt;4%</td>
+                <td>Смени тело письма / CTA</td>
+                <td><strong>ВЫСОКИЙ</strong> -- видят, но не вовлекаются</td>
+            </tr>
+            <tr>
+                <td>Low interest rate</td>
+                <td>&lt;1%</td>
+                <td>Пересмотри весь подход</td>
+                <td><strong>КРИТИЧНО</strong> -- проблема с messaging</td>
+            </tr>
+            <tr>
+                <td>High bounce rate</td>
+                <td>&gt;5%</td>
+                <td>Исправь качество списков</td>
+                <td><strong>EMERGENCY</strong> -- репутация под угрозой</td>
+            </tr>
+            <tr>
+                <td>High unsubscribe rate</td>
+                <td>&gt;1%</td>
+                <td>Пересмотри таргетинг</td>
+                <td><strong>СРОЧНО</strong> -- не тех людей достаешь</td>
+            </tr>
+        </table>
+
+        <h3>Контекст для SMB (ОАЭ):</h3>
+        <ul style="padding-left: 20px; margin-bottom: 16px; color: #444;">
+            <li>Цикл продажи: <strong>1-3 месяца</strong> (быстрее, чем enterprise)</li>
+            <li>Decision makers: <strong>1-3 человека</strong> (часто просто владелец)</li>
+            <li>Размер сделки: <strong>5,000-50,000 AED/месяц</strong></li>
+            <li>Целевой email response rate: <strong>5-15%</strong> для хорошо таргетированных SMB в ОАЭ</li>
+        </ul>
+
+        <h3>Мультиканальные бенчмарки:</h3>
+
+        <table>
+            <tr>
+                <th>Микс каналов</th>
+                <th>Meeting Booked Rate (от ответов)</th>
+            </tr>
+            <tr>
+                <td>Только email</td>
+                <td>46%</td>
+            </tr>
+            <tr>
+                <td>Email + LinkedIn</td>
+                <td>60% (+14 пунктов)</td>
+            </tr>
+            <tr>
+                <td>Email + LinkedIn + Звонки</td>
+                <td>70% (+24 пункта)</td>
+            </tr>
+        </table>
+
+        <p><strong>Мультиканальный подход в 3.5 раза эффективнее, чем только email.</strong> Вот почему Tier 2 sequence включает LinkedIn connection рядом с email.</p>
+
+        <div class="warning">
+            <div class="title">Первые кампании будут ниже среднего</div>
+            <p>Это бенчмарки опытных команд. Твоя первая кампания скорее всего покажет цифры ниже, пока ты оптимизируешь. Это ожидаемо. Фреймворк выше говорит ЧТО чинить и в каком порядке. Не паникуй -- итерируй.</p>
+        </div>
+
+        <div class="try-it">
+            <div class="title">Попробуй сейчас: Создай трекер кампаний (5 мин)</div>
+            <p>
+                Создай Google Sheets таблицу (или напиши на бумаге) с колонками:<br>
+                Campaign Name | Vertical | Start Date | Total Sent | Open Rate | Reply Rate | Bounce Rate | Meetings Booked | Deals Created | Notes<br><br>
+                Это твой <strong>Campaign Performance Tracker</strong>. Заполняй одну строку на кампанию, раз в неделю.
+            </p>
+        </div>
+
+        <div class="rita-shortcut">
+            <div class="title">Rita Shortcut</div>
+            Проверяй эту таблицу каждый понедельник. Это занимает 5 минут и сразу показывает, работает ли твой outbound.
+        </div>
+    </div>
+
+    <!-- Section 3: Smartlead <-> Apollo Feedback Loop -->
+    <div class="section" id="section3">
+        <h2><span class="num">3</span> Feedback loop: Smartlead <-> Apollo</h2>
+
+        <h3>Проблема без feedback loop:</h3>
+
+        <p>Apollo хранит контакты и CRM. Smartlead хранит данные о вовлеченности (кто открыл, ответил, отписался). Без связи между ними ты летишь вслепую -- не знаешь, какие контакты в Apollo горячие, а какие мертвые. Feedback loop решает это.</p>
+
+        <h3>Утренняя понедельничная рутина (30 минут):</h3>
+
+        <div style="background: #f0e6ff; border: 2px solid #7c3aed; border-radius: 12px; padding: 24px; margin: 20px 0;">
+            <h3 style="color: #5b21b6; margin-top: 0;">Фаза 1 -- В Smartlead (10 мин):</h3>
+            <ol style="padding-left: 20px; color: #444;">
+                <li>Открой каждую активную кампанию</li>
+                <li>Экспортируй результаты: ответы, bounces, отписки</li>
+                <li>Категоризируй каждый ответ:
+                    <br><strong>Positive:</strong> "Sounds interesting, tell me more" --> HOT LEAD
+                    <br><strong>Negative:</strong> "Not interested" --> Отметь и двигайся дальше
+                    <br><strong>OOO:</strong> "I'm out until March 15" --> Запиши дату возврата
+                    <br><strong>Wrong person:</strong> "I'm not the right contact" --> Попроси referral
+                    <br><strong>Angry:</strong> "Stop emailing me" --> Добавь в Do Not Contact
+                </li>
+                <li>Запиши, какие кампании/вертикали показали лучший результат</li>
+            </ol>
+
+            <h3 style="color: #5b21b6; margin-top: 20px;">Фаза 2 -- В Apollo (15 мин):</h3>
+
+            <table style="margin-top: 8px;">
+                <tr>
+                    <th>Результат в Smartlead</th>
+                    <th>Стадия в Apollo</th>
+                    <th>Действие в Apollo</th>
+                </tr>
+                <tr>
+                    <td>Positive reply</td>
+                    <td>"Replied" > "Interested"</td>
+                    <td>Создать deal + задачу</td>
+                </tr>
+                <tr>
+                    <td>Negative reply</td>
+                    <td>"Not Interested"</td>
+                    <td>Залогировать заметку с причиной</td>
+                </tr>
+                <tr>
+                    <td>Bounce</td>
+                    <td>"Bad Data"</td>
+                    <td>Убрать из будущих списков</td>
+                </tr>
+                <tr>
+                    <td>Unsubscribe</td>
+                    <td>"Do Not Contact"</td>
+                    <td>Заблокировать весь outreach</td>
+                </tr>
+                <tr>
+                    <td>OOO</td>
+                    <td>(без изменений)</td>
+                    <td>Записать дату возврата, создать follow-up задачу</td>
+                </tr>
+            </table>
+
+            <ol style="padding-left: 20px; color: #444; margin-top: 12px;" start="2">
+                <li>Залогируй заметки на контактах, которые ответили (вставь что они написали + sentiment)</li>
+                <li>Создай сделки для позитивных ответов (с оценкой стоимости)</li>
+                <li>Создай follow-up задачи (конкретное действие + дедлайн)</li>
+                <li>Убери bounce-контакты из всех активных списков</li>
+            </ol>
+
+            <h3 style="color: #5b21b6; margin-top: 20px;">Фаза 3 -- Проверка аналитики (5 мин):</h3>
+            <ol style="padding-left: 20px; color: #444;">
+                <li>Pipeline: сделки продвигаются? Есть зависшие >7 дней?</li>
+                <li>Кредиты: уложимся в месячный лимит?</li>
+                <li><strong>Enrich</strong> > <strong>Data Health Center</strong>: новые смены работы? Пропавшие email?</li>
+                <li>Workflow outputs: выдали ли workflows job change и intent какие-то результаты?</li>
+            </ol>
+        </div>
+
+        <h3>Правила email-инфраструктуры:</h3>
+
+        <table>
+            <tr>
+                <th>Правило</th>
+                <th>Требование</th>
+                <th>Почему</th>
+            </tr>
+            <tr>
+                <td>Домен отправки</td>
+                <td>Отдельный от основного бизнес-домена</td>
+                <td>Один удар по доставляемости убьет ВСЮ деловую почту</td>
+            </tr>
+            <tr>
+                <td>SPF/DKIM/DMARC</td>
+                <td>Все три настроены на доменах отправки</td>
+                <td>Google/Outlook ТРЕБУЮТ с 2024-2025</td>
+            </tr>
+            <tr>
+                <td>Инбоксы на домен</td>
+                <td>3-5</td>
+                <td>Распределить объем по инбоксам</td>
+            </tr>
+            <tr>
+                <td>Email/инбокс/день</td>
+                <td>30-50 макс.</td>
+                <td>Защитить репутацию отправителя</td>
+            </tr>
+            <tr>
+                <td>Прогрев</td>
+                <td>2+ недели до запуска кампаний</td>
+                <td>Постепенно выстроить репутацию домена</td>
+            </tr>
+            <tr>
+                <td>Прогрев после запуска</td>
+                <td>Продолжать warmup параллельно с реальными рассылками</td>
+                <td>Поддерживать репутацию домена</td>
+            </tr>
+            <tr>
+                <td>Complaint rate</td>
+                <td>&lt;0.1% ВСЕГДА</td>
+                <td>Жесткий порог Google</td>
+            </tr>
+        </table>
+
+        <div class="warning">
+            <div class="title">НИКОГДА не используй основной домен для холодного outreach!</div>
+            <p>Повторим: твой основной бизнес-домен (тот, с которого пишут клиенты) <strong>НИКОГДА</strong> не должен использоваться для холодного outreach. Если холодные email вызовут жалобы на спам, это ударит по КАЖДОМУ письму с этого домена -- включая счета, переписку с клиентами и коммерческие предложения. Используй отдельные домены, купленные специально для outbound.</p>
+        </div>
+
+        <div class="try-it">
+            <div class="title">Попробуй сейчас: Напиши свою понедельничную рутину (8 мин)</div>
+            <p>
+                Задокументируй свою понедельничную рутину как чек-лист, который ты будешь реально использовать:
+            </p>
+        </div>
+
+        <h3>Мой понедельничный чек-лист (30 мин):</h3>
+
+        <h3 style="font-size: 1rem;">Фаза 1: Smartlead (10 мин)</h3>
+        <ul class="checklist">
+            <li><span class="check"></span> Открыть каждую активную кампанию</li>
+            <li><span class="check"></span> Экспортировать и категоризировать ответы: positive / negative / OOO / wrong person / angry</li>
+            <li><span class="check"></span> Лучшая кампания + вертикаль: ___________</li>
+            <li><span class="check"></span> Худшая кампания: ___________</li>
+        </ul>
+
+        <h3 style="font-size: 1rem;">Фаза 2: Apollo (15 мин)</h3>
+        <ul class="checklist">
+            <li><span class="check"></span> Обновить стадии контактов по всем ответам</li>
+            <li><span class="check"></span> Залогировать заметки по позитивным ответам (что написали)</li>
+            <li><span class="check"></span> Создать сделки для позитивных ответов</li>
+            <li><span class="check"></span> Создать follow-up задачи для всех новых сделок</li>
+            <li><span class="check"></span> Удалить bounce-контакты из активных списков</li>
+        </ul>
+
+        <h3 style="font-size: 1rem;">Фаза 3: Аналитика (5 мин)</h3>
+        <ul class="checklist">
+            <li><span class="check"></span> Зависшие сделки (>7 дней в одной стадии)? --> Создать nudge-задачу</li>
+            <li><span class="check"></span> Использование кредитов в норме? --> Если >80%, замедлить обогащение</li>
+            <li><span class="check"></span> Data Health Center: смены работы, пропавшие email?</li>
+            <li><span class="check"></span> Результаты workflows? --> Обработать авто-созданные списки</li>
+        </ul>
+
+        <p><strong>Критерий успеха:</strong> Этот чек-лист записан там, где ты реально увидишь его каждый понедельник (распечатан, закладка, или повторяющееся событие в календаре).</p>
+    </div>
+
+    <!-- Section 4: Reply Handling Framework -->
+    <div class="section" id="section4">
+        <h2><span class="num">4</span> Фреймворк обработки ответов</h2>
+
+        <h3>Как обрабатывать каждый тип ответа:</h3>
+
+        <table>
+            <tr>
+                <th>Тип ответа</th>
+                <th>Немедленное действие</th>
+                <th>Тон</th>
+                <th>Пример ответа</th>
+            </tr>
+            <tr>
+                <td><strong>Positive</strong></td>
+                <td>Ответь за 2 часа. Предложи конкретное время встречи. Держи momentum.</td>
+                <td>Энтузиазм + профессионализм</td>
+                <td>"Great to hear! Would Tuesday 10am or Thursday 2pm work for a 15-min call?"</td>
+            </tr>
+            <tr>
+                <td><strong>Negative / Objection</strong></td>
+                <td>Покажи эмпатию. Не контр-питчи. Брось quick insight. Оставь дверь открытой.</td>
+                <td>Уважительный, без давления</td>
+                <td>"Totally understand. If things change, happy to reconnect. By the way, [quick insight]."</td>
+            </tr>
+            <tr>
+                <td><strong>Angry</strong></td>
+                <td>Оставайся профессионалом. Поблагодари за честность. Извлеки урок.</td>
+                <td>Спокойный, краткий</td>
+                <td>"Thank you for your candid feedback. We'll remove you from future messages."</td>
+            </tr>
+            <tr>
+                <td><strong>OOO</strong></td>
+                <td>Запиши дату возврата. Создай задачу на follow-up после возвращения.</td>
+                <td>--</td>
+                <td>(Не отвечай -- жди, пока вернется)</td>
+            </tr>
+            <tr>
+                <td><strong>Wrong person</strong></td>
+                <td>Попроси рекомендацию вежливо.</td>
+                <td>Благодарный</td>
+                <td>"Thanks for letting me know! Any chance you could point me to the right person?"</td>
+            </tr>
+        </table>
+
+        <div class="tip">
+            <div class="title">Тегируй каждый ответ в Apollo</div>
+            <p>Используй кастомное поле: Reply Type = positive / negative / OOO / objection / angry / wrong person. Эти данные помогут оптимизировать таргетинг и messaging со временем.</p>
+        </div>
+
+        <div class="try-it">
+            <div class="title">Попробуй сейчас: Практика обработки ответов (2 мин)</div>
+            <p>
+                <strong>Сценарий:</strong> Владелец салона красоты отвечает: "I tried Facebook ads two years ago and lost 3,000 AED. Not interested."<br><br>
+                Напиши свой ответ (2-3 предложения, используя фреймворк выше):<br>
+                _____________________________________________________<br><br>
+                <strong>Ожидаемый подход:</strong> Покажи эмпатию ("Totally understand -- bad ad experiences are frustrating"), не спорь ("We're different" звучит оборонительно), брось quick insight ("A lot has changed since then -- targeting has gotten much more precise"), оставь дверь открытой ("If you're ever curious, happy to share -- no pressure").
+            </p>
+        </div>
+    </div>
+
+    <!-- Practice Exercise -->
+    <div class="section">
+        <h2>Практика: Собери свою систему трекинга (5 мин)</h2>
+
+        <p>Проверь, что у тебя есть все 3 компонента системы:</p>
+
+        <ul class="checklist">
+            <li><span class="check"></span> <strong>Campaign Performance Tracker</strong> (таблица из раздела 2) -- создан?</li>
+            <li><span class="check"></span> <strong>Monday Morning Routine</strong> (чек-лист из раздела 3) -- записан?</li>
+            <li><span class="check"></span> <strong>Reply Handling Framework</strong> (из раздела 4) -- усвоен?</li>
+        </ul>
+
+        <p>Если чего-то нет -- создай сейчас. Это твои операционные инструменты для ведения outbound кампаний.</p>
+    </div>
+
+    <!-- Day Summary -->
+    <div class="day-summary">
+        <h3>Итоги Дня 9</h3>
+        <ol style="padding-left: 20px; color: #444;">
+            <li><strong>Фокусируйся на 5 ключевых метриках:</strong> open rate, reply rate, bounce rate, pipeline value, credit usage.</li>
+            <li><strong>Пороги решений:</strong> &lt;20% open --> тема; &lt;4% reply --> тело/CTA; &gt;5% bounce --> качество списков.</li>
+            <li><strong>Понедельничный feedback loop (30 мин)</strong> держит pipeline здоровым и данные чистыми.</li>
+            <li><strong>Smartlead отправляет, Apollo трекает</strong> -- feedback loop связывает их.</li>
+            <li><strong>Обработка ответов:</strong> positive = двигайся быстро; negative = эмпатия + дверь открыта; angry = профессионально + учись.</li>
+        </ol>
+    </div>
+
+    <!-- Checklist -->
+    <div class="section">
+        <h3>Чек-лист -- Теперь я умею:</h3>
+        <ul class="checklist">
+            <li><span class="check"></span> Найти в Apollo аналитические дашборды и 5 ключевых метрик</li>
+            <li><span class="check"></span> Применять пороги решений для диагностики проблем кампаний</li>
+            <li><span class="check"></span> Выполнять понедельничную рутину (Smartlead > Apollo > Аналитика)</li>
+            <li><span class="check"></span> Обрабатывать разные типы ответов по структурированному фреймворку</li>
+            <li><span class="check"></span> Объяснить требования к email-инфраструктуре (отдельный домен, SPF/DKIM/DMARC, warmup)</li>
+        </ul>
+    </div>
+
+    <!-- Quiz -->
+    <div class="section">
+        <div class="quiz">
+            <div class="title">Квиз Дня 9 (4 вопроса)</div>
+            <ol>
+                <li><strong>У твоей кампании open rate 15% и reply rate 6%. Что исправить первым?</strong>
+                    <br>a) Reply rate -- 6% ниже цели
+                    <br>b) Open rate -- 15% ниже порога 20%
+                    <br>c) Оба в норме
+                    <br>d) Увеличить объем отправки для компенсации
+                </li>
+                <li><strong>Какие 3 фазы понедельничной утренней рутины?</strong></li>
+                <li><strong>Какие 3 вещи ОБЯЗАТЕЛЬНО настроить на домене отправки до холодного outreach?</strong></li>
+                <li><strong>Проспект отвечает злобно: "Remove me from your list immediately!" Какие 3 действия?</strong></li>
+            </ol>
+        </div>
+
+        <details>
+            <summary>Показать ответы</summary>
+            <div style="padding: 16px; background:#f8f9fb; border-radius:8px; margin-top:8px; color:#444;">
+                <p><strong>Q1:</strong> b) Исправь тему письма первой. 15% open rate -- ниже критического порога 20%. Большинство проспектов даже НЕ ВИДЯТ твое письмо. Reply rate 6% среди тех, кто открывает -- на самом деле неплохой, но общий охват слишком мал. Исправь тему > больше открытий > больше ответов в сумме.</p>
+                <p><strong>Q2:</strong> (1) Smartlead: экспорт результатов, категоризация ответов. (2) Apollo: обновление стадий, логирование заметок, создание сделок + задач, удаление bounces. (3) Аналитика: проверка pipeline, кредитов, data health, результатов workflows.</p>
+                <p><strong>Q3:</strong> SPF, DKIM и DMARC записи. Эти протоколы аутентификации email обязательны для Google и Outlook с 2024-2025. Без них твои письма будут заблокированы или попадут в спам.</p>
+                <p><strong>Q4:</strong> (1) Ответь профессионально и кратко: "Thank you for your feedback. We've removed you from all future messages." (2) В Apollo: обнови стадию на "Do Not Contact." (3) В Smartlead: отпиши от всех кампаний. Плюс: каждый злой ответ -- это данные о таргетинге или messaging. Проанализируй, что пошло не так.</p>
+            </div>
+        </details>
+    </div>
+
+    <!-- Next day preview -->
+    <div class="section" style="border-left: 4px solid #0f3460;">
+        <h3>Завтра: День 10 -- Капстоун: Финальный тест</h3>
+        <p>Выполнишь ПОЛНЫЙ рабочий цикл агентства от обнаружения сигнала до управления pipeline, пройдешь тест готовности и получишь ресурсы для дальнейшего обучения. Последний день -- покажи все, чему научился!</p>
+    </div>
+
+</div>
+
+<div class="footer">
+    <p>SF Agency - Внутреннее обучение Apollo.io</p>
+    <p>Создано: Март 2026</p>
+</div>
+
+</body>
+</html>
