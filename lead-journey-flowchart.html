@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lead Journey — Multi-Channel Outbound Flowchart</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,300;0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg: #FFFFFF;
+    --surface: #F7F8FA;
+    --surface-2: #F0F1F4;
+    --border: #E0E2E8;
+    --border-light: #D0D3DB;
+    --text: #1A1A1A;
+    --text-muted: #4A4E5A;
+    --text-dim: #7A7E8A;
+
+    /* Channel colors */
+    --li-orange: #C97A1E;
+    --li-orange-dim: rgba(201, 122, 30, 0.08);
+    --li-orange-border: rgba(201, 122, 30, 0.20);
+    --email-blue: #3B6FD4;
+    --email-blue-dim: rgba(59, 111, 212, 0.08);
+    --email-blue-border: rgba(59, 111, 212, 0.20);
+    --green: #22994D;
+    --green-dim: rgba(34, 153, 77, 0.07);
+    --green-border: rgba(34, 153, 77, 0.18);
+    --red: #D94444;
+    --red-dim: rgba(217, 68, 68, 0.07);
+    --red-border: rgba(217, 68, 68, 0.18);
+    --gray: #6B7280;
+    --gray-dim: rgba(107, 114, 128, 0.06);
+    --purple: #7C5CC4;
+    --purple-dim: rgba(124, 92, 196, 0.07);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Exo 2', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Header */
+  .header {
+    padding: 48px 48px 32px;
+    border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background:
+      radial-gradient(ellipse 600px 300px at 20% 50%, var(--li-orange-dim), transparent),
+      radial-gradient(ellipse 600px 300px at 80% 50%, var(--email-blue-dim), transparent);
+    pointer-events: none;
+  }
+
+  .header-content {
+    position: relative;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+
+  .header h1 {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 42px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+  }
+
+  .header .subtitle {
+    font-size: 15px;
+    color: var(--text-muted);
+    font-weight: 400;
+  }
+
+  .legend {
+    display: flex;
+    gap: 24px;
+    margin-top: 24px;
+    flex-wrap: wrap;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  .legend-dot.li { background: var(--li-orange); }
+  .legend-dot.email { background: var(--email-blue); }
+  .legend-dot.win { background: var(--green); }
+  .legend-dot.dead { background: var(--red); }
+  .legend-dot.wait { background: var(--gray); }
+  .legend-dot.rule { background: var(--purple); }
+
+  /* Core rule banner */
+  .core-rule {
+    max-width: 1400px;
+    margin: 24px auto 0;
+    padding: 16px 24px;
+    background: var(--purple-dim);
+    border: 1px solid rgba(167, 139, 250, 0.2);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+  }
+
+  .core-rule .icon {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .core-rule strong {
+    color: var(--purple);
+  }
+
+  /* Main content */
+  .main {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 32px 48px 64px;
+  }
+
+  /* Timeline */
+  .timeline {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  /* Connector line */
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 139px;
+    top: 40px;
+    bottom: 40px;
+    width: 2px;
+    background: linear-gradient(
+      to bottom,
+      var(--li-orange) 0%,
+      var(--li-orange) 25%,
+      var(--border-light) 25%,
+      var(--border-light) 35%,
+      var(--email-blue) 35%,
+      var(--email-blue) 75%,
+      var(--border-light) 75%,
+      var(--border-light) 100%
+    );
+    opacity: 0.4;
+  }
+
+  /* Phase label */
+  .phase {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin: 32px 0 16px;
+    padding-left: 170px;
+  }
+
+  .phase:first-child { margin-top: 0; }
+
+  .phase-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 5px 14px;
+    border-radius: 6px;
+  }
+
+  .phase-label.li-phase {
+    background: var(--li-orange-dim);
+    color: var(--li-orange);
+    border: 1px solid var(--li-orange-border);
+  }
+
+  .phase-label.email-phase {
+    background: var(--email-blue-dim);
+    color: var(--email-blue);
+    border: 1px solid var(--email-blue-border);
+  }
+
+  .phase-label.review-phase {
+    background: var(--green-dim);
+    color: var(--green);
+    border: 1px solid var(--green-border);
+  }
+
+  .phase-line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Step row */
+  .step {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 0;
+    min-height: 80px;
+    position: relative;
+  }
+
+  /* Day label */
+  .day-col {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding-right: 24px;
+    padding-top: 20px;
+    position: relative;
+  }
+
+  .day-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text-muted);
+  }
+
+  .day-label {
+    font-size: 11px;
+    color: var(--text-dim);
+    margin-top: 2px;
+  }
+
+  /* Node dot on timeline */
+  .day-col::after {
+    content: '';
+    position: absolute;
+    right: -5px;
+    top: 24px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--surface);
+    border: 2px solid var(--border-light);
+    z-index: 2;
+  }
+
+  .step.li-step .day-col::after { border-color: var(--li-orange); background: var(--li-orange); }
+  .step.email-step .day-col::after { border-color: var(--email-blue); background: var(--email-blue); }
+  .step.check-step .day-col::after { border-color: var(--purple); background: var(--purple); }
+  .step.wait-step .day-col::after { border-color: var(--gray); background: var(--gray); opacity: 0.5; }
+
+  /* Action content */
+  .action-col {
+    padding: 12px 0 12px 24px;
+    border-left: none;
+  }
+
+  .action-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    position: relative;
+    transition: border-color 0.2s;
+  }
+
+  .action-card:hover {
+    border-color: var(--border-light);
+  }
+
+  .action-card.li-card { border-left: 3px solid var(--li-orange); }
+  .action-card.email-card { border-left: 3px solid var(--email-blue); }
+  .action-card.check-card { border-left: 3px solid var(--purple); }
+  .action-card.wait-card { border-left: 3px solid var(--gray); opacity: 0.7; }
+
+  .action-title {
+    font-weight: 600;
+    font-size: 15px;
+    margin-bottom: 4px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .action-title .channel-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .channel-tag.li {
+    background: var(--li-orange-dim);
+    color: var(--li-orange);
+  }
+
+  .channel-tag.email {
+    background: var(--email-blue-dim);
+    color: var(--email-blue);
+  }
+
+  .channel-tag.auto {
+    background: var(--gray-dim);
+    color: var(--gray);
+    font-size: 9px;
+  }
+
+  .action-desc {
+    font-size: 13px;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  /* Branches */
+  .branches {
+    margin-top: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .branch {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 13px;
+    line-height: 1.4;
+  }
+
+  .branch.win {
+    background: var(--green-dim);
+    border: 1px solid var(--green-border);
+    color: var(--green);
+  }
+
+  .branch.dead {
+    background: var(--red-dim);
+    border: 1px solid var(--red-border);
+    color: var(--red);
+  }
+
+  .branch.continue {
+    background: var(--gray-dim);
+    border: 1px solid rgba(107, 114, 128, 0.15);
+    color: var(--text-muted);
+  }
+
+  .branch.action-needed {
+    background: var(--li-orange-dim);
+    border: 1px solid var(--li-orange-border);
+    color: var(--li-orange);
+  }
+
+  .branch.email-action {
+    background: var(--email-blue-dim);
+    border: 1px solid var(--email-blue-border);
+    color: var(--email-blue);
+  }
+
+  .branch-icon {
+    flex-shrink: 0;
+    font-size: 14px;
+    margin-top: 1px;
+  }
+
+  .branch-text {
+    flex: 1;
+  }
+
+  .branch-text strong {
+    color: inherit;
+    font-weight: 600;
+  }
+
+  .branch-text .consequence {
+    display: block;
+    font-size: 12px;
+    opacity: 0.8;
+    margin-top: 2px;
+  }
+
+  /* Decision diamond */
+  .decision-box {
+    margin-top: 14px;
+    background: var(--surface-2);
+    border: 1px dashed var(--border-light);
+    border-radius: 10px;
+    padding: 14px 16px;
+  }
+
+  .decision-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--purple);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .decision-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .decision-grid.three-col {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  /* Daily checklist section */
+  .checklist-section {
+    margin-top: 48px;
+    padding-top: 40px;
+    border-top: 1px solid var(--border);
+  }
+
+  .checklist-title {
+    font-family: 'Exo 2', sans-serif;
+    font-size: 28px;
+    font-weight: 400;
+    margin-bottom: 8px;
+  }
+
+  .checklist-subtitle {
+    font-size: 14px;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+  }
+
+  .checklist-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .checklist-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 20px;
+  }
+
+  .checklist-card h3 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .checklist-card h3 .time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text-dim);
+    font-weight: 400;
+  }
+
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 8px 0;
+    font-size: 13px;
+    color: var(--text-muted);
+    border-bottom: 1px solid rgba(42, 45, 58, 0.5);
+  }
+
+  .check-item:last-child { border-bottom: none; }
+
+  .check-box {
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid var(--border-light);
+    border-radius: 4px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Quick ref table */
+  .quick-ref {
+    margin-top: 32px;
+  }
+
+  .ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+
+  .ref-table th {
+    text-align: left;
+    padding: 10px 16px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .ref-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  .ref-table tr:hover td {
+    background: var(--surface);
+  }
+
+  .ref-table .scenario {
+    color: var(--text);
+    font-weight: 500;
+  }
+
+  .ref-table .action-cell {
+    font-weight: 500;
+  }
+
+  .ref-table .action-cell.stay-email { color: var(--email-blue); }
+  .ref-table .action-cell.stay-li { color: var(--li-orange); }
+  .ref-table .action-cell.dead-cell { color: var(--red); }
+  .ref-table .action-cell.win-cell { color: var(--green); }
+
+  /* Print styles */
+  @media print {
+    body { background: #fff; color: #1a1a1a; }
+    .header { border-bottom-color: #ddd; }
+    .header::before { display: none; }
+    .action-card { border-color: #ddd; background: #fafafa; }
+    .branch { border-color: #ddd; }
+    .main { padding: 16px; }
+  }
+
+  @media (max-width: 768px) {
+    .header { padding: 24px; }
+    .main { padding: 16px 24px; }
+    .step { grid-template-columns: 80px 1fr; }
+    .timeline::before { left: 79px; }
+    .checklist-grid { grid-template-columns: 1fr; }
+    .decision-grid { grid-template-columns: 1fr; }
+    .legend { gap: 12px; }
+    .header h1 { font-size: 28px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-content">
+    <h1>Lead Journey: Multi-Channel Outbound</h1>
+    <div class="subtitle">LinkedIn + Email Sync System — Daily Reference for Rita</div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot li"></div> LinkedIn (manual)</div>
+      <div class="legend-item"><div class="legend-dot email"></div> Email (SmartLead auto)</div>
+      <div class="legend-item"><div class="legend-dot win"></div> Reply / Win</div>
+      <div class="legend-item"><div class="legend-dot dead"></div> Dead end</div>
+      <div class="legend-item"><div class="legend-dot wait"></div> Wait / Pending</div>
+      <div class="legend-item"><div class="legend-dot rule"></div> Decision point</div>
+    </div>
+    <div class="core-rule">
+      <span class="icon">&#9670;</span>
+      <span><strong>First Reply Wins</strong> — whichever channel gets a reply first becomes THE channel. Stop all activity on the other. Never run parallel conversations.</span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN FLOWCHART -->
+<div class="main">
+  <div class="timeline">
+
+    <!-- ═══════════ PHASE 1: LINKEDIN PRE-WARM ═══════════ -->
+    <div class="phase">
+      <span class="phase-label li-phase">Phase 1 &mdash; LinkedIn Pre-Warm</span>
+      <div class="phase-line"></div>
+    </div>
+
+    <!-- DAY 0 -->
+    <div class="step li-step">
+      <div class="day-col">
+        <span class="day-num">Day 0</span>
+      </div>
+      <div class="action-col">
+        <div class="action-card li-card">
+          <div class="action-title">
+            <span class="channel-tag li">LinkedIn</span>
+            View their profile
+          </div>
+          <div class="action-desc">
+            Visit the lead's LinkedIn profile. They get a notification that someone viewed them. Creates name recognition before any outreach.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAY 1 -->
+    <div class="step li-step">
+      <div class="day-col">
+        <span class="day-num">Day 1</span>
+      </div>
+      <div class="action-col">
+        <div class="action-card li-card">
+          <div class="action-title">
+            <span class="channel-tag li">LinkedIn</span>
+            Send connection request
+          </div>
+          <div class="action-desc">
+            Short, no-pitch note: <em>"Hi [Name], I work with [industry] companies in UAE — would love to connect."</em><br>
+            <strong>Batch: 25 contacts/day</strong> &rarr; 250 contacts = 10 days to send all.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAY 2-10 -->
+    <div class="step wait-step">
+      <div class="day-col">
+        <span class="day-num">Day 2–10</span>
+        <span class="day-label">wait</span>
+      </div>
+      <div class="action-col">
+        <div class="action-card wait-card">
+          <div class="action-title">
+            <span class="channel-tag auto">Passive</span>
+            Continue sending batches + wait for accepts
+          </div>
+          <div class="action-desc">
+            Each day: send next batch of 25 connection requests.<br>
+            Meanwhile, earlier batches start getting accepted/declined. Update Sheet daily.
+          </div>
+          <div class="branches">
+            <div class="branch continue">
+              <span class="branch-icon">&#9202;</span>
+              <span class="branch-text">
+                <strong>No action needed yet</strong> — just track accepts in the Sheet (LI Status = accepted / pending)
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ PHASE 2: EMAIL SEQUENCE ═══════════ -->
+    <div class="phase">
+      <span class="phase-label email-phase">Phase 2 &mdash; Email Sequence (SmartLead)</span>
+      <div class="phase-line"></div>
+    </div>
+
+    <!-- DAY 11 — EMAIL 1 -->
+    <div class="step email-step">
+      <div class="day-col">
+        <span class="day-num">Day 11</span>
+      </div>
+      <div class="action-col">
+        <div class="action-card email-card">
+          <div class="action-title">
+            <span class="channel-tag email">Email</span>
+            <span class="channel-tag auto">Auto</span>
+            Email 1 — Opening email
+          </div>
+          <div class="action-desc">
+            SmartLead sends Email 1 to <strong>ALL 250 contacts</strong>.<br>
+            LI accept/decline does NOT matter — everyone gets the email.
+          </div>
+          <div class="decision-box">
+            <div class="decision-title">&#9670; Check after 24–48h</div>
+            <div class="decision-grid">
+              <div class="branch win">
+                <span class="branch-icon">&#10004;</span>
+                <span class="branch-text">
+                  <strong>Email replied</strong>
+                  <span class="consequence">&rarr; STOP LinkedIn for this lead. Reply in email. Mark "replied" in Sheet.</span>
+                </span>
+              </div>
+              <div class="branch dead">
+                <span class="branch-icon">&#10008;</span>
+                <span class="branch-text">
+                  <strong>Email bounced</strong>
+                  <span class="consequence">&rarr; Jump to Bounce Recovery (see below)</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAY 14 — EMAIL 2 -->
+    <div class="step email-step">
+      <div class="day-col">
+        <span class="day-num">Day 14</span>
+      </div>
+      <div class="action-col">
+        <div class="action-card email-card">
+          <div class="action-title">
+            <span class="channel-tag email">Email</span>
+            <span class="channel-tag auto">Auto</span>
+            Email 2 — Follow-up
+          </div>
+          <div class="action-desc">
+            SmartLead auto-sends Email 2 to everyone who hasn't replied or bounced.
+          </div>
+          <div class="decision-box">
+            <div class="decision-title">&#9670; Check after 24h</div>
+            <div class="decision-grid">
+              <div class="branch win">
+                <span class="branch-icon">&#10004;</span>
+                <span class="branch-text">
+                  <strong>Email replied</strong>
+                  <span class="consequence">&rarr; STOP LinkedIn. Reply in email only.</span>
+                </span>
+              </div>
+              <div class="branch continue">
+                <span class="branch-icon">&#8594;</span>
+                <span class="branch-text">
+                  <strong>No reply</strong>
+                  <span class="consequence">&rarr; Proceed to Day 15 LinkedIn Nudge check</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ DECISION POINT: LINKEDIN NUDGE ═══════════ -->
+    <div class="phase">
+      <span class="phase-label li-phase">Decision Point &mdash; LinkedIn Nudge</span>
+      <div class="phase-line"></div>
+    </div>
+
+    <!-- DAY 15 — LINKEDIN NUDGE -->
+    <div class="step check-step">
+      <div class="day-col">
+        <span class="day-num">Day 15</span>
+        <span class="day-label">manual</span>
+      </div>
+      <div class="action-col">
+        <div class="action-card check-card">
+          <div class="action-title">
+            <span class="channel-tag li">LinkedIn</span>
+            LinkedIn Nudge — conditional
+          </div>
+          <div class="action-desc">
+            Rita checks the Sheet for leads that are past Email 2 with no reply. For each one:
+          </div>
+          <div class="decision-box">
+            <div class="decision-title">&#9670; Two conditions must BOTH be true</div>
+            <div class="branches" style="gap: 8px;">
+
+              <div class="branch action-needed">
+                <span class="branch-icon">&#10004;</span>
+                <span class="branch-text">
+                  <strong>LI accepted + No email reply</strong>
+                  <span class="consequence">&rarr; Send ONE LinkedIn DM: <em>"Hey [Name], sent you a quick note via email about [topic] — curious if it's on your radar?"</em></span>
+                </span>
+              </div>
+
+              <div class="branch continue">
+                <span class="branch-icon">&#8212;</span>
+                <span class="branch-text">
+                  <strong>LI NOT accepted + No email reply</strong>
+                  <span class="consequence">&rarr; Do nothing. Can't DM someone who didn't accept. Let Email 3 handle it.</span>
+                </span>
+              </div>
+
+              <div class="branch continue">
+                <span class="branch-icon">&#8212;</span>
+                <span class="branch-text">
+                  <strong>LI accepted + Already replied to email</strong>
+                  <span class="consequence">&rarr; Do nothing on LinkedIn. Conversation is already happening in email.</span>
+                </span>
+              </div>
+
+            </div>
+          </div>
+
+          <!-- Sub-branches for nudge outcomes -->
+          <div class="decision-box" style="margin-top: 10px;">
+            <div class="decision-title">&#9670; After sending LinkedIn nudge — wait 48h</div>
+            <div class="decision-grid">
+              <div class="branch win">
+                <span class="branch-icon">&#10004;</span>
+                <span class="branch-text">
+                  <strong>They reply on LinkedIn</strong>
+                  <span class="consequence">&rarr; STAY on LinkedIn. Pause SmartLead sequence for this contact. Mark "replied" in Sheet.</span>
+                </span>
+              </div>
+              <div class="branch email-action">
+                <span class="branch-icon">&#8594;</span>
+                <span class="branch-text">
+                  <strong>They reply to Email (not LI)</strong>
+                  <span class="consequence">&rarr; STAY in email. Stop LinkedIn. They chose their channel.</span>
+                </span>
+              </div>
+              <div class="branch continue">
+                <span class="branch-icon">&#8212;</span>
+                <span class="branch-text">
+                  <strong>No reply anywhere</strong>
+                  <span class="consequence">&rarr; Let Email 3 (breakup) fire on Day 18. No more LinkedIn.</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAY 18 — EMAIL 3 -->
+    <div class="step email-step">
+      <div class="day-col">
+        <span class="day-num">Day 18</span>
+      </div>
+      <div class="action-col">
+        <div class="action-card email-card">
+          <div class="action-title">
+            <span class="channel-tag email">Email</span>
+            <span class="channel-tag auto">Auto</span>
+            Email 3 — Breakup email
+          </div>
+          <div class="action-desc">
+            Final email in the SmartLead sequence. Sent only to leads with no reply to Email 1 or 2.
+          </div>
+          <div class="decision-box">
+            <div class="decision-title">&#9670; Final check after 72h</div>
+            <div class="decision-grid">
+              <div class="branch win">
+                <span class="branch-icon">&#10004;</span>
+                <span class="branch-text">
+                  <strong>They reply</strong>
+                  <span class="consequence">&rarr; Continue in email. This is a warm lead now.</span>
+                </span>
+              </div>
+              <div class="branch dead">
+                <span class="branch-icon">&#10008;</span>
+                <span class="branch-text">
+                  <strong>No reply</strong>
+                  <span class="consequence">&rarr; Archive. Dead lead for now. Revisit in 60–90 days.</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ PHASE 3: RESOLUTION ═══════════ -->
+    <div class="phase">
+      <span class="phase-label review-phase">Phase 3 &mdash; Resolution</span>
+      <div class="phase-line"></div>
+    </div>
+
+    <!-- DAY 21 — FINAL REVIEW -->
+    <div class="step" style="position: relative;">
+      <div class="day-col">
+        <span class="day-num">Day 21</span>
+        <span class="day-label">review</span>
+        <style>.step:last-of-type .day-col::after { border-color: var(--green); background: var(--green); }</style>
+      </div>
+      <div class="action-col">
+        <div class="action-card" style="border-left: 3px solid var(--green);">
+          <div class="action-title">Final Review &amp; Archive</div>
+          <div class="action-desc" style="margin-bottom: 14px;">
+            Every lead ends up in one of these states. Update the Sheet.
+          </div>
+          <div class="branches">
+            <div class="branch win">
+              <span class="branch-icon">&#9733;</span>
+              <span class="branch-text">
+                <strong>Replied (email or LinkedIn)</strong>
+                <span class="consequence">Active conversation &rarr; move to "Engaged" tab. Continue in whichever channel they replied on.</span>
+              </span>
+            </div>
+            <div class="branch win" style="background: rgba(74, 222, 128, 0.06);">
+              <span class="branch-icon">&#9733;</span>
+              <span class="branch-text">
+                <strong>Booked a call</strong>
+                <span class="consequence">Move to "Booked" tab. Prepare for strategy session.</span>
+              </span>
+            </div>
+            <div class="branch dead">
+              <span class="branch-icon">&#128464;</span>
+              <span class="branch-text">
+                <strong>No reply on any channel</strong>
+                <span class="consequence">Archive &rarr; "Dormant" tab. Set reminder to revisit in 60–90 days with a fresh angle.</span>
+              </span>
+            </div>
+            <div class="branch dead" style="background: rgba(248, 113, 113, 0.06);">
+              <span class="branch-icon">&#10008;</span>
+              <span class="branch-text">
+                <strong>Unsubscribed / asked to stop</strong>
+                <span class="consequence">Remove from all lists permanently. Do NOT contact again.</span>
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /timeline -->
+
+  <!-- ═══════════ BOUNCE RECOVERY ═══════════ -->
+  <div class="checklist-section" style="margin-top: 40px;">
+    <div class="checklist-title">Bounce Recovery Path</div>
+    <div class="checklist-subtitle">When Email 1 bounces — what to do based on LinkedIn status</div>
+    <div class="checklist-grid">
+      <div class="checklist-card" style="border-left: 3px solid var(--li-orange);">
+        <h3><span style="color: var(--li-orange);">&#9679;</span> Bounced + LI Accepted</h3>
+        <div class="check-item">
+          <span style="color: var(--li-orange); font-weight: 600;">&#8594;</span>
+          <span>LinkedIn becomes your PRIMARY channel</span>
+        </div>
+        <div class="check-item">
+          <span style="color: var(--li-orange); font-weight: 600;">&#8594;</span>
+          <span>Send LinkedIn DM with your pitch (don't wait for Day 15)</span>
+        </div>
+        <div class="check-item">
+          <span style="color: var(--li-orange); font-weight: 600;">&#8594;</span>
+          <span>Remove from SmartLead sequence (no point sending to bad email)</span>
+        </div>
+        <div class="check-item">
+          <span style="color: var(--li-orange); font-weight: 600;">&#8594;</span>
+          <span>Follow up on LinkedIn at Day 18 if no LI reply</span>
+        </div>
+      </div>
+      <div class="checklist-card" style="border-left: 3px solid var(--red);">
+        <h3><span style="color: var(--red);">&#9679;</span> Bounced + LI NOT Accepted</h3>
+        <div class="check-item">
+          <span style="color: var(--red); font-weight: 600;">&#10008;</span>
+          <span>Dead lead — no way to reach them</span>
+        </div>
+        <div class="check-item">
+          <span style="color: var(--red); font-weight: 600;">&#10008;</span>
+          <span>Remove from SmartLead</span>
+        </div>
+        <div class="check-item">
+          <span style="color: var(--text-dim); font-weight: 600;">&#8230;</span>
+          <span>Optional: try to find alternate email via Apollo/Google</span>
+        </div>
+        <div class="check-item">
+          <span style="color: var(--text-dim); font-weight: 600;">&#8230;</span>
+          <span>If no alt email found &rarr; archive permanently</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════ QUICK REFERENCE TABLE ═══════════ -->
+  <div class="quick-ref">
+    <div class="checklist-title">Quick Reference — "What Do I Do When…"</div>
+    <div class="checklist-subtitle">Print this page. Every scenario Rita will encounter is covered.</div>
+    <table class="ref-table">
+      <thead>
+        <tr>
+          <th>Scenario</th>
+          <th>What happened</th>
+          <th style="width: 200px;">Action</th>
+          <th>Update Sheet</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="scenario">They reply to email</td>
+          <td>Email reply came in on SmartLead</td>
+          <td class="action-cell stay-email">Reply in EMAIL only</td>
+          <td>Mark "replied — email"</td>
+        </tr>
+        <tr>
+          <td class="scenario">They reply to LI nudge</td>
+          <td>LinkedIn DM reply after your nudge</td>
+          <td class="action-cell stay-li">Reply in LINKEDIN only. Pause SmartLead.</td>
+          <td>Mark "replied — linkedin"</td>
+        </tr>
+        <tr>
+          <td class="scenario">They reply to BOTH</td>
+          <td>Got email reply AND LI reply</td>
+          <td class="action-cell stay-email">Pick email (richer thread). Acknowledge on LI: "Got your email, let's continue there!"</td>
+          <td>Mark "replied — email"</td>
+        </tr>
+        <tr>
+          <td class="scenario">LI accepted, no email reply</td>
+          <td>They connected but ignored emails</td>
+          <td class="action-cell stay-li">Send ONE nudge DM after Email 2. Then let Email 3 play.</td>
+          <td>Mark "LI nudge sent"</td>
+        </tr>
+        <tr>
+          <td class="scenario">LI NOT accepted, no email reply</td>
+          <td>Ignored everything</td>
+          <td class="action-cell dead-cell">Let email sequence complete. Archive after Email 3.</td>
+          <td>Mark "no response"</td>
+        </tr>
+        <tr>
+          <td class="scenario">Email bounced, LI accepted</td>
+          <td>Bad email but they're on LinkedIn</td>
+          <td class="action-cell stay-li">LinkedIn is now primary. Send pitch DM immediately.</td>
+          <td>Mark "bounced — LI primary"</td>
+        </tr>
+        <tr>
+          <td class="scenario">Email bounced, LI not accepted</td>
+          <td>Can't reach them anywhere</td>
+          <td class="action-cell dead-cell">Dead lead. Try to find alt email or archive.</td>
+          <td>Mark "dead"</td>
+        </tr>
+        <tr>
+          <td class="scenario">They booked a call</td>
+          <td>Clicked Koalalendar link</td>
+          <td class="action-cell win-cell">Stop ALL outreach. Prepare for call.</td>
+          <td>Move to "Booked" tab</td>
+        </tr>
+        <tr>
+          <td class="scenario">They asked to stop / unsubscribe</td>
+          <td>Negative reply on any channel</td>
+          <td class="action-cell dead-cell">Stop ALL. Remove from SmartLead + Sheet. Never contact again.</td>
+          <td>Mark "unsubscribed"</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- ═══════════ RITA'S DAILY CHECKLIST ═══════════ -->
+  <div class="checklist-section">
+    <div class="checklist-title">Rita's Daily Routine</div>
+    <div class="checklist-subtitle">10 minutes every morning before starting outreach. Same order every day.</div>
+    <div class="checklist-grid">
+      <div class="checklist-card" style="border-top: 3px solid var(--email-blue);">
+        <h3>1. Check SmartLead <span class="time">~3 min</span></h3>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <span>Open SmartLead &rarr; check for new replies</span>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <span>For each reply: update Sheet &rarr; Email Status = "replied"</span>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <span>Check for bounces &rarr; mark "bounced" in Sheet</span>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <span>Reply to warm leads in SmartLead (don't touch them on LI)</span>
+        </div>
+      </div>
+      <div class="checklist-card" style="border-top: 3px solid var(--li-orange);">
+        <h3>2. Check LinkedIn <span class="time">~3 min</span></h3>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <span>Check for new connection accepts &rarr; update LI Status in Sheet</span>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <span>Check for DM replies &rarr; update Sheet, pause SmartLead for those contacts</span>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <span>Reply to LI conversations (don't start email for them)</span>
+        </div>
+      </div>
+      <div class="checklist-card" style="border-top: 3px solid var(--purple);">
+        <h3>3. Sync Decisions <span class="time">~2 min</span></h3>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <span>Filter Sheet: LI Accepted = yes + Email Status = no reply + past Email 2</span>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <span>Send LinkedIn nudge DMs to those contacts (max 1 nudge per contact ever)</span>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <span>Filter: Email bounced + LI Accepted &rarr; send pitch DM on LinkedIn</span>
+        </div>
+      </div>
+      <div class="checklist-card" style="border-top: 3px solid var(--green);">
+        <h3>4. New Outreach <span class="time">~2 min</span></h3>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <span>Send today's batch of 25 LI connection requests (if still in Phase 1)</span>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <span>Log which batch was sent today in Sheet</span>
+        </div>
+        <div class="check-item">
+          <div class="check-box"></div>
+          <span>SmartLead handles email sending automatically — no manual action needed</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+</body>
+</html>
